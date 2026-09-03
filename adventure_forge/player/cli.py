@@ -6,7 +6,7 @@ Enforces:
 - I8: Observation budget with clean pagination for large action sets.
 """
 import sys
-from typing import Optional, List
+from typing import Optional, List, Tuple
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.state import GameState
 from adventure_forge.core.engine import AdventureEngine

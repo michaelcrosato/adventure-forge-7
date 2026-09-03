@@ -5,7 +5,7 @@ Performs BFS/DFS exploration of the world graph to prove:
 - No accidental dead-end traps without programmed exits.
 - No crashes during state exploration.
 """
-from typing import Set, List, Dict, Tuple
+from typing import Set, List, Dict, Tuple, Any
 from collections import deque
 from adventure_forge.core.state import GameState
 from adventure_forge.core.character import CharacterSheet
