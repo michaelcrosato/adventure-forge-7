@@ -1,0 +1,2385 @@
+"""Province: The Scorchwaste.
+Unique Mechanic: Ambient Heat & Hydration Survival.
+"""
+from adventure_forge.content.schema import RegionManifest, SceneNode, DynamicDescription
+from adventure_forge.core.actions import Action
+
+def build_scorchwaste_province() -> RegionManifest:
+    scenes = {}
+
+    # Province Hub
+    scenes["scorchwaste_hub"] = SceneNode(
+        id="scorchwaste_hub",
+        title="The Scorchwaste - Central Hub",
+        region="scorchwaste",
+        description="Red sandstone cliffs frame the desert gateway. Caravan camels drink at the stone trough.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"min_attribute": {"attribute": "strength", "value": 12}},
+                text="Your military posture draws respectful nods from travelers."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_hub_scout", label="Scout hub", category="interaction", result_text="You survey the bustling provincial crossroads."),
+            Action(id="scorchwaste_hub_rest", label="Rest at inn", category="interaction", effects=[{"modify_stamina": 5}], result_text="You rest and regain stamina."),
+            Action(id="scorchwaste_to_bazaar", label="Go to Bazaar", category="movement", target_scene="bazaar_center", result_text="You travel along the highway to the Grand Bazaar."),
+        ]
+    )
+
+    # POI: The Ashen Gate (10 nodes)
+    scenes["scorchwaste_ashen_gate_gate"] = SceneNode(
+        id="scorchwaste_ashen_gate_gate",
+        title="The Ashen Gate - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_ashen_gate_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_ashen_gate_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_courtyard"] = SceneNode(
+        id="scorchwaste_ashen_gate_courtyard",
+        title="The Ashen Gate - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_ashen_gate_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_ashen_gate_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_quarters"] = SceneNode(
+        id="scorchwaste_ashen_gate_quarters",
+        title="The Ashen Gate - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_ashen_gate_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_ashen_gate_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_armory"] = SceneNode(
+        id="scorchwaste_ashen_gate_armory",
+        title="The Ashen Gate - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_ashen_gate_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_ashen_gate_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_cellar"] = SceneNode(
+        id="scorchwaste_ashen_gate_cellar",
+        title="The Ashen Gate - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_ashen_gate_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_ashen_gate_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_passage"] = SceneNode(
+        id="scorchwaste_ashen_gate_passage",
+        title="The Ashen Gate - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_ashen_gate_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_ashen_gate_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_chamber"] = SceneNode(
+        id="scorchwaste_ashen_gate_chamber",
+        title="The Ashen Gate - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_ashen_gate_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_ashen_gate_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_overlook"] = SceneNode(
+        id="scorchwaste_ashen_gate_overlook",
+        title="The Ashen Gate - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_ashen_gate_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_ashen_gate_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_sanctum"] = SceneNode(
+        id="scorchwaste_ashen_gate_sanctum",
+        title="The Ashen Gate - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_ashen_gate_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_ashen_gate_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_ashen_gate_vault"] = SceneNode(
+        id="scorchwaste_ashen_gate_vault",
+        title="The Ashen Gate - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Carved stone monoliths guard the sun-bleached pass.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_ashen_gate_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_ashen_gate_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_ashen_gate_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_ashen_gate_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_ashen_gate", label="Visit The Ashen Ga", category="movement", target_scene="scorchwaste_ashen_gate_gate", result_text="You travel to The Ashen Gate.")
+    )
+
+    # POI: Nomad Tent Camp (10 nodes)
+    scenes["scorchwaste_mirage_camp_gate"] = SceneNode(
+        id="scorchwaste_mirage_camp_gate",
+        title="Nomad Tent Camp - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_mirage_camp_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_mirage_camp_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_courtyard"] = SceneNode(
+        id="scorchwaste_mirage_camp_courtyard",
+        title="Nomad Tent Camp - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_mirage_camp_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_mirage_camp_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_quarters"] = SceneNode(
+        id="scorchwaste_mirage_camp_quarters",
+        title="Nomad Tent Camp - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_mirage_camp_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_mirage_camp_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_armory"] = SceneNode(
+        id="scorchwaste_mirage_camp_armory",
+        title="Nomad Tent Camp - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_mirage_camp_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_mirage_camp_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_cellar"] = SceneNode(
+        id="scorchwaste_mirage_camp_cellar",
+        title="Nomad Tent Camp - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_mirage_camp_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_mirage_camp_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_passage"] = SceneNode(
+        id="scorchwaste_mirage_camp_passage",
+        title="Nomad Tent Camp - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_mirage_camp_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_mirage_camp_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_chamber"] = SceneNode(
+        id="scorchwaste_mirage_camp_chamber",
+        title="Nomad Tent Camp - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_mirage_camp_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_mirage_camp_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_overlook"] = SceneNode(
+        id="scorchwaste_mirage_camp_overlook",
+        title="Nomad Tent Camp - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_mirage_camp_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_mirage_camp_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_sanctum"] = SceneNode(
+        id="scorchwaste_mirage_camp_sanctum",
+        title="Nomad Tent Camp - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_mirage_camp_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_mirage_camp_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_mirage_camp_vault"] = SceneNode(
+        id="scorchwaste_mirage_camp_vault",
+        title="Nomad Tent Camp - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Woven wool awnings cast deep crimson shade.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_mirage_camp_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_mirage_camp_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_mirage_camp_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_mirage_camp_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_mirage_camp", label="Visit Nomad Tent C", category="movement", target_scene="scorchwaste_mirage_camp_gate", result_text="You travel to Nomad Tent Camp.")
+    )
+
+    # POI: Sandswept Crypt (10 nodes)
+    scenes["scorchwaste_buried_tomb_gate"] = SceneNode(
+        id="scorchwaste_buried_tomb_gate",
+        title="Sandswept Crypt - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_buried_tomb_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_buried_tomb_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_courtyard"] = SceneNode(
+        id="scorchwaste_buried_tomb_courtyard",
+        title="Sandswept Crypt - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_buried_tomb_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_buried_tomb_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_quarters"] = SceneNode(
+        id="scorchwaste_buried_tomb_quarters",
+        title="Sandswept Crypt - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_buried_tomb_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_buried_tomb_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_armory"] = SceneNode(
+        id="scorchwaste_buried_tomb_armory",
+        title="Sandswept Crypt - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_buried_tomb_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_buried_tomb_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_cellar"] = SceneNode(
+        id="scorchwaste_buried_tomb_cellar",
+        title="Sandswept Crypt - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_buried_tomb_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_buried_tomb_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_passage"] = SceneNode(
+        id="scorchwaste_buried_tomb_passage",
+        title="Sandswept Crypt - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_buried_tomb_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_buried_tomb_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_chamber"] = SceneNode(
+        id="scorchwaste_buried_tomb_chamber",
+        title="Sandswept Crypt - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_buried_tomb_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_buried_tomb_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_overlook"] = SceneNode(
+        id="scorchwaste_buried_tomb_overlook",
+        title="Sandswept Crypt - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_buried_tomb_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_buried_tomb_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_sanctum"] = SceneNode(
+        id="scorchwaste_buried_tomb_sanctum",
+        title="Sandswept Crypt - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_buried_tomb_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_buried_tomb_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_buried_tomb_vault"] = SceneNode(
+        id="scorchwaste_buried_tomb_vault",
+        title="Sandswept Crypt - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Wind blows red sand across carved obsidian doors.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_buried_tomb_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_buried_tomb_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_buried_tomb_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_buried_tomb_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_buried_tomb", label="Visit Sandswept Cr", category="movement", target_scene="scorchwaste_buried_tomb_gate", result_text="You travel to Sandswept Crypt.")
+    )
+
+    # POI: Obsidian Basin (10 nodes)
+    scenes["scorchwaste_crater_mine_gate"] = SceneNode(
+        id="scorchwaste_crater_mine_gate",
+        title="Obsidian Basin - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_crater_mine_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_crater_mine_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_courtyard"] = SceneNode(
+        id="scorchwaste_crater_mine_courtyard",
+        title="Obsidian Basin - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_crater_mine_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_crater_mine_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_quarters"] = SceneNode(
+        id="scorchwaste_crater_mine_quarters",
+        title="Obsidian Basin - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_crater_mine_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_crater_mine_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_armory"] = SceneNode(
+        id="scorchwaste_crater_mine_armory",
+        title="Obsidian Basin - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_crater_mine_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_crater_mine_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_cellar"] = SceneNode(
+        id="scorchwaste_crater_mine_cellar",
+        title="Obsidian Basin - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_crater_mine_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_crater_mine_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_passage"] = SceneNode(
+        id="scorchwaste_crater_mine_passage",
+        title="Obsidian Basin - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_crater_mine_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_crater_mine_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_chamber"] = SceneNode(
+        id="scorchwaste_crater_mine_chamber",
+        title="Obsidian Basin - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_crater_mine_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_crater_mine_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_overlook"] = SceneNode(
+        id="scorchwaste_crater_mine_overlook",
+        title="Obsidian Basin - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_crater_mine_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_crater_mine_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_sanctum"] = SceneNode(
+        id="scorchwaste_crater_mine_sanctum",
+        title="Obsidian Basin - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_crater_mine_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_crater_mine_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_crater_mine_vault"] = SceneNode(
+        id="scorchwaste_crater_mine_vault",
+        title="Obsidian Basin - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Volcanic glass sparkles under the desert sun.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_crater_mine_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_crater_mine_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_crater_mine_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_crater_mine_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_crater_mine", label="Visit Obsidian Bas", category="movement", target_scene="scorchwaste_crater_mine_gate", result_text="You travel to Obsidian Basin.")
+    )
+
+    # POI: White Salt Flats (10 nodes)
+    scenes["scorchwaste_salt_pan_gate"] = SceneNode(
+        id="scorchwaste_salt_pan_gate",
+        title="White Salt Flats - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_salt_pan_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_salt_pan_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_courtyard"] = SceneNode(
+        id="scorchwaste_salt_pan_courtyard",
+        title="White Salt Flats - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_salt_pan_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_salt_pan_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_quarters"] = SceneNode(
+        id="scorchwaste_salt_pan_quarters",
+        title="White Salt Flats - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_salt_pan_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_salt_pan_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_armory"] = SceneNode(
+        id="scorchwaste_salt_pan_armory",
+        title="White Salt Flats - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_salt_pan_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_salt_pan_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_cellar"] = SceneNode(
+        id="scorchwaste_salt_pan_cellar",
+        title="White Salt Flats - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_salt_pan_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_salt_pan_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_passage"] = SceneNode(
+        id="scorchwaste_salt_pan_passage",
+        title="White Salt Flats - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_salt_pan_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_salt_pan_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_chamber"] = SceneNode(
+        id="scorchwaste_salt_pan_chamber",
+        title="White Salt Flats - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_salt_pan_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_salt_pan_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_overlook"] = SceneNode(
+        id="scorchwaste_salt_pan_overlook",
+        title="White Salt Flats - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_salt_pan_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_salt_pan_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_sanctum"] = SceneNode(
+        id="scorchwaste_salt_pan_sanctum",
+        title="White Salt Flats - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_salt_pan_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_salt_pan_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_salt_pan_vault"] = SceneNode(
+        id="scorchwaste_salt_pan_vault",
+        title="White Salt Flats - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Blinding white crust stretches to the horizon.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_salt_pan_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_salt_pan_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_salt_pan_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_salt_pan_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_salt_pan", label="Visit White Salt F", category="movement", target_scene="scorchwaste_salt_pan_gate", result_text="You travel to White Salt Flats.")
+    )
+
+    # POI: Solar Altar (10 nodes)
+    scenes["scorchwaste_sun_shrine_gate"] = SceneNode(
+        id="scorchwaste_sun_shrine_gate",
+        title="Solar Altar - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_sun_shrine_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_sun_shrine_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_courtyard"] = SceneNode(
+        id="scorchwaste_sun_shrine_courtyard",
+        title="Solar Altar - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_sun_shrine_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_sun_shrine_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_quarters"] = SceneNode(
+        id="scorchwaste_sun_shrine_quarters",
+        title="Solar Altar - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_sun_shrine_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_sun_shrine_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_armory"] = SceneNode(
+        id="scorchwaste_sun_shrine_armory",
+        title="Solar Altar - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_sun_shrine_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_sun_shrine_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_cellar"] = SceneNode(
+        id="scorchwaste_sun_shrine_cellar",
+        title="Solar Altar - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_sun_shrine_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_sun_shrine_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_passage"] = SceneNode(
+        id="scorchwaste_sun_shrine_passage",
+        title="Solar Altar - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_sun_shrine_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_sun_shrine_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_chamber"] = SceneNode(
+        id="scorchwaste_sun_shrine_chamber",
+        title="Solar Altar - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_sun_shrine_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_sun_shrine_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_overlook"] = SceneNode(
+        id="scorchwaste_sun_shrine_overlook",
+        title="Solar Altar - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_sun_shrine_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_sun_shrine_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_sanctum"] = SceneNode(
+        id="scorchwaste_sun_shrine_sanctum",
+        title="Solar Altar - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_sun_shrine_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_sun_shrine_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_sun_shrine_vault"] = SceneNode(
+        id="scorchwaste_sun_shrine_vault",
+        title="Solar Altar - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. A golden disk reflects blinding desert light.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_sun_shrine_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_sun_shrine_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_sun_shrine_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_sun_shrine_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_sun_shrine", label="Visit Solar Altar", category="movement", target_scene="scorchwaste_sun_shrine_gate", result_text="You travel to Solar Altar.")
+    )
+
+    # POI: Hidden Spring Oasis (10 nodes)
+    scenes["scorchwaste_canyon_oasis_gate"] = SceneNode(
+        id="scorchwaste_canyon_oasis_gate",
+        title="Hidden Spring Oasis - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_canyon_oasis_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_canyon_oasis_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_courtyard"] = SceneNode(
+        id="scorchwaste_canyon_oasis_courtyard",
+        title="Hidden Spring Oasis - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_canyon_oasis_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_canyon_oasis_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_quarters"] = SceneNode(
+        id="scorchwaste_canyon_oasis_quarters",
+        title="Hidden Spring Oasis - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_canyon_oasis_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_canyon_oasis_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_armory"] = SceneNode(
+        id="scorchwaste_canyon_oasis_armory",
+        title="Hidden Spring Oasis - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_canyon_oasis_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_canyon_oasis_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_cellar"] = SceneNode(
+        id="scorchwaste_canyon_oasis_cellar",
+        title="Hidden Spring Oasis - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_canyon_oasis_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_canyon_oasis_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_passage"] = SceneNode(
+        id="scorchwaste_canyon_oasis_passage",
+        title="Hidden Spring Oasis - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_canyon_oasis_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_canyon_oasis_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_chamber"] = SceneNode(
+        id="scorchwaste_canyon_oasis_chamber",
+        title="Hidden Spring Oasis - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_canyon_oasis_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_canyon_oasis_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_overlook"] = SceneNode(
+        id="scorchwaste_canyon_oasis_overlook",
+        title="Hidden Spring Oasis - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_canyon_oasis_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_canyon_oasis_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_sanctum"] = SceneNode(
+        id="scorchwaste_canyon_oasis_sanctum",
+        title="Hidden Spring Oasis - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_canyon_oasis_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_canyon_oasis_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_canyon_oasis_vault"] = SceneNode(
+        id="scorchwaste_canyon_oasis_vault",
+        title="Hidden Spring Oasis - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Date palms shelter a deep pool of fresh water.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_canyon_oasis_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_canyon_oasis_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_canyon_oasis_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_canyon_oasis_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_canyon_oasis", label="Visit Hidden Sprin", category="movement", target_scene="scorchwaste_canyon_oasis_gate", result_text="You travel to Hidden Spring Oasis.")
+    )
+
+    # POI: Sand Skiff Wreck (10 nodes)
+    scenes["scorchwaste_skiff_graveyard_gate"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_gate",
+        title="Sand Skiff Wreck - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_skiff_graveyard_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_skiff_graveyard_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_courtyard"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_courtyard",
+        title="Sand Skiff Wreck - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_skiff_graveyard_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_skiff_graveyard_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_quarters"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_quarters",
+        title="Sand Skiff Wreck - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_skiff_graveyard_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_skiff_graveyard_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_armory"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_armory",
+        title="Sand Skiff Wreck - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_skiff_graveyard_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_skiff_graveyard_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_cellar"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_cellar",
+        title="Sand Skiff Wreck - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_skiff_graveyard_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_skiff_graveyard_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_passage"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_passage",
+        title="Sand Skiff Wreck - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_skiff_graveyard_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_skiff_graveyard_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_chamber"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_chamber",
+        title="Sand Skiff Wreck - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_skiff_graveyard_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_skiff_graveyard_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_overlook"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_overlook",
+        title="Sand Skiff Wreck - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_skiff_graveyard_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_skiff_graveyard_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_sanctum"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_sanctum",
+        title="Sand Skiff Wreck - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_skiff_graveyard_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_skiff_graveyard_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_skiff_graveyard_vault"] = SceneNode(
+        id="scorchwaste_skiff_graveyard_vault",
+        title="Sand Skiff Wreck - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Bleached wooden hulls lie half-buried in sand.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_skiff_graveyard_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_skiff_graveyard_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_skiff_graveyard_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_skiff_graveyard_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_skiff_graveyard", label="Visit Sand Skiff W", category="movement", target_scene="scorchwaste_skiff_graveyard_gate", result_text="You travel to Sand Skiff Wreck.")
+    )
+
+    # POI: Razor Dune Ridge (10 nodes)
+    scenes["scorchwaste_dune_ridge_gate"] = SceneNode(
+        id="scorchwaste_dune_ridge_gate",
+        title="Razor Dune Ridge - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_dune_ridge_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_dune_ridge_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_courtyard"] = SceneNode(
+        id="scorchwaste_dune_ridge_courtyard",
+        title="Razor Dune Ridge - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_dune_ridge_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_dune_ridge_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_quarters"] = SceneNode(
+        id="scorchwaste_dune_ridge_quarters",
+        title="Razor Dune Ridge - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_dune_ridge_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_dune_ridge_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_armory"] = SceneNode(
+        id="scorchwaste_dune_ridge_armory",
+        title="Razor Dune Ridge - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_dune_ridge_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_dune_ridge_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_cellar"] = SceneNode(
+        id="scorchwaste_dune_ridge_cellar",
+        title="Razor Dune Ridge - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_dune_ridge_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_dune_ridge_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_passage"] = SceneNode(
+        id="scorchwaste_dune_ridge_passage",
+        title="Razor Dune Ridge - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_dune_ridge_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_dune_ridge_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_chamber"] = SceneNode(
+        id="scorchwaste_dune_ridge_chamber",
+        title="Razor Dune Ridge - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_dune_ridge_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_dune_ridge_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_overlook"] = SceneNode(
+        id="scorchwaste_dune_ridge_overlook",
+        title="Razor Dune Ridge - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_dune_ridge_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_dune_ridge_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_sanctum"] = SceneNode(
+        id="scorchwaste_dune_ridge_sanctum",
+        title="Razor Dune Ridge - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_dune_ridge_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_dune_ridge_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_dune_ridge_vault"] = SceneNode(
+        id="scorchwaste_dune_ridge_vault",
+        title="Razor Dune Ridge - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. Shifting sand dunes ripple under hot desert wind.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_dune_ridge_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_dune_ridge_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_dune_ridge_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_dune_ridge_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_dune_ridge", label="Visit Razor Dune R", category="movement", target_scene="scorchwaste_dune_ridge_gate", result_text="You travel to Razor Dune Ridge.")
+    )
+
+    # POI: Nomad Deep Well (10 nodes)
+    scenes["scorchwaste_nomad_well_gate"] = SceneNode(
+        id="scorchwaste_nomad_well_gate",
+        title="Nomad Deep Well - Outer Gate",
+        region="scorchwaste",
+        description="Iron bars secure the heavy timber entrance. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
+            Action(id="scorchwaste_nomad_well_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_nomad_well_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_courtyard", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_courtyard"] = SceneNode(
+        id="scorchwaste_nomad_well_courtyard",
+        title="Nomad Deep Well - Main Courtyard",
+        region="scorchwaste",
+        description="Cobblestones show heavy cart wheel wear. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
+            Action(id="scorchwaste_nomad_well_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_nomad_well_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_gate", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_quarters", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_quarters"] = SceneNode(
+        id="scorchwaste_nomad_well_quarters",
+        title="Nomad Deep Well - Living Quarters",
+        region="scorchwaste",
+        description="Rows of wooden bunks line the walls. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
+            Action(id="scorchwaste_nomad_well_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_nomad_well_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_courtyard", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_armory", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_armory"] = SceneNode(
+        id="scorchwaste_nomad_well_armory",
+        title="Nomad Deep Well - Supply Depot",
+        region="scorchwaste",
+        description="Crates of rations and tools stand stacked. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
+            Action(id="scorchwaste_nomad_well_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_nomad_well_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_quarters", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_cellar", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_cellar"] = SceneNode(
+        id="scorchwaste_nomad_well_cellar",
+        title="Nomad Deep Well - Lower Cellar",
+        region="scorchwaste",
+        description="Damp air smells of cool earth and storage. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
+            Action(id="scorchwaste_nomad_well_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_nomad_well_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_armory", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_passage", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_passage"] = SceneNode(
+        id="scorchwaste_nomad_well_passage",
+        title="Nomad Deep Well - Stone Corridor",
+        region="scorchwaste",
+        description="Wall sconces hold flickering tallow candles. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
+            Action(id="scorchwaste_nomad_well_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_nomad_well_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_cellar", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_chamber", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_chamber"] = SceneNode(
+        id="scorchwaste_nomad_well_chamber",
+        title="Nomad Deep Well - Inner Chamber",
+        region="scorchwaste",
+        description="A sturdy oak desk holds ledgers and maps. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
+            Action(id="scorchwaste_nomad_well_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_nomad_well_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_passage", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_overlook", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_overlook"] = SceneNode(
+        id="scorchwaste_nomad_well_overlook",
+        title="Nomad Deep Well - High Overlook",
+        region="scorchwaste",
+        description="A stone ledge provides a clear view. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
+            Action(id="scorchwaste_nomad_well_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_nomad_well_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_chamber", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_sanctum", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_sanctum"] = SceneNode(
+        id="scorchwaste_nomad_well_sanctum",
+        title="Nomad Deep Well - Inner Sanctum",
+        region="scorchwaste",
+        description="A stone altar stands in quiet reverence. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
+            Action(id="scorchwaste_nomad_well_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_nomad_well_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_overlook", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_vault", result_text="You press on to the next area."),
+        ]
+    )
+
+    scenes["scorchwaste_nomad_well_vault"] = SceneNode(
+        id="scorchwaste_nomad_well_vault",
+        title="Nomad Deep Well - Deep Vault",
+        region="scorchwaste",
+        description="Iron-banded chests sit in deep shadows. A bronze bucket hangs on a hemp rope.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes track motion in the dark."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You note tactical cover and exit routes."
+            ),
+        ],
+        base_actions=[
+            Action(id="scorchwaste_nomad_well_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
+            Action(id="scorchwaste_nomad_well_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_nomad_well_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_sanctum", result_text="You retrace your steps."),
+            Action(id="scorchwaste_nomad_well_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
+        ]
+    )
+
+    scenes["scorchwaste_hub"].base_actions.append(
+        Action(id="scorchwaste_hub_to_nomad_well", label="Visit Nomad Deep W", category="movement", target_scene="scorchwaste_nomad_well_gate", result_text="You travel to Nomad Deep Well.")
+    )
+
+    return RegionManifest(
+        id="scorchwaste",
+        name="The Scorchwaste",
+        mechanic_name="Ambient Heat & Hydration Survival",
+        mechanic_description="Comprehensive open-world region with 10 deep POIs.",
+        scenes=scenes
+    )

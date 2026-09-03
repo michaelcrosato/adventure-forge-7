@@ -54,6 +54,46 @@ def build_stress_market_region() -> RegionManifest:
         result_text="You take the wet steps down to the underground grotto.",
         risk="low"
     ))
+    stress_actions.append(Action(
+        id="travel_to_reach_hub",
+        label="Travel Reach",
+        category="movement",
+        target_scene="reach_hub",
+        result_text="You embark on the mountain highway toward the Reach.",
+        risk="low"
+    ))
+    stress_actions.append(Action(
+        id="travel_to_lowlands_hub",
+        label="Travel Lowlands",
+        category="movement",
+        target_scene="lowlands_hub",
+        result_text="You board a river barge down to the Lowlands hub.",
+        risk="low"
+    ))
+    stress_actions.append(Action(
+        id="travel_to_scorch_hub",
+        label="Travel Scorchwaste",
+        category="movement",
+        target_scene="scorchwaste_hub",
+        result_text="You join a desert caravan heading for the Scorchwaste hub.",
+        risk="medium"
+    ))
+    stress_actions.append(Action(
+        id="travel_to_court_hub",
+        label="Travel High Crown",
+        category="movement",
+        target_scene="high_court_hub",
+        result_text="You take the royal highway to the High Crown citadel.",
+        risk="low"
+    ))
+    stress_actions.append(Action(
+        id="travel_to_abyss_hub",
+        label="Travel Abyss",
+        category="movement",
+        target_scene="sunken_hollows_hub",
+        result_text="You take the deep elevator down to the Sunken Abyss.",
+        risk="low"
+    ))
 
     # 2. 30 Distinct Merchant Stalls
     merchants = [

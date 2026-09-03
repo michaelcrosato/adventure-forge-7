@@ -56,7 +56,7 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
     visited_scenes.add(initial_state.current_scene)
     visited_state_hashes.add(initial_state.fingerprint())
 
-    max_steps = 1000
+    max_steps = 10000
     steps_taken = 0
 
     while queue and steps_taken < max_steps:
@@ -64,9 +64,10 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
         steps_taken += 1
 
         obs = engine.observe(state)
+
         for act in obs.legal_actions:
             act_id = act["id"]
-            # Skip infinite barter loops in stress market during crawl
+            # Skip infinite barter loops in stress market during reachability crawl
             if act_id.startswith("barter_") or act_id.startswith("inspect_"):
                 continue
 
@@ -75,13 +76,14 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
                 continue
 
             scene_id = next_state.current_scene
-            visited_scenes.add(scene_id)
-
-            fp = next_state.fingerprint()
-            if fp not in visited_state_hashes:
-                visited_state_hashes.add(fp)
+            if scene_id not in visited_scenes:
+                visited_scenes.add(scene_id)
+                visited_state_hashes.add(next_state.fingerprint())
                 if not next_obs.is_terminal:
                     queue.append(next_state)
+
+        if len(visited_scenes) >= len(all_target_scenes):
+            break
 
     unvisited = all_target_scenes - visited_scenes
     stats = {

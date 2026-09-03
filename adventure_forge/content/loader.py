@@ -15,14 +15,24 @@ def build_world_registry() -> Dict[str, RegionManifest]:
     from adventure_forge.content.data.court import build_high_court_region
     from adventure_forge.content.data.hollows import build_sunken_hollows_region
     from adventure_forge.content.data.stress_market import build_stress_market_region
+    from adventure_forge.content.data.provinces.reach import build_reach_province
+    from adventure_forge.content.data.provinces.lowlands import build_lowlands_province
+    from adventure_forge.content.data.provinces.scorchwaste import build_scorchwaste_province
+    from adventure_forge.content.data.provinces.high_court import build_high_court_province
+    from adventure_forge.content.data.provinces.sunken_hollows import build_sunken_hollows_province
 
     return {
         "iron_crags": build_iron_crags_region(),
         "lower_warrens": build_lower_warrens_region(),
-        "scorchwaste": build_scorchwaste_region(),
-        "high_court": build_high_court_region(),
-        "sunken_hollows": build_sunken_hollows_region(),
+        "scorchwaste_local": build_scorchwaste_region(),
+        "high_court_local": build_high_court_region(),
+        "sunken_hollows_local": build_sunken_hollows_region(),
         "stress_market": build_stress_market_region(),
+        "province_reach": build_reach_province(),
+        "province_lowlands": build_lowlands_province(),
+        "province_scorchwaste": build_scorchwaste_province(),
+        "province_high_court": build_high_court_province(),
+        "province_sunken_hollows": build_sunken_hollows_province(),
     }
 
 
