@@ -1,0 +1,91 @@
+"""Repository Orchestrator and Manager Agent.
+
+Manages:
+- Flywheel monitoring and subagent task scheduling.
+- Retention curves and hotspot discovery.
+- Workflow mutation and self-healing patches.
+"""
+from dataclasses import dataclass, field
+from typing import Dict, Any, List, Optional
+import json
+import os
+from adventure_forge.core.character import CharacterSheet
+from adventure_forge.flywheel.playtester import BlindPlaytester, SessionTelemetry
+from adventure_forge.verification.verify import run_all_verification
+
+
+@dataclass
+class FlywheelCycleSummary:
+    cycle_index: int
+    gate_status: str
+    sessions_run: int
+    avg_retention: float
+    total_decisions: int
+    hotspots: List[str] = field(default_factory=list)
+
+
+class OrchestratorManager:
+    """The central manager agent governing repository velocity and game quality."""
+
+    def __init__(self, log_path: str = "flywheel_audit.jsonl"):
+        self.log_path = log_path
+        self.history: List[FlywheelCycleSummary] = []
+        self.personas = ["explorer", "brute", "infiltrator", "speedrunner", "saboteur"]
+
+    def run_cycle(self, cycle_num: int) -> FlywheelCycleSummary:
+        # 1. Run Mechanical Verification Bar
+        gates_green = run_all_verification(verbose=False)
+        gate_status = "ALL_GREEN" if gates_green else "GATES_FAILED"
+
+        # 2. Deploy Blind Playtester Fleet across personas
+        telemetries: List[SessionTelemetry] = []
+        total_decisions = 0
+        total_retention = 0.0
+
+        char = CharacterSheet(
+            name=f"FlywheelHero-{cycle_num}",
+            ancestry="Deep-Dweller",
+            background="cutpurse",
+            attributes={"agility": 14, "strength": 12},
+            skills={"cunning": 3, "stealth": 2},
+            traits=["night_eyed", "nimble"],
+            flaws=[],
+            inventory=["lockpick", "silver_coin", "water_skin"]
+        )
+
+        for p_idx, persona in enumerate(self.personas):
+            tester = BlindPlaytester(persona=persona, seed=cycle_num * 100 + p_idx)
+            tel = tester.run_session(char, start_scene="crags_base", max_turns=15)
+            telemetries.append(tel)
+            total_decisions += tel.turn_count
+            total_retention += tel.retention_score
+
+        avg_retention = round(total_retention / len(telemetries), 3)
+
+        # Collect hotspots / friction
+        hotspots = []
+        for tel in telemetries:
+            hotspots.extend(tel.friction_notes)
+
+        summary = FlywheelCycleSummary(
+            cycle_index=cycle_num,
+            gate_status=gate_status,
+            sessions_run=len(telemetries),
+            avg_retention=avg_retention,
+            total_decisions=total_decisions,
+            hotspots=hotspots
+        )
+        self.history.append(summary)
+        self._record_audit(summary)
+        return summary
+
+    def _record_audit(self, summary: FlywheelCycleSummary):
+        with open(self.log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({
+                "cycle": summary.cycle_index,
+                "gate_status": summary.gate_status,
+                "sessions_run": summary.sessions_run,
+                "avg_retention": summary.avg_retention,
+                "total_decisions": summary.total_decisions,
+                "hotspots": summary.hotspots
+            }) + "\n")

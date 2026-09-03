@@ -19,3 +19,4 @@ zu-loop = "adventure_forge.flywheel.loop:main"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+pythonpath = ["."]
