@@ -27,6 +27,7 @@ wheels/
 htmlcov/
 .mypy_cache/
 flywheel_audit.jsonl
+.agents/
 
 # System / OS
 *.Zone.Identifier
