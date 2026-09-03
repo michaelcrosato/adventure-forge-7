@@ -258,7 +258,7 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     scenes["scorchwaste_hub"].base_actions.append(
-        Action(id="scorchwaste_hub_to_ashen_gate", label="Visit The Ashen Ga", category="movement", target_scene="scorchwaste_ashen_gate_gate", result_text="You travel to The Ashen Gate.")
+        Action(id="scorchwaste_hub_to_ashen_gate", label="Visit Ashen Gate", category="movement", target_scene="scorchwaste_ashen_gate_gate", result_text="You travel to The Ashen Gate.")
     )
 
     # POI: Nomad Tent Camp (10 nodes)
@@ -493,7 +493,7 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     scenes["scorchwaste_hub"].base_actions.append(
-        Action(id="scorchwaste_hub_to_mirage_camp", label="Visit Nomad Tent C", category="movement", target_scene="scorchwaste_mirage_camp_gate", result_text="You travel to Nomad Tent Camp.")
+        Action(id="scorchwaste_hub_to_mirage_camp", label="Visit Nomad Camp", category="movement", target_scene="scorchwaste_mirage_camp_gate", result_text="You travel to Nomad Tent Camp.")
     )
 
     # POI: Sandswept Crypt (10 nodes)
@@ -1198,7 +1198,7 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     scenes["scorchwaste_hub"].base_actions.append(
-        Action(id="scorchwaste_hub_to_salt_pan", label="Visit White Salt F", category="movement", target_scene="scorchwaste_salt_pan_gate", result_text="You travel to White Salt Flats.")
+        Action(id="scorchwaste_hub_to_salt_pan", label="Visit Salt Flats", category="movement", target_scene="scorchwaste_salt_pan_gate", result_text="You travel to White Salt Flats.")
     )
 
     # POI: Solar Altar (10 nodes)
@@ -1903,7 +1903,7 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     scenes["scorchwaste_hub"].base_actions.append(
-        Action(id="scorchwaste_hub_to_skiff_graveyard", label="Visit Sand Skiff W", category="movement", target_scene="scorchwaste_skiff_graveyard_gate", result_text="You travel to Sand Skiff Wreck.")
+        Action(id="scorchwaste_hub_to_skiff_graveyard", label="Visit Sand Skiff", category="movement", target_scene="scorchwaste_skiff_graveyard_gate", result_text="You travel to Sand Skiff Wreck.")
     )
 
     # POI: Razor Dune Ridge (10 nodes)
@@ -2138,7 +2138,7 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     scenes["scorchwaste_hub"].base_actions.append(
-        Action(id="scorchwaste_hub_to_dune_ridge", label="Visit Razor Dune R", category="movement", target_scene="scorchwaste_dune_ridge_gate", result_text="You travel to Razor Dune Ridge.")
+        Action(id="scorchwaste_hub_to_dune_ridge", label="Visit Dune Ridge", category="movement", target_scene="scorchwaste_dune_ridge_gate", result_text="You travel to Razor Dune Ridge.")
     )
 
     # POI: Nomad Deep Well (10 nodes)
@@ -2373,7 +2373,7 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     scenes["scorchwaste_hub"].base_actions.append(
-        Action(id="scorchwaste_hub_to_nomad_well", label="Visit Nomad Deep W", category="movement", target_scene="scorchwaste_nomad_well_gate", result_text="You travel to Nomad Deep Well.")
+        Action(id="scorchwaste_hub_to_nomad_well", label="Visit Nomad Well", category="movement", target_scene="scorchwaste_nomad_well_gate", result_text="You travel to Nomad Deep Well.")
     )
 
     return RegionManifest(

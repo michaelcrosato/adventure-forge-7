@@ -1206,7 +1206,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_gate",
         title="Windy Gorge - Outer Gate",
         region="reach",
-        description="Iron bars secure the heavy timber entrance. Gale-force gusts howling through limestone fissures.",
+        description="Iron bars secure the heavy timber entrance. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1229,7 +1229,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_courtyard",
         title="Windy Gorge - Main Courtyard",
         region="reach",
-        description="Cobblestones show heavy cart wheel wear. Gale-force gusts howling through limestone fissures.",
+        description="Cobblestones show heavy cart wheel wear. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1252,7 +1252,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_quarters",
         title="Windy Gorge - Living Quarters",
         region="reach",
-        description="Rows of wooden bunks line the walls. Gale-force gusts howling through limestone fissures.",
+        description="Rows of wooden bunks line the walls. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1275,7 +1275,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_armory",
         title="Windy Gorge - Supply Depot",
         region="reach",
-        description="Crates of rations and tools stand stacked. Gale-force gusts howling through limestone fissures.",
+        description="Crates of rations and tools stand stacked. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1298,7 +1298,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_cellar",
         title="Windy Gorge - Lower Cellar",
         region="reach",
-        description="Damp air smells of cool earth and storage. Gale-force gusts howling through limestone fissures.",
+        description="Damp air smells of cool earth and storage. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1321,7 +1321,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_passage",
         title="Windy Gorge - Stone Corridor",
         region="reach",
-        description="Wall sconces hold flickering tallow candles. Gale-force gusts howling through limestone fissures.",
+        description="Wall sconces hold flickering tallow candles. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1344,7 +1344,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_chamber",
         title="Windy Gorge - Inner Chamber",
         region="reach",
-        description="A sturdy oak desk holds ledgers and maps. Gale-force gusts howling through limestone fissures.",
+        description="A sturdy oak desk holds ledgers and maps. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1367,7 +1367,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_overlook",
         title="Windy Gorge - High Overlook",
         region="reach",
-        description="A stone ledge provides a clear view. Gale-force gusts howling through limestone fissures.",
+        description="A stone ledge provides a clear view. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1390,7 +1390,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_sanctum",
         title="Windy Gorge - Inner Sanctum",
         region="reach",
-        description="A stone altar stands in quiet reverence. Gale-force gusts howling through limestone fissures.",
+        description="A stone altar stands in quiet reverence. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1413,7 +1413,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_wind_hollow_vault",
         title="Windy Gorge - Deep Vault",
         region="reach",
-        description="Iron-banded chests sit in deep shadows. Gale-force gusts howling through limestone fissures.",
+        description="Iron-banded chests sit in deep shadows. Cold wind blows through the narrow stone gap.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1942,7 +1942,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_gate",
         title="Old Watchtower Ruin - Outer Gate",
         region="reach",
-        description="Iron bars secure the heavy timber entrance. Crumbling masonry overlooks the northern valley.",
+        description="Iron bars secure the heavy timber entrance. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1965,7 +1965,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_courtyard",
         title="Old Watchtower Ruin - Main Courtyard",
         region="reach",
-        description="Cobblestones show heavy cart wheel wear. Crumbling masonry overlooks the northern valley.",
+        description="Cobblestones show heavy cart wheel wear. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1988,7 +1988,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_quarters",
         title="Old Watchtower Ruin - Living Quarters",
         region="reach",
-        description="Rows of wooden bunks line the walls. Crumbling masonry overlooks the northern valley.",
+        description="Rows of wooden bunks line the walls. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2011,7 +2011,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_armory",
         title="Old Watchtower Ruin - Supply Depot",
         region="reach",
-        description="Crates of rations and tools stand stacked. Crumbling masonry overlooks the northern valley.",
+        description="Crates of rations and tools stand stacked. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2034,7 +2034,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_cellar",
         title="Old Watchtower Ruin - Lower Cellar",
         region="reach",
-        description="Damp air smells of cool earth and storage. Crumbling masonry overlooks the northern valley.",
+        description="Damp air smells of cool earth and storage. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2057,7 +2057,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_passage",
         title="Old Watchtower Ruin - Stone Corridor",
         region="reach",
-        description="Wall sconces hold flickering tallow candles. Crumbling masonry overlooks the northern valley.",
+        description="Wall sconces hold flickering tallow candles. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2080,7 +2080,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_chamber",
         title="Old Watchtower Ruin - Inner Chamber",
         region="reach",
-        description="A sturdy oak desk holds ledgers and maps. Crumbling masonry overlooks the northern valley.",
+        description="A sturdy oak desk holds ledgers and maps. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2103,7 +2103,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_overlook",
         title="Old Watchtower Ruin - High Overlook",
         region="reach",
-        description="A stone ledge provides a clear view. Crumbling masonry overlooks the northern valley.",
+        description="A stone ledge provides a clear view. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2126,7 +2126,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_sanctum",
         title="Old Watchtower Ruin - Inner Sanctum",
         region="reach",
-        description="A stone altar stands in quiet reverence. Crumbling masonry overlooks the northern valley.",
+        description="A stone altar stands in quiet reverence. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2149,7 +2149,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_watch_ruin_vault",
         title="Old Watchtower Ruin - Deep Vault",
         region="reach",
-        description="Iron-banded chests sit in deep shadows. Crumbling masonry overlooks the northern valley.",
+        description="Iron-banded chests sit in deep shadows. Old stone walls look over the green valley below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},

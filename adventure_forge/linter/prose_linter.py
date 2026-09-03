@@ -9,7 +9,7 @@ Enforces G2 / GAME-02:
 - Disallows ornamental purple prose clichés.
 """
 import re
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 
 # Clichés and ornamental adjectives forbidden by the Hemingway baseline
@@ -21,8 +21,8 @@ FORBIDDEN_PURPLE_WORDS = {
 
 
 def split_sentences(text: str) -> List[str]:
-    """Split text into sentences using punctuation boundaries."""
-    raw = re.split(r'[.!?]+(?:\s+|$)', text.strip())
+    """Split text into sentences using punctuation boundaries, including quotes."""
+    raw = re.split(r'[.!?]+[\"\'\u201d\u2019]*(?:\s+|$)', text.strip())
     return [s.strip() for s in raw if s.strip()]
 
 
@@ -64,21 +64,39 @@ class ProseLinter:
         self,
         max_sentence_words: int = 18,
         max_room_sentences: int = 3,
-        max_action_label_words: int = 4,
-        max_dialogue_words: int = 60
+        max_action_label_words: int = 3,
+        max_dialogue_words: int = 60,
+        max_readability_grade: float = 8.0,
+        min_readability_grade: Optional[float] = None,
+        min_readability_words: int = 5,
+        **kwargs: Any
     ):
         self.max_sentence_words = max_sentence_words
         self.max_room_sentences = max_room_sentences
         self.max_action_label_words = max_action_label_words
         self.max_dialogue_words = max_dialogue_words
+        # Support aliases max_grade / min_grade / min_words if passed via kwargs
+        self.max_readability_grade = kwargs.get("max_grade", max_readability_grade)
+        self.min_readability_grade = kwargs.get("min_grade", min_readability_grade)
+        self.min_readability_words = kwargs.get("min_words", min_readability_words)
 
-    def lint_text(self, text: str, context: str = "text") -> List[str]:
-        """Lint a piece of prose for length, sentence bounds, and purple words."""
-        errors = []
+    def lint_text(
+        self,
+        text: str,
+        context: str = "text",
+        check_readability: bool = True
+    ) -> List[str]:
+        """Lint a piece of prose for length, sentence bounds, purple words, and readability."""
+        errors: List[str] = []
+        if not text or not text.strip():
+            return errors
+
         sentences = split_sentences(text)
+        words = [w.lower() for w in re.findall(r'\b[\w\'-]+\b', text)]
+        if not words:
+            return errors
 
         # Check purple prose
-        words = [w.lower() for w in re.findall(r'\b[\w\'-]+\b', text)]
         for w in words:
             if w in FORBIDDEN_PURPLE_WORDS:
                 errors.append(f"[{context}] Disallowed purple prose word found: '{w}'")
@@ -91,11 +109,38 @@ class ProseLinter:
                     f"[{context}] Sentence {idx} exceeds {self.max_sentence_words} words ({count} words): '{s[:40]}...'"
                 )
 
+        # Readability (Flesch-Kincaid Grade Level)
+        # Bypassed on micro-phrases (< min_readability_words) to prevent syllable-ratio false positives
+        if check_readability and len(words) >= self.min_readability_words:
+            grade = flesch_kincaid_grade(text)
+            if self.max_readability_grade is not None and grade > self.max_readability_grade:
+                errors.append(
+                    f"[{context}] Readability grade {grade} exceeds maximum {self.max_readability_grade} (target Grade 6-8)."
+                )
+            if self.min_readability_grade is not None and grade < self.min_readability_grade:
+                errors.append(
+                    f"[{context}] Readability grade {grade} falls below minimum {self.min_readability_grade} (target Grade 6-8)."
+                )
+
+        return errors
+
+    def lint_dialogue(self, text: str, context: str = "dialogue") -> List[str]:
+        """Lint a dialogue turn for length (<=60 words), sentence bounds, purple words, and readability."""
+        errors: List[str] = []
+        if not text or not text.strip():
+            return errors
+        total_words = word_count(text)
+        if total_words > self.max_dialogue_words:
+            errors.append(
+                f"[{context}] Dialogue exceeds {self.max_dialogue_words} words ({total_words} words): '{text[:40]}...'"
+            )
+        errors.extend(self.lint_text(text, context=context))
         return errors
 
     def lint_scene(self, scene: Any) -> List[str]:
         """Lint an entire SceneNode including descriptions, dynamic snippets, and action labels."""
-        errors = []
+        errors: List[str] = []
+
         # Room description
         desc_sentences = split_sentences(scene.description)
         if len(desc_sentences) > self.max_room_sentences:
@@ -111,23 +156,30 @@ class ProseLinter:
                 errors.append(
                     f"[Scene {scene.id} Dynamic #{idx}] Exceeds 2 sentences ({len(dyn_sentences)} sentences)."
                 )
-            errors.extend(self.lint_text(dyn.text, f"Scene {scene.id} Dynamic #{idx}"))
+            errors.extend(self.lint_text(dyn.text, f"Scene {scene.id} Dynamic #{idx}", check_readability=False))
 
-        # Action labels
+        # Action labels & results
         for act in scene.base_actions:
             lbl_count = word_count(act.label)
-            if lbl_count > self.max_action_label_words:
+            if lbl_count < 1 or lbl_count > self.max_action_label_words:
                 errors.append(
                     f"[Scene {scene.id} Action {act.id}] Label exceeds {self.max_action_label_words} words ({lbl_count} words): '{act.label}'"
                 )
             if act.result_text:
-                errors.extend(self.lint_text(act.result_text, f"Scene {scene.id} Action {act.id} Result"))
+                errors.extend(self.lint_text(act.result_text, f"Scene {scene.id} Action {act.id} Result", check_readability=False))
+
+        # Entity descriptions (if present)
+        for ent in getattr(scene, 'entities', []):
+            if isinstance(ent, dict) and 'description' in ent and ent['description']:
+                errors.extend(
+                    self.lint_text(ent['description'], f"Scene {scene.id} Entity {ent.get('id', 'unknown')} Description", check_readability=False)
+                )
 
         return errors
 
     def lint_registry(self, world_registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
         """Lint an entire world registry. Returns (passed, error_list)."""
-        all_errors = []
+        all_errors: List[str] = []
         for reg_id, region in world_registry.items():
             for sc_id, scene in region.scenes.items():
                 errs = self.lint_scene(scene)

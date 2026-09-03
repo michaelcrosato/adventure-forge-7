@@ -145,7 +145,7 @@ def build_lower_warrens_region() -> RegionManifest:
             ),
             Action(
                 id="head_to_market",
-                label="Go to Grand Bazaar",
+                label="Enter Grand Bazaar",
                 category="movement",
                 target_scene="bazaar_center",
                 result_text="You follow the smell of spices into the open market plaza.",

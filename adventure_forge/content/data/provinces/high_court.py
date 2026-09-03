@@ -258,7 +258,7 @@ def build_high_court_province() -> RegionManifest:
     )
 
     scenes["high_court_hub"].base_actions.append(
-        Action(id="high_court_hub_to_grand_basilica", label="Visit The Grand Ba", category="movement", target_scene="high_court_grand_basilica_gate", result_text="You travel to The Grand Basilica.")
+        Action(id="high_court_hub_to_grand_basilica", label="Visit Grand Basilica", category="movement", target_scene="high_court_grand_basilica_gate", result_text="You travel to The Grand Basilica.")
     )
 
     # POI: Hall of Justiciars (10 nodes)
@@ -493,7 +493,7 @@ def build_high_court_province() -> RegionManifest:
     )
 
     scenes["high_court_hub"].base_actions.append(
-        Action(id="high_court_hub_to_justiciar_hall", label="Visit Hall of Just", category="movement", target_scene="high_court_justiciar_hall_gate", result_text="You travel to Hall of Justiciars.")
+        Action(id="high_court_hub_to_justiciar_hall", label="Visit Justiciar Hall", category="movement", target_scene="high_court_justiciar_hall_gate", result_text="You travel to Hall of Justiciars.")
     )
 
     # POI: The Royal Archives (10 nodes)
@@ -728,7 +728,7 @@ def build_high_court_province() -> RegionManifest:
     )
 
     scenes["high_court_hub"].base_actions.append(
-        Action(id="high_court_hub_to_royal_archive", label="Visit The Royal Ar", category="movement", target_scene="high_court_royal_archive_gate", result_text="You travel to The Royal Archives.")
+        Action(id="high_court_hub_to_royal_archive", label="Visit Royal Archive", category="movement", target_scene="high_court_royal_archive_gate", result_text="You travel to The Royal Archives.")
     )
 
     # POI: Chancellor Garden (10 nodes)
@@ -1668,7 +1668,7 @@ def build_high_court_province() -> RegionManifest:
     )
 
     scenes["high_court_hub"].base_actions.append(
-        Action(id="high_court_hub_to_high_spire", label="Visit White Spire ", category="movement", target_scene="high_court_high_spire_gate", result_text="You travel to White Spire Parapet.")
+        Action(id="high_court_hub_to_high_spire", label="Visit White Spire", category="movement", target_scene="high_court_high_spire_gate", result_text="You travel to White Spire Parapet.")
     )
 
     # POI: Herald Office (10 nodes)
@@ -1676,7 +1676,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_gate",
         title="Herald Office - Outer Gate",
         region="high_court",
-        description="Iron bars secure the heavy timber entrance. Embossed seals sit ready for royal proclamation.",
+        description="Iron bars secure the heavy timber entrance. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1699,7 +1699,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_courtyard",
         title="Herald Office - Main Courtyard",
         region="high_court",
-        description="Cobblestones show heavy cart wheel wear. Embossed seals sit ready for royal proclamation.",
+        description="Cobblestones show heavy cart wheel wear. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1722,7 +1722,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_quarters",
         title="Herald Office - Living Quarters",
         region="high_court",
-        description="Rows of wooden bunks line the walls. Embossed seals sit ready for royal proclamation.",
+        description="Rows of wooden bunks line the walls. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1745,7 +1745,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_armory",
         title="Herald Office - Supply Depot",
         region="high_court",
-        description="Crates of rations and tools stand stacked. Embossed seals sit ready for royal proclamation.",
+        description="Crates of rations and tools stand stacked. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1768,7 +1768,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_cellar",
         title="Herald Office - Lower Cellar",
         region="high_court",
-        description="Damp air smells of cool earth and storage. Embossed seals sit ready for royal proclamation.",
+        description="Damp air smells of cool earth and storage. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1791,7 +1791,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_passage",
         title="Herald Office - Stone Corridor",
         region="high_court",
-        description="Wall sconces hold flickering tallow candles. Embossed seals sit ready for royal proclamation.",
+        description="Wall sconces hold flickering tallow candles. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1814,7 +1814,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_chamber",
         title="Herald Office - Inner Chamber",
         region="high_court",
-        description="A sturdy oak desk holds ledgers and maps. Embossed seals sit ready for royal proclamation.",
+        description="A sturdy oak desk holds ledgers and maps. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1837,7 +1837,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_overlook",
         title="Herald Office - High Overlook",
         region="high_court",
-        description="A stone ledge provides a clear view. Embossed seals sit ready for royal proclamation.",
+        description="A stone ledge provides a clear view. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1860,7 +1860,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_sanctum",
         title="Herald Office - Inner Sanctum",
         region="high_court",
-        description="A stone altar stands in quiet reverence. Embossed seals sit ready for royal proclamation.",
+        description="A stone altar stands in quiet reverence. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1883,7 +1883,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_herald_chamber_vault",
         title="Herald Office - Deep Vault",
         region="high_court",
-        description="Iron-banded chests sit in deep shadows. Embossed seals sit ready for royal proclamation.",
+        description="Iron-banded chests sit in deep shadows. Wax seals sit ready on the carved oak table.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1911,7 +1911,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_gate",
         title="Ambassador Salon - Outer Gate",
         region="high_court",
-        description="Iron bars secure the heavy timber entrance. Velvet couches host quiet political debates.",
+        description="Iron bars secure the heavy timber entrance. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1934,7 +1934,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_courtyard",
         title="Ambassador Salon - Main Courtyard",
         region="high_court",
-        description="Cobblestones show heavy cart wheel wear. Velvet couches host quiet political debates.",
+        description="Cobblestones show heavy cart wheel wear. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1957,7 +1957,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_quarters",
         title="Ambassador Salon - Living Quarters",
         region="high_court",
-        description="Rows of wooden bunks line the walls. Velvet couches host quiet political debates.",
+        description="Rows of wooden bunks line the walls. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1980,7 +1980,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_armory",
         title="Ambassador Salon - Supply Depot",
         region="high_court",
-        description="Crates of rations and tools stand stacked. Velvet couches host quiet political debates.",
+        description="Crates of rations and tools stand stacked. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2003,7 +2003,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_cellar",
         title="Ambassador Salon - Lower Cellar",
         region="high_court",
-        description="Damp air smells of cool earth and storage. Velvet couches host quiet political debates.",
+        description="Damp air smells of cool earth and storage. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2026,7 +2026,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_passage",
         title="Ambassador Salon - Stone Corridor",
         region="high_court",
-        description="Wall sconces hold flickering tallow candles. Velvet couches host quiet political debates.",
+        description="Wall sconces hold flickering tallow candles. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2049,7 +2049,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_chamber",
         title="Ambassador Salon - Inner Chamber",
         region="high_court",
-        description="A sturdy oak desk holds ledgers and maps. Velvet couches host quiet political debates.",
+        description="A sturdy oak desk holds ledgers and maps. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2072,7 +2072,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_overlook",
         title="Ambassador Salon - High Overlook",
         region="high_court",
-        description="A stone ledge provides a clear view. Velvet couches host quiet political debates.",
+        description="A stone ledge provides a clear view. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2095,7 +2095,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_sanctum",
         title="Ambassador Salon - Inner Sanctum",
         region="high_court",
-        description="A stone altar stands in quiet reverence. Velvet couches host quiet political debates.",
+        description="A stone altar stands in quiet reverence. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2118,7 +2118,7 @@ def build_high_court_province() -> RegionManifest:
         id="high_court_diplomat_lounge_vault",
         title="Ambassador Salon - Deep Vault",
         region="high_court",
-        description="Iron-banded chests sit in deep shadows. Velvet couches host quiet political debates.",
+        description="Iron-banded chests sit in deep shadows. Soft chairs sit in the quiet meeting room.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},

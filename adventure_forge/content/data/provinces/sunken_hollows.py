@@ -12,7 +12,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_hub",
         title="The Sunken Abyss - Central Hub",
         region="sunken_hollows",
-        description="Bioluminescent algae illuminates the underground cavern lake. Water drips rhythmically from stalactites.",
+        description="Green moss lights the underground cavern lake. Cold water drips from dark stone points.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"min_attribute": {"attribute": "strength", "value": 12}},
@@ -31,7 +31,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_gate",
         title="Glowstone Grotto - Outer Gate",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. Emerald moss covers wet limestone boulders.",
+        description="Iron bars secure the heavy timber entrance. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -54,7 +54,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_courtyard",
         title="Glowstone Grotto - Main Courtyard",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. Emerald moss covers wet limestone boulders.",
+        description="Cobblestones show heavy cart wheel wear. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -77,7 +77,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_quarters",
         title="Glowstone Grotto - Living Quarters",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. Emerald moss covers wet limestone boulders.",
+        description="Rows of wooden bunks line the walls. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -100,7 +100,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_armory",
         title="Glowstone Grotto - Supply Depot",
         region="sunken_hollows",
-        description="Crates of rations and tools stand stacked. Emerald moss covers wet limestone boulders.",
+        description="Crates of rations and tools stand stacked. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -123,7 +123,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_cellar",
         title="Glowstone Grotto - Lower Cellar",
         region="sunken_hollows",
-        description="Damp air smells of cool earth and storage. Emerald moss covers wet limestone boulders.",
+        description="Damp air smells of cool earth and storage. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -146,7 +146,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_passage",
         title="Glowstone Grotto - Stone Corridor",
         region="sunken_hollows",
-        description="Wall sconces hold flickering tallow candles. Emerald moss covers wet limestone boulders.",
+        description="Wall sconces hold flickering tallow candles. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -169,7 +169,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_chamber",
         title="Glowstone Grotto - Inner Chamber",
         region="sunken_hollows",
-        description="A sturdy oak desk holds ledgers and maps. Emerald moss covers wet limestone boulders.",
+        description="A sturdy oak desk holds ledgers and maps. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -192,7 +192,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_overlook",
         title="Glowstone Grotto - High Overlook",
         region="sunken_hollows",
-        description="A stone ledge provides a clear view. Emerald moss covers wet limestone boulders.",
+        description="A stone ledge provides a clear view. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -215,7 +215,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_sanctum",
         title="Glowstone Grotto - Inner Sanctum",
         region="sunken_hollows",
-        description="A stone altar stands in quiet reverence. Emerald moss covers wet limestone boulders.",
+        description="A stone altar stands in quiet reverence. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -238,7 +238,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_glow_grotto_vault",
         title="Glowstone Grotto - Deep Vault",
         region="sunken_hollows",
-        description="Iron-banded chests sit in deep shadows. Emerald moss covers wet limestone boulders.",
+        description="Iron-banded chests sit in deep shadows. Green moss covers the wet stone rocks.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -1198,7 +1198,7 @@ def build_sunken_hollows_province() -> RegionManifest:
     )
 
     scenes["sunken_hollows_hub"].base_actions.append(
-        Action(id="sunken_hollows_hub_to_deep_siphon", label="Visit The Flooded ", category="movement", target_scene="sunken_hollows_deep_siphon_gate", result_text="You travel to The Flooded Siphon.")
+        Action(id="sunken_hollows_hub_to_deep_siphon", label="Visit The Flooded", category="movement", target_scene="sunken_hollows_deep_siphon_gate", result_text="You travel to The Flooded Siphon.")
     )
 
     # POI: Abyssal Pearl Vault (10 nodes)
@@ -1903,7 +1903,7 @@ def build_sunken_hollows_province() -> RegionManifest:
     )
 
     scenes["sunken_hollows_hub"].base_actions.append(
-        Action(id="sunken_hollows_hub_to_sub_wharf", label="Visit Underground ", category="movement", target_scene="sunken_hollows_sub_wharf_gate", result_text="You travel to Underground Wharf.")
+        Action(id="sunken_hollows_hub_to_sub_wharf", label="Visit Underground", category="movement", target_scene="sunken_hollows_sub_wharf_gate", result_text="You travel to Underground Wharf.")
     )
 
     # POI: Steam Geyser Basin (10 nodes)
@@ -2146,7 +2146,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_gate",
         title="The Echoing Dome - Outer Gate",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. Vast subterranean caverns carry whispers for miles.",
+        description="Iron bars secure the heavy timber entrance. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2169,7 +2169,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_courtyard",
         title="The Echoing Dome - Main Courtyard",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. Vast subterranean caverns carry whispers for miles.",
+        description="Cobblestones show heavy cart wheel wear. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2192,7 +2192,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_quarters",
         title="The Echoing Dome - Living Quarters",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. Vast subterranean caverns carry whispers for miles.",
+        description="Rows of wooden bunks line the walls. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2215,7 +2215,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_armory",
         title="The Echoing Dome - Supply Depot",
         region="sunken_hollows",
-        description="Crates of rations and tools stand stacked. Vast subterranean caverns carry whispers for miles.",
+        description="Crates of rations and tools stand stacked. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2238,7 +2238,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_cellar",
         title="The Echoing Dome - Lower Cellar",
         region="sunken_hollows",
-        description="Damp air smells of cool earth and storage. Vast subterranean caverns carry whispers for miles.",
+        description="Damp air smells of cool earth and storage. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2261,7 +2261,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_passage",
         title="The Echoing Dome - Stone Corridor",
         region="sunken_hollows",
-        description="Wall sconces hold flickering tallow candles. Vast subterranean caverns carry whispers for miles.",
+        description="Wall sconces hold flickering tallow candles. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2284,7 +2284,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_chamber",
         title="The Echoing Dome - Inner Chamber",
         region="sunken_hollows",
-        description="A sturdy oak desk holds ledgers and maps. Vast subterranean caverns carry whispers for miles.",
+        description="A sturdy oak desk holds ledgers and maps. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2307,7 +2307,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_overlook",
         title="The Echoing Dome - High Overlook",
         region="sunken_hollows",
-        description="A stone ledge provides a clear view. Vast subterranean caverns carry whispers for miles.",
+        description="A stone ledge provides a clear view. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2330,7 +2330,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_sanctum",
         title="The Echoing Dome - Inner Sanctum",
         region="sunken_hollows",
-        description="A stone altar stands in quiet reverence. Vast subterranean caverns carry whispers for miles.",
+        description="A stone altar stands in quiet reverence. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2353,7 +2353,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_vault",
         title="The Echoing Dome - Deep Vault",
         region="sunken_hollows",
-        description="Iron-banded chests sit in deep shadows. Vast subterranean caverns carry whispers for miles.",
+        description="Iron-banded chests sit in deep shadows. The huge dark caves carry quiet whispers for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2373,7 +2373,7 @@ def build_sunken_hollows_province() -> RegionManifest:
     )
 
     scenes["sunken_hollows_hub"].base_actions.append(
-        Action(id="sunken_hollows_hub_to_echoing_dome", label="Visit The Echoing ", category="movement", target_scene="sunken_hollows_echoing_dome_gate", result_text="You travel to The Echoing Dome.")
+        Action(id="sunken_hollows_hub_to_echoing_dome", label="Visit The Echoing", category="movement", target_scene="sunken_hollows_echoing_dome_gate", result_text="You travel to The Echoing Dome.")
     )
 
     return RegionManifest(

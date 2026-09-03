@@ -728,7 +728,7 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     scenes["lowlands_hub"].base_actions.append(
-        Action(id="lowlands_hub_to_canal_sluice", label="Visit Great Canal ", category="movement", target_scene="lowlands_canal_sluice_gate", result_text="You travel to Great Canal Sluice.")
+        Action(id="lowlands_hub_to_canal_sluice", label="Visit Great Canal", category="movement", target_scene="lowlands_canal_sluice_gate", result_text="You travel to Great Canal Sluice.")
     )
 
     # POI: Anchor & Chain Inn (10 nodes)
@@ -1668,7 +1668,7 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     scenes["lowlands_hub"].base_actions.append(
-        Action(id="lowlands_hub_to_brewery_vault", label="Visit Old Brewery ", category="movement", target_scene="lowlands_brewery_vault_gate", result_text="You travel to Old Brewery Vault.")
+        Action(id="lowlands_hub_to_brewery_vault", label="Visit Old Brewery", category="movement", target_scene="lowlands_brewery_vault_gate", result_text="You travel to Old Brewery Vault.")
     )
 
     # POI: Harbor Bell Tower (10 nodes)
@@ -1903,7 +1903,7 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     scenes["lowlands_hub"].base_actions.append(
-        Action(id="lowlands_hub_to_bell_tower", label="Visit Harbor Bell ", category="movement", target_scene="lowlands_bell_tower_gate", result_text="You travel to Harbor Bell Tower.")
+        Action(id="lowlands_hub_to_bell_tower", label="Visit Harbor Bell", category="movement", target_scene="lowlands_bell_tower_gate", result_text="You travel to Harbor Bell Tower.")
     )
 
     # POI: River Customs Gate (10 nodes)

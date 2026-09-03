@@ -1,7 +1,7 @@
 """World Province Generator for Skyrim-Scale (500+ nodes) Expansion.
 
 Generates 5 rich, thematic provinces with 10 POIs each (10 nodes per POI),
-yielding 525+ nodes adhering strictly to the Hemingway baseline, multi-trait
+yielding 520+ nodes adhering strictly to the Hemingway baseline, multi-trait
 reactivity, and zero-softlock invariants.
 """
 import os
@@ -14,16 +14,16 @@ PROVINCE_CONFIGS = [
         "mechanic": "Verticality & Mountain Climbing",
         "hub_desc": "Granite peaks loom over the stone waystation. Mountain patrolmen inspect incoming pack mules.",
         "pois": [
-            ("dunwall_fort", "Dunwall Fortress", "Iron battlements crown the sheer cliff face.", "crags_base"),
-            ("granite_mine", "Deep Granite Quarry", "Picks ring out against dark stone veins.", "crags_base"),
-            ("high_pass", "Eagle Wing Pass", "Narrow ledges wind past frozen mountain waterfalls.", "crags_base"),
-            ("bastion_redoubt", "Bandit Bastion", "Spiked palisades block the canyon entrance.", "crags_base"),
-            ("iron_spire", "Ancient Iron Spire", "Rusted metal towers rise into the mountain clouds.", "crags_base"),
-            ("wind_hollow", "Windy Gorge", "Gale-force gusts howling through limestone fissures.", "crags_base"),
-            ("timber_camp", "Highland Timber Camp", "Fresh pine logs lie stacked along the trail.", "crags_base"),
-            ("frost_cavern", "Glacial Cavern", "Blue ice walls echo with dripping water.", "crags_base"),
-            ("watch_ruin", "Old Watchtower Ruin", "Crumbling masonry overlooks the northern valley.", "crags_base"),
-            ("signal_crag", "Signal Fire Bluff", "Stacked cedar kindling sits ready for lighting.", "crags_base"),
+            ("dunwall_fort", "Dunwall Fortress", "Iron battlements crown the sheer cliff face.", "crags_base", "Visit Dunwall Fort"),
+            ("granite_mine", "Deep Granite Quarry", "Picks ring out against dark stone veins.", "crags_base", "Visit Deep Granite"),
+            ("high_pass", "Eagle Wing Pass", "Narrow ledges wind past frozen mountain waterfalls.", "crags_base", "Visit Eagle Pass"),
+            ("bastion_redoubt", "Bandit Bastion", "Spiked palisades block the canyon entrance.", "crags_base", "Visit Bandit Basti"),
+            ("iron_spire", "Ancient Iron Spire", "Rusted metal towers rise into the mountain clouds.", "crags_base", "Visit Ancient Iron"),
+            ("wind_hollow", "Windy Gorge", "Cold wind blows through the narrow stone gap.", "crags_base", "Visit Windy Gorge"),
+            ("timber_camp", "Highland Timber Camp", "Fresh pine logs lie stacked along the trail.", "crags_base", "Visit Highland Tim"),
+            ("frost_cavern", "Glacial Cavern", "Blue ice walls echo with dripping water.", "crags_base", "Visit Glacial Cave"),
+            ("watch_ruin", "Old Watchtower Ruin", "Old stone walls look over the green valley below.", "crags_base", "Visit Old Watchtow"),
+            ("signal_crag", "Signal Fire Bluff", "Stacked cedar kindling sits ready for lighting.", "crags_base", "Visit Signal Fire"),
         ]
     },
     {
@@ -32,16 +32,16 @@ PROVINCE_CONFIGS = [
         "mechanic": "Social Stealth & Disguise",
         "hub_desc": "Barge horns echo along the river canal. City guards question passing dock workers.",
         "pois": [
-            ("oakhaven_port", "Port Oakhaven Docks", "Salt spray coats the wooden pier pilings.", "warrens_gate"),
-            ("thieves_hall", "Shadow Cellar", "Masked smugglers barter contraband under dim lamps.", "warrens_gate"),
-            ("canal_sluice", "Great Canal Sluice", "Heavy water wheels turn inside brick housings.", "warrens_gate"),
-            ("dock_tavern", "Anchor & Chain Inn", "Drunken sailors sing around wooden bench tables.", "warrens_gate"),
-            ("cloth_market", "Weavers District", "Dyed linens hang drying across the alleyways.", "warrens_gate"),
-            ("smuggler_cove", "Sunken Smuggler Cove", "Rowboats moor inside sea caverns at low tide.", "warrens_gate"),
-            ("brewery_vault", "Old Brewery Vault", "Copper vats bubble with dark fermented barley.", "warrens_gate"),
-            ("bell_tower", "Harbor Bell Tower", "The massive iron bell warns ships of fog.", "warrens_gate"),
-            ("customs_house", "River Customs Gate", "Clerks stamp cargo manifests behind iron bars.", "warrens_gate"),
-            ("potters_quay", "Potters Quay", "Clay jars line the muddy riverbank landing.", "warrens_gate"),
+            ("oakhaven_port", "Port Oakhaven Docks", "Salt spray coats the wooden pier pilings.", "warrens_gate", "Visit Port Oakhave"),
+            ("thieves_hall", "Shadow Cellar", "Masked smugglers barter contraband under dim lamps.", "warrens_gate", "Visit Shadow Cella"),
+            ("canal_sluice", "Great Canal Sluice", "Heavy water wheels turn inside brick housings.", "warrens_gate", "Visit Great Canal"),
+            ("dock_tavern", "Anchor & Chain Inn", "Drunken sailors sing around wooden bench tables.", "warrens_gate", "Visit Anchor & Cha"),
+            ("cloth_market", "Weavers District", "Dyed linens hang drying across the alleyways.", "warrens_gate", "Visit Weavers Dist"),
+            ("smuggler_cove", "Sunken Smuggler Cove", "Rowboats moor inside sea caverns at low tide.", "warrens_gate", "Visit Sunken Smugg"),
+            ("brewery_vault", "Old Brewery Vault", "Copper vats bubble with dark fermented barley.", "warrens_gate", "Visit Old Brewery"),
+            ("bell_tower", "Harbor Bell Tower", "The massive iron bell warns ships of fog.", "warrens_gate", "Visit Harbor Bell"),
+            ("customs_house", "River Customs Gate", "Clerks stamp cargo manifests behind iron bars.", "warrens_gate", "Visit River Custom"),
+            ("potters_quay", "Potters Quay", "Clay jars line the muddy riverbank landing.", "warrens_gate", "Visit Potters Quay"),
         ]
     },
     {
@@ -50,16 +50,16 @@ PROVINCE_CONFIGS = [
         "mechanic": "Ambient Heat & Hydration Survival",
         "hub_desc": "Red sandstone cliffs frame the desert gateway. Caravan camels drink at the stone trough.",
         "pois": [
-            ("ashen_gate", "The Ashen Gate", "Carved stone monoliths guard the sun-bleached pass.", "scorch_dunes"),
-            ("mirage_camp", "Nomad Tent Camp", "Woven wool awnings cast deep crimson shade.", "scorch_dunes"),
-            ("buried_tomb", "Sandswept Crypt", "Wind blows red sand across carved obsidian doors.", "scorch_dunes"),
-            ("crater_mine", "Obsidian Basin", "Volcanic glass sparkles under the desert sun.", "scorch_dunes"),
-            ("salt_pan", "White Salt Flats", "Blinding white crust stretches to the horizon.", "scorch_dunes"),
-            ("sun_shrine", "Solar Altar", "A golden disk reflects blinding desert light.", "scorch_dunes"),
-            ("canyon_oasis", "Hidden Spring Oasis", "Date palms shelter a deep pool of fresh water.", "scorch_dunes"),
-            ("skiff_graveyard", "Sand Skiff Wreck", "Bleached wooden hulls lie half-buried in sand.", "scorch_dunes"),
-            ("dune_ridge", "Razor Dune Ridge", "Shifting sand dunes ripple under hot desert wind.", "scorch_dunes"),
-            ("nomad_well", "Nomad Deep Well", "A bronze bucket hangs on a hemp rope.", "scorch_dunes"),
+            ("ashen_gate", "The Ashen Gate", "Carved stone monoliths guard the sun-bleached pass.", "scorch_dunes", "Visit Ashen Gate"),
+            ("mirage_camp", "Nomad Tent Camp", "Woven wool awnings cast deep crimson shade.", "scorch_dunes", "Visit Nomad Camp"),
+            ("buried_tomb", "Sandswept Crypt", "Wind blows red sand across carved obsidian doors.", "scorch_dunes", "Visit Sandswept Cr"),
+            ("crater_mine", "Obsidian Basin", "Volcanic glass sparkles under the desert sun.", "scorch_dunes", "Visit Obsidian Bas"),
+            ("salt_pan", "White Salt Flats", "Blinding white crust stretches to the horizon.", "scorch_dunes", "Visit Salt Flats"),
+            ("sun_shrine", "Solar Altar", "A golden disk reflects blinding desert light.", "scorch_dunes", "Visit Solar Altar"),
+            ("canyon_oasis", "Hidden Spring Oasis", "Date palms shelter a deep pool of fresh water.", "scorch_dunes", "Visit Hidden Sprin"),
+            ("skiff_graveyard", "Sand Skiff Wreck", "Bleached wooden hulls lie half-buried in sand.", "scorch_dunes", "Visit Sand Skiff"),
+            ("dune_ridge", "Razor Dune Ridge", "Shifting sand dunes ripple under hot desert wind.", "scorch_dunes", "Visit Dune Ridge"),
+            ("nomad_well", "Nomad Deep Well", "A bronze bucket hangs on a hemp rope.", "scorch_dunes", "Visit Nomad Well"),
         ]
     },
     {
@@ -68,34 +68,34 @@ PROVINCE_CONFIGS = [
         "mechanic": "Legal Evidence & Court Intrigues",
         "hub_desc": "White marble colonnades rise above manicured plazas. Armored knights stand at attention.",
         "pois": [
-            ("grand_basilica", "The Grand Basilica", "Sunlight streams through tall arched clerestories.", "court_antechamber"),
-            ("justiciar_hall", "Hall of Justiciars", "Bailiffs carry sealed legal briefs between courts.", "court_antechamber"),
-            ("royal_archive", "The Royal Archives", "Cedar book stacks reach the vaulted ceiling.", "court_antechamber"),
-            ("chancellor_court", "Chancellor Garden", "Stone fountains bubble among trimmed rose hedges.", "court_antechamber"),
-            ("knight_barracks", "Knight-Palatine Armory", "Polished breastplates hang in neat rows.", "court_antechamber"),
-            ("catacomb_kings", "Catacombs of Kings", "Marble sarcophagi rest inside cool alcoves.", "court_antechamber"),
-            ("high_spire", "White Spire Parapet", "Wind flutters heraldic pennants across the walls.", "court_antechamber"),
-            ("herald_chamber", "Herald Office", "Embossed seals sit ready for royal proclamation.", "court_antechamber"),
-            ("diplomat_lounge", "Ambassador Salon", "Velvet couches host quiet political debates.", "court_antechamber"),
-            ("silver_vault", "Ducal Silver Vault", "Heavy steel vault doors require three bronze keys.", "court_antechamber"),
+            ("grand_basilica", "The Grand Basilica", "Sunlight streams through tall arched clerestories.", "court_antechamber", "Visit Grand Basilica"),
+            ("justiciar_hall", "Hall of Justiciars", "Bailiffs carry sealed legal briefs between courts.", "court_antechamber", "Visit Justiciar Hall"),
+            ("royal_archive", "The Royal Archives", "Cedar book stacks reach the vaulted ceiling.", "court_antechamber", "Visit Royal Archive"),
+            ("chancellor_court", "Chancellor Garden", "Stone fountains bubble among trimmed rose hedges.", "court_antechamber", "Visit Chancellor G"),
+            ("knight_barracks", "Knight-Palatine Armory", "Polished breastplates hang in neat rows.", "court_antechamber", "Visit Knight-Palat"),
+            ("catacomb_kings", "Catacombs of Kings", "Marble sarcophagi rest inside cool alcoves.", "court_antechamber", "Visit Catacombs of"),
+            ("high_spire", "White Spire Parapet", "Wind flutters heraldic pennants across the walls.", "court_antechamber", "Visit White Spire"),
+            ("herald_chamber", "Herald Office", "Wax seals sit ready on the carved oak table.", "court_antechamber", "Visit Herald Offic"),
+            ("diplomat_lounge", "Ambassador Salon", "Soft chairs sit in the quiet meeting room.", "court_antechamber", "Visit Ambassador S"),
+            ("silver_vault", "Ducal Silver Vault", "Heavy steel vault doors require three bronze keys.", "court_antechamber", "Visit Ducal Silver"),
         ]
     },
     {
         "id": "sunken_hollows",
         "name": "The Sunken Abyss",
         "mechanic": "Water Buoyancy & Underwater Diving",
-        "hub_desc": "Bioluminescent algae illuminates the underground cavern lake. Water drips rhythmically from stalactites.",
+        "hub_desc": "Green moss lights the underground cavern lake. Cold water drips from dark stone points.",
         "pois": [
-            ("glow_grotto", "Glowstone Grotto", "Emerald moss covers wet limestone boulders.", "hollows_grotto"),
-            ("abyssal_river", "Subterranean River", "Black water rushes through smooth cavern arches.", "hollows_grotto"),
-            ("drowned_temple", "Drowned Shrine", "Submerged stone pillars rise through clear water.", "hollows_grotto"),
-            ("coral_chasm", "Crystal Trench", "Glowing coral reefs thrive in subterranean warmth.", "hollows_grotto"),
-            ("deep_siphon", "The Flooded Siphon", "Air pockets linger beneath stone cavern domes.", "hollows_grotto"),
-            ("vault_depths", "Abyssal Pearl Vault", "Giant oyster beds cling to carved steps.", "hollows_grotto"),
-            ("fungal_forest", "Giant Fungal Grove", "Luminescent cap stalks tower over damp paths.", "hollows_grotto"),
-            ("sub_wharf", "Underground Wharf", "Flat-bottom barges moor at mossy stone docks.", "hollows_grotto"),
-            ("geyser_basin", "Steam Geyser Basin", "Warm mist rises from mineral-rich geothermal vents.", "hollows_grotto"),
-            ("echoing_dome", "The Echoing Dome", "Vast subterranean caverns carry whispers for miles.", "hollows_grotto"),
+            ("glow_grotto", "Glowstone Grotto", "Green moss covers the wet stone rocks.", "hollows_grotto", "Visit Glowstone Gr"),
+            ("abyssal_river", "Subterranean River", "Black water rushes through smooth cavern arches.", "hollows_grotto", "Visit Subterranean"),
+            ("drowned_temple", "Drowned Shrine", "Submerged stone pillars rise through clear water.", "hollows_grotto", "Visit Drowned Shri"),
+            ("coral_chasm", "Crystal Trench", "Glowing coral reefs thrive in subterranean warmth.", "hollows_grotto", "Visit Crystal Tren"),
+            ("deep_siphon", "The Flooded Siphon", "Air pockets linger beneath stone cavern domes.", "hollows_grotto", "Visit The Flooded"),
+            ("vault_depths", "Abyssal Pearl Vault", "Giant oyster beds cling to carved steps.", "hollows_grotto", "Visit Abyssal Pear"),
+            ("fungal_forest", "Giant Fungal Grove", "Luminescent cap stalks tower over damp paths.", "hollows_grotto", "Visit Giant Fungal"),
+            ("sub_wharf", "Underground Wharf", "Flat-bottom barges moor at mossy stone docks.", "hollows_grotto", "Visit Underground"),
+            ("geyser_basin", "Steam Geyser Basin", "Warm mist rises from mineral-rich geothermal vents.", "hollows_grotto", "Visit Steam Geyser"),
+            ("echoing_dome", "The Echoing Dome", "The huge dark caves carry quiet whispers for miles.", "hollows_grotto", "Visit The Echoing"),
         ]
     }
 ]
@@ -112,6 +112,16 @@ SUB_NODE_NAMES = [
     ("sanctum", "Inner Sanctum", "A stone altar stands in quiet reverence.", "Examine altar", "Offer prayer"),
     ("vault", "Deep Vault", "Iron-banded chests sit in deep shadows.", "Inspect chests", "Search shadows"),
 ]
+
+
+def format_action_label(poi_name: str) -> str:
+    """Fallback formatter ensuring any POI name produces a <= 3 word action label."""
+    words = poi_name.strip().split()
+    if words and words[0].lower() in ("the", "a", "an"):
+        words = words[1:]
+    if len(words) <= 2:
+        return f"Visit {' '.join(words)}"
+    return f"Visit {' '.join(words[:2])}"
 
 
 def generate_province_code(prov):
@@ -148,12 +158,23 @@ def generate_province_code(prov):
         ''
     ]
 
-    for poi_key, poi_name, poi_desc, anchor_scene in prov["pois"]:
+    for poi in prov["pois"]:
+        poi_key = poi[0]
+        poi_name = poi[1]
+        poi_desc = poi[2]
+        anchor_scene = poi[3]
+        poi_label = poi[4] if len(poi) > 4 else format_action_label(poi_name)
+
         lines.append(f'    # POI: {poi_name} (10 nodes)')
         for node_idx, (sub_key, sub_label, sub_desc, act1, act2) in enumerate(SUB_NODE_NAMES):
             sc_id = f"{prov_id}_{poi_key}_{sub_key}"
             prev_id = f"{prov_id}_{poi_key}_{SUB_NODE_NAMES[node_idx-1][0]}" if node_idx > 0 else f"{prov_id}_hub"
             next_id = f"{prov_id}_{poi_key}_{SUB_NODE_NAMES[node_idx+1][0]}" if node_idx < len(SUB_NODE_NAMES) - 1 else None
+
+            # Special case for reach_frost_cavern_sanctum night_eyed dynamic description
+            night_eyed_text = "Your keen eyes track motion in the dark."
+            if prov_id == "reach" and poi_key == "frost_cavern" and sub_key == "sanctum":
+                night_eyed_text = "A hidden crevasse glimmers faintly behind the frost-covered altar."
 
             lines.append(f'    scenes["{sc_id}"] = SceneNode(')
             lines.append(f'        id="{sc_id}",')
@@ -163,7 +184,7 @@ def generate_province_code(prov):
             lines.append('        dynamic_descriptions=[')
             lines.append('            DynamicDescription(')
             lines.append('                condition={"has_trait": "night_eyed"},')
-            lines.append('                text="Your keen eyes track motion in the dark."')
+            lines.append(f'                text="{night_eyed_text}"')
             lines.append('            ),')
             lines.append('            DynamicDescription(')
             lines.append('                condition={"min_skill": {"skill": "cunning", "value": 2}},')
@@ -178,14 +199,52 @@ def generate_province_code(prov):
                 lines.append(f'            Action(id="{sc_id}_to_next", label="Press forward", category="movement", target_scene="{next_id}", result_text="You press on to the next area."),')
             else:
                 lines.append(f'            Action(id="{sc_id}_to_hub", label="Return to Hub", category="movement", target_scene="{prov_id}_hub", result_text="You return victorious to the hub."),')
+
+            # Special case for reach_frost_cavern_sanctum secret shrine trait exploit action
+            if prov_id == "reach" and poi_key == "frost_cavern" and sub_key == "sanctum":
+                lines.append('            Action(id="reach_frost_cavern_to_secret_shrine", label="Enter hidden crevasse", category="trait_exploit", condition={"has_trait": "night_eyed"}, target_scene="reach_secret_shrine", result_text="Your dark sight guides you through the narrow ice fissure."),')
+
             lines.append('        ]')
             lines.append('    )')
             lines.append('')
 
+            # Special case for reach_secret_shrine (node 520)
+            if prov_id == "reach" and poi_key == "frost_cavern" and sub_key == "sanctum":
+                lines.append('    scenes["reach_secret_shrine"] = SceneNode(')
+                lines.append('        id="reach_secret_shrine",')
+                lines.append('        title="Glacial Cavern - Secret Alpine Shrine",')
+                lines.append('        region="reach",')
+                lines.append('        description="Pale starlight filters through high crystalline crevasses. A carved stone icon rests on an ancient ice dais.",')
+                lines.append('        dynamic_descriptions=[')
+                lines.append('            DynamicDescription(')
+                lines.append('                condition={"has_trait": "night_eyed"},')
+                lines.append('                text="Your keen eyes pick out faint constellations etched into the ice dais."')
+                lines.append('            ),')
+                lines.append('            DynamicDescription(')
+                lines.append('                condition={"min_skill": {"skill": "cunning", "value": 2}},')
+                lines.append('                text="You spot ancient mountain footholds cut into the chimney."')
+                lines.append('            ),')
+                lines.append('            DynamicDescription(')
+                lines.append('                condition={"ancestry_is": "deep-dweller"},')
+                lines.append('                text="Your subterranean blood recognizes the ancient cold stone craft."')
+                lines.append('            ),')
+                lines.append('            DynamicDescription(')
+                lines.append('                condition={"background_is": "noble_exile"},')
+                lines.append('                text="Highborn archives mentioned this forgotten redoubt of the first clans."')
+                lines.append('            ),')
+                lines.append('        ],')
+                lines.append('        base_actions=[')
+                lines.append('            Action(id="reach_secret_shrine_act_0", label="Pray at icon", category="interaction", effects=[{"modify_stamina": 3}, {"log_event": "A tranquil mountain stillness restores your focus."}], result_text="You offer a silent prayer before the frost icon."),')
+                lines.append('            Action(id="reach_secret_shrine_act_1", label="Search ice dais", category="interaction", effects=[{"modify_item": {"item": "ice_lotus", "delta": 1}}, {"log_event": "You gathered a frozen alpine blossom."}], result_text="You discover a preserved ice lotus tucked beneath the pedestal."),')
+                lines.append('            Action(id="reach_secret_shrine_to_sanctum", label="Return to sanctum", category="movement", target_scene="reach_frost_cavern_sanctum", result_text="You retrace your steps through the crevasse."),')
+                lines.append('        ]')
+                lines.append('    )')
+                lines.append('')
+
         # Connect Hub to first node of each POI
         first_node = f"{prov_id}_{poi_key}_gate"
         lines.append(f'    scenes["{prov_id}_hub"].base_actions.append(')
-        lines.append(f'        Action(id="{prov_id}_hub_to_{poi_key}", label="Visit {poi_name[:12]}", category="movement", target_scene="{first_node}", result_text="You travel to {poi_name}.")')
+        lines.append(f'        Action(id="{prov_id}_hub_to_{poi_key}", label="{poi_label}", category="movement", target_scene="{first_node}", result_text="You travel to {poi_name}.")')
         lines.append('    )')
         lines.append('')
 
