@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adventure-forge"
+version = "0.1.0"
+description = "Unbounded Action Engine with Skyrim scale and BG3 depth"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+af-verify = "adventure_forge.verification.verify:main"
+af-play = "adventure_forge.player.cli:main"
+af-flywheel = "adventure_forge.flywheel.loop:main"
+zu-loop = "adventure_forge.flywheel.loop:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
