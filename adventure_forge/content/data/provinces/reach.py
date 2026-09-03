@@ -728,7 +728,7 @@ def build_reach_province() -> RegionManifest:
     )
 
     scenes["reach_hub"].base_actions.append(
-        Action(id="reach_hub_to_high_pass", label="Visit Eagle Wing P", category="movement", target_scene="reach_high_pass_gate", result_text="You travel to Eagle Wing Pass.")
+        Action(id="reach_hub_to_high_pass", label="Visit Eagle Pass", category="movement", target_scene="reach_high_pass_gate", result_text="You travel to Eagle Wing Pass.")
     )
 
     # POI: Bandit Bastion (10 nodes)
@@ -1864,7 +1864,7 @@ def build_reach_province() -> RegionManifest:
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                text="A hidden crevasse glimmers faintly behind the frost-covered altar."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -1876,6 +1876,37 @@ def build_reach_province() -> RegionManifest:
             Action(id="reach_frost_cavern_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
             Action(id="reach_frost_cavern_sanctum_to_prev", label="Return back", category="movement", target_scene="reach_frost_cavern_overlook", result_text="You retrace your steps."),
             Action(id="reach_frost_cavern_sanctum_to_next", label="Press forward", category="movement", target_scene="reach_frost_cavern_vault", result_text="You press on to the next area."),
+            Action(id="reach_frost_cavern_to_secret_shrine", label="Enter hidden crevasse", category="trait_exploit", condition={"has_trait": "night_eyed"}, target_scene="reach_secret_shrine", result_text="Your dark sight guides you through the narrow ice fissure."),
+        ]
+    )
+
+    scenes["reach_secret_shrine"] = SceneNode(
+        id="reach_secret_shrine",
+        title="Glacial Cavern - Secret Alpine Shrine",
+        region="reach",
+        description="Pale starlight filters through high crystalline crevasses. A carved stone icon rests on an ancient ice dais.",
+        dynamic_descriptions=[
+            DynamicDescription(
+                condition={"has_trait": "night_eyed"},
+                text="Your keen eyes pick out faint constellations etched into the ice dais."
+            ),
+            DynamicDescription(
+                condition={"min_skill": {"skill": "cunning", "value": 2}},
+                text="You spot ancient mountain footholds cut into the chimney."
+            ),
+            DynamicDescription(
+                condition={"ancestry_is": "deep-dweller"},
+                text="Your subterranean blood recognizes the ancient cold stone craft."
+            ),
+            DynamicDescription(
+                condition={"background_is": "noble_exile"},
+                text="Highborn archives mentioned this forgotten redoubt of the first clans."
+            ),
+        ],
+        base_actions=[
+            Action(id="reach_secret_shrine_act_0", label="Pray at icon", category="interaction", effects=[{"modify_stamina": 3}, {"log_event": "A tranquil mountain stillness restores your focus."}], result_text="You offer a silent prayer before the frost icon."),
+            Action(id="reach_secret_shrine_act_1", label="Search ice dais", category="interaction", effects=[{"modify_item": {"item": "ice_lotus", "delta": 1}}, {"log_event": "You gathered a frozen alpine blossom."}], result_text="You discover a preserved ice lotus tucked beneath the pedestal."),
+            Action(id="reach_secret_shrine_to_sanctum", label="Return to sanctum", category="movement", target_scene="reach_frost_cavern_sanctum", result_text="You retrace your steps through the crevasse."),
         ]
     )
 
@@ -2373,7 +2404,7 @@ def build_reach_province() -> RegionManifest:
     )
 
     scenes["reach_hub"].base_actions.append(
-        Action(id="reach_hub_to_signal_crag", label="Visit Signal Fire ", category="movement", target_scene="reach_signal_crag_gate", result_text="You travel to Signal Fire Bluff.")
+        Action(id="reach_hub_to_signal_crag", label="Visit Signal Fire", category="movement", target_scene="reach_signal_crag_gate", result_text="You travel to Signal Fire Bluff.")
     )
 
     return RegionManifest(
