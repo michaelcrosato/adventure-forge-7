@@ -14,6 +14,7 @@ def request(
     path: str = "/",
     method: str = "GET",
     body: bytes = b"",
+    headers: list[tuple[bytes, bytes]] | None = None,
     target_app: Any = vercel_app.app,
 ) -> list[dict]:
     sent: list[dict] = []
@@ -24,7 +25,12 @@ def request(
     async def send(message: dict) -> None:
         sent.append(message)
 
-    scope = {"type": "http", "method": method, "path": path}
+    scope = {
+        "type": "http",
+        "method": method,
+        "path": path,
+        "headers": headers or [],
+    }
     asyncio.run(target_app(scope, receive, send))
     return sent
 
@@ -141,3 +147,58 @@ def test_lifespan_handler() -> None:
         "lifespan.startup.complete",
         "lifespan.shutdown.complete",
     ]
+
+
+def test_vercel_rewrite_simulation() -> None:
+    """Ensure Vercel rewrites to /api/index.py with x-matched-path resolve properly."""
+    home_msgs = request("/api/index.py", headers=[(b"x-matched-path", b"/")])
+    assert home_msgs[0]["status"] == 200
+    assert b"AdventureForge" in home_msgs[1]["body"]
+
+    health_msgs = request("/api/index.py", headers=[(b"x-matched-path", b"/health")])
+    assert health_msgs[0]["status"] == 200
+    payload = json.loads(health_msgs[1]["body"])
+    assert payload["status"] == "ok"
+
+
+def test_game_api_workflow() -> None:
+    """Test full playable game API lifecycle: presets, new game, and step."""
+    # 1. Presets endpoint
+    preset_msgs = request("/api/game/presets")
+    assert preset_msgs[0]["status"] == 200
+    presets = json.loads(preset_msgs[1]["body"])["presets"]
+    assert "cutpurse" in presets
+
+    # 2. New game
+    new_req = json.dumps({"preset": "cutpurse", "seed": 42}).encode("utf-8")
+    new_msgs = request("/api/game/new", "POST", body=new_req)
+    assert new_msgs[0]["status"] == 200
+    game_data = json.loads(new_msgs[1]["body"])
+    assert game_data["success"] is True
+    assert "observation" in game_data
+    assert "state" in game_data
+    actions = game_data["observation"]["legal_actions"]
+    assert len(actions) > 0
+
+    # 3. Step action
+    chosen_action = actions[0]["id"]
+    step_req = json.dumps({
+        "state": game_data["state"],
+        "action_id": chosen_action,
+    }).encode("utf-8")
+    step_msgs = request("/api/game/step", "POST", body=step_req)
+    assert step_msgs[0]["status"] == 200
+    step_data = json.loads(step_msgs[1]["body"])
+    assert step_data["success"] is True
+    assert step_data["observation"]["turn_count"] == 1
+
+
+def test_game_api_validation_errors() -> None:
+    """Test invalid payloads return 400 Bad Request."""
+    bad_step = request("/api/game/step", "POST", body=b"invalid-json")
+    assert bad_step[0]["status"] == 400
+
+    missing_fields = json.dumps({"state": {}}).encode("utf-8")
+    missing_resp = request("/api/game/step", "POST", body=missing_fields)
+    assert missing_resp[0]["status"] == 400
+
