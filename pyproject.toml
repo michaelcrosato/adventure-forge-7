@@ -16,6 +16,9 @@ af-play = "adventure_forge.player.cli:main"
 af-flywheel = "adventure_forge.flywheel.loop:main"
 zu-loop = "adventure_forge.flywheel.loop:main"
 
+[tool.setuptools.packages.find]
+include = ["adventure_forge*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
