@@ -59,11 +59,11 @@ Every feature from the Survey phase appears here with its assigned milestone.
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Quality, Prose Linter & Type Safety Remediation | Fix type imports in `crawler.py` and `cli.py`; wire `flesch_kincaid_grade` (6-8) into linter; set max action label words to 3; remediate violating content and fix generator drift | None | PLANNED |
-| M2 | World Graph Interactable Density Enrichment | Augment >= 255 province nodes with a 3rd meaningful interactable or systemic entity to meet >= 50% (260+) threshold; maintain 100% reachability and Hemingway constraints | M1 | PLANNED |
-| M3 | Canonical Verification Command, MCP Surface & Triage | Implement `./verify`, `adventure_forge.verify`, `player/mcp_server.py`, and wire/test `flywheel/triage.py` | M1 | PLANNED |
-| M4 | 4-Tier Test Suite Expansion & E2E Gate Clearance | Comprehensive test suite covering Tiers 1–4 across all 23 modules, validating all acceptance criteria | M2, M3 | PLANNED |
-| M5 | Adversarial Coverage Hardening (Tier 5) | Adversarial challenger analysis, gap detection, and test coverage hardening | M4 | PLANNED |
+| M1 | Quality, Prose Linter & Type Safety Remediation | Fix type imports in `crawler.py` and `cli.py`; wire `flesch_kincaid_grade` (6-8) into linter; set max action label words to 3; remediate violating content and fix generator drift | None | COMPLETE |
+| M2 | World Graph Interactable Density Enrichment | Augment >= 255 province nodes with a 3rd meaningful interactable or systemic entity to meet >= 50% (260+) threshold; maintain 100% reachability and Hemingway constraints | M1 | COMPLETE |
+| M3 | Canonical Verification Command, MCP Surface & Triage | Implement `./verify`, `adventure_forge.verify`, `player/mcp_server.py`, and wire/test `flywheel/triage.py` | M1 | COMPLETE |
+| M4 | 4-Tier Test Suite Expansion & E2E Gate Clearance | Comprehensive test suite covering Tiers 1–4 across all 23 modules, validating all acceptance criteria | M2, M3 | COMPLETE |
+| M5 | Adversarial Coverage Hardening (Tier 5) | Adversarial challenger analysis, gap detection, and test coverage hardening | M4 | COMPLETE |
 
 ## Interface Contracts
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`
