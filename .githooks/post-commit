@@ -1,0 +1,34 @@
+#!/bin/sh
+# Automatically push to GitHub after every commit.
+
+# Skip pushing if explicitly requested
+if [ "${SKIP_AUTO_PUSH:-0}" = "1" ] || [ "${GIT_PUSH_DISABLED:-0}" = "1" ]; then
+    echo "[post-commit] SKIP_AUTO_PUSH set; skipping automatic push."
+    exit 0
+fi
+
+# Avoid pushing during intermediate rebase steps
+git_dir="$(git rev-parse --git-dir 2>/dev/null)"
+if [ -n "$git_dir" ] && { [ -d "$git_dir/rebase-merge" ] || [ -d "$git_dir/rebase-apply" ]; }; then
+    exit 0
+fi
+
+# Determine current branch
+current_branch="$(git symbolic-ref --short HEAD 2>/dev/null)"
+if [ -z "$current_branch" ]; then
+    echo "[post-commit] Detached HEAD; skipping automatic push."
+    exit 0
+fi
+
+# Determine remote (default to origin)
+remote_name="$(git config "branch.${current_branch}.remote" 2>/dev/null)"
+if [ -z "$remote_name" ]; then
+    remote_name="origin"
+fi
+
+echo "==> [post-commit] Automatically pushing ${current_branch} to ${remote_name}..."
+if git push "${remote_name}" "${current_branch}"; then
+    echo "==> [post-commit] Successfully pushed ${current_branch} to ${remote_name}."
+else
+    echo "==> [post-commit] Warning: Automatic push to ${remote_name}/${current_branch} failed." >&2
+fi

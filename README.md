@@ -61,6 +61,13 @@ AdventureForge deploys seamlessly to Vercel with zero configuration when importe
 npx vercel dev
 ```
 
+### Automatic GitHub Sync
+The repository includes an automatic post-commit hook in `.githooks/post-commit` configured via `core.hooksPath`. Whenever any commit is made, it is automatically pushed to the remote GitHub repository.
+```bash
+# Enable hooks if cloning fresh:
+git config core.hooksPath .githooks
+```
+
 ---
 
 ## Architecture & Roadmap
