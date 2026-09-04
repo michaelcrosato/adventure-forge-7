@@ -22,6 +22,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         base_actions=[
             Action(id="sunken_hollows_hub_scout", label="Scout hub", category="interaction", result_text="You survey the bustling provincial crossroads."),
             Action(id="sunken_hollows_hub_rest", label="Rest at inn", category="interaction", effects=[{"modify_stamina": 5}], result_text="You rest and regain stamina."),
+            Action(id="sunken_hollows_hub_board", label="Check notice board", category="interaction", effects=[{"set_flag": {"flag": "sunken_hollows_notices_read", "value": True}}, {"log_event": "You read the municipal notice board."}], result_text="You read the pinned municipal notices."),
             Action(id="sunken_hollows_to_bazaar", label="Go to Bazaar", category="movement", target_scene="bazaar_center", result_text="You travel along the highway to the Grand Bazaar."),
         ]
     )
@@ -42,9 +43,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_glow_grotto_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_glow_grotto_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_glow_grotto_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_glow_grotto_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_glow_grotto_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_glow_grotto_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_courtyard", result_text="You press on to the next area."),
         ]
@@ -65,9 +70,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_glow_grotto_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_glow_grotto_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_glow_grotto_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_glow_grotto_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_glow_grotto_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_glow_grotto_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_quarters", result_text="You press on to the next area."),
         ]
@@ -89,8 +98,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_glow_grotto_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_glow_grotto_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_glow_grotto_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_glow_grotto_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_glow_grotto_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_armory", result_text="You press on to the next area."),
         ]
@@ -111,9 +121,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_glow_grotto_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_glow_grotto_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_glow_grotto_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_glow_grotto_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_glow_grotto_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_glow_grotto_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_cellar", result_text="You press on to the next area."),
         ]
@@ -135,8 +149,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_glow_grotto_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_glow_grotto_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_glow_grotto_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_glow_grotto_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_glow_grotto_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_passage", result_text="You press on to the next area."),
         ]
@@ -157,9 +172,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_glow_grotto_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_glow_grotto_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_glow_grotto_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_glow_grotto_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_glow_grotto_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_glow_grotto_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_chamber", result_text="You press on to the next area."),
         ]
@@ -181,8 +200,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_glow_grotto_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_glow_grotto_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_glow_grotto_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_glow_grotto_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_glow_grotto_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_overlook", result_text="You press on to the next area."),
         ]
@@ -204,8 +224,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_glow_grotto_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_glow_grotto_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_glow_grotto_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_glow_grotto_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_glow_grotto_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_sanctum", result_text="You press on to the next area."),
         ]
@@ -227,8 +248,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_glow_grotto_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_glow_grotto_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_glow_grotto_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_glow_grotto_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_glow_grotto_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_glow_grotto_vault", result_text="You press on to the next area."),
         ]
@@ -249,9 +271,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_glow_grotto_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_glow_grotto_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_glow_grotto_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_glow_grotto_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_glow_grotto_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_glow_grotto_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_glow_grotto_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_glow_grotto_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_glow_grotto_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_glow_grotto_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -277,9 +303,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_abyssal_river_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_abyssal_river_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_abyssal_river_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_abyssal_river_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_abyssal_river_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_abyssal_river_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_courtyard", result_text="You press on to the next area."),
         ]
@@ -300,9 +330,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_abyssal_river_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_abyssal_river_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_abyssal_river_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_abyssal_river_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_abyssal_river_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_abyssal_river_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_quarters", result_text="You press on to the next area."),
         ]
@@ -324,8 +358,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_abyssal_river_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_abyssal_river_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_abyssal_river_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_abyssal_river_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_abyssal_river_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_armory", result_text="You press on to the next area."),
         ]
@@ -346,9 +381,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_abyssal_river_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_abyssal_river_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_abyssal_river_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_abyssal_river_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_abyssal_river_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_abyssal_river_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_cellar", result_text="You press on to the next area."),
         ]
@@ -370,8 +409,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_abyssal_river_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_abyssal_river_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_abyssal_river_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_abyssal_river_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_abyssal_river_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_passage", result_text="You press on to the next area."),
         ]
@@ -392,9 +432,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_abyssal_river_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_abyssal_river_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_abyssal_river_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_abyssal_river_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_abyssal_river_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_abyssal_river_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_chamber", result_text="You press on to the next area."),
         ]
@@ -416,8 +460,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_abyssal_river_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_abyssal_river_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_abyssal_river_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_abyssal_river_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_abyssal_river_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_overlook", result_text="You press on to the next area."),
         ]
@@ -439,8 +484,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_abyssal_river_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_abyssal_river_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_abyssal_river_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_abyssal_river_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_abyssal_river_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_sanctum", result_text="You press on to the next area."),
         ]
@@ -462,8 +508,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_abyssal_river_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_abyssal_river_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_abyssal_river_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_abyssal_river_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_abyssal_river_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_abyssal_river_vault", result_text="You press on to the next area."),
         ]
@@ -484,9 +531,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_abyssal_river_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_abyssal_river_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_abyssal_river_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_abyssal_river_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_abyssal_river_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_abyssal_river_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_abyssal_river_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_abyssal_river_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_abyssal_river_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_abyssal_river_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -512,9 +563,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_drowned_temple_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_drowned_temple_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_drowned_temple_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_drowned_temple_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_drowned_temple_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_drowned_temple_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_courtyard", result_text="You press on to the next area."),
         ]
@@ -535,9 +590,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_drowned_temple_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_drowned_temple_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_drowned_temple_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_drowned_temple_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_drowned_temple_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_drowned_temple_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_quarters", result_text="You press on to the next area."),
         ]
@@ -559,8 +618,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_drowned_temple_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_drowned_temple_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_drowned_temple_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_drowned_temple_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_drowned_temple_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_armory", result_text="You press on to the next area."),
         ]
@@ -581,9 +641,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_drowned_temple_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_drowned_temple_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_drowned_temple_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_drowned_temple_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_drowned_temple_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_drowned_temple_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_cellar", result_text="You press on to the next area."),
         ]
@@ -605,8 +669,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_drowned_temple_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_drowned_temple_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_drowned_temple_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_drowned_temple_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_drowned_temple_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_passage", result_text="You press on to the next area."),
         ]
@@ -627,9 +692,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_drowned_temple_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_drowned_temple_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_drowned_temple_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_drowned_temple_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_drowned_temple_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_drowned_temple_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_chamber", result_text="You press on to the next area."),
         ]
@@ -651,8 +720,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_drowned_temple_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_drowned_temple_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_drowned_temple_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_drowned_temple_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_drowned_temple_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_overlook", result_text="You press on to the next area."),
         ]
@@ -674,8 +744,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_drowned_temple_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_drowned_temple_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_drowned_temple_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_drowned_temple_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_drowned_temple_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_sanctum", result_text="You press on to the next area."),
         ]
@@ -697,8 +768,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_drowned_temple_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_drowned_temple_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_drowned_temple_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_drowned_temple_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_drowned_temple_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_vault", result_text="You press on to the next area."),
         ]
@@ -719,9 +791,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_drowned_temple_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_drowned_temple_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_drowned_temple_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_drowned_temple_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_drowned_temple_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_drowned_temple_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -747,9 +823,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_coral_chasm_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_coral_chasm_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_coral_chasm_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_coral_chasm_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_coral_chasm_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_coral_chasm_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_courtyard", result_text="You press on to the next area."),
         ]
@@ -770,9 +850,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_coral_chasm_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_coral_chasm_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_coral_chasm_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_coral_chasm_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_coral_chasm_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_coral_chasm_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_quarters", result_text="You press on to the next area."),
         ]
@@ -794,8 +878,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_coral_chasm_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_coral_chasm_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_coral_chasm_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_coral_chasm_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_coral_chasm_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_armory", result_text="You press on to the next area."),
         ]
@@ -816,9 +901,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_coral_chasm_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_coral_chasm_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_coral_chasm_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_coral_chasm_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_coral_chasm_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_coral_chasm_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_cellar", result_text="You press on to the next area."),
         ]
@@ -840,8 +929,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_coral_chasm_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_coral_chasm_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_coral_chasm_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_coral_chasm_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_coral_chasm_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_passage", result_text="You press on to the next area."),
         ]
@@ -862,9 +952,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_coral_chasm_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_coral_chasm_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_coral_chasm_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_coral_chasm_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_coral_chasm_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_coral_chasm_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_chamber", result_text="You press on to the next area."),
         ]
@@ -886,8 +980,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_coral_chasm_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_coral_chasm_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_coral_chasm_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_coral_chasm_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_coral_chasm_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_overlook", result_text="You press on to the next area."),
         ]
@@ -909,8 +1004,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_coral_chasm_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_coral_chasm_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_coral_chasm_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_coral_chasm_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_coral_chasm_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_sanctum", result_text="You press on to the next area."),
         ]
@@ -932,8 +1028,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_coral_chasm_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_coral_chasm_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_coral_chasm_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_coral_chasm_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_coral_chasm_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_vault", result_text="You press on to the next area."),
         ]
@@ -954,9 +1051,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_coral_chasm_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_coral_chasm_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_coral_chasm_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_coral_chasm_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_coral_chasm_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_coral_chasm_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -982,9 +1083,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_deep_siphon_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_deep_siphon_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_deep_siphon_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_deep_siphon_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_deep_siphon_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_deep_siphon_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_courtyard", result_text="You press on to the next area."),
         ]
@@ -1005,9 +1110,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_deep_siphon_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_deep_siphon_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_deep_siphon_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_deep_siphon_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_deep_siphon_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_deep_siphon_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_quarters", result_text="You press on to the next area."),
         ]
@@ -1029,8 +1138,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_deep_siphon_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_deep_siphon_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_deep_siphon_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_deep_siphon_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_deep_siphon_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_armory", result_text="You press on to the next area."),
         ]
@@ -1051,9 +1161,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_deep_siphon_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_deep_siphon_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_deep_siphon_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_deep_siphon_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_deep_siphon_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_deep_siphon_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_cellar", result_text="You press on to the next area."),
         ]
@@ -1075,8 +1189,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_deep_siphon_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_deep_siphon_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_deep_siphon_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_deep_siphon_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_deep_siphon_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_passage", result_text="You press on to the next area."),
         ]
@@ -1097,9 +1212,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_deep_siphon_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_deep_siphon_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_deep_siphon_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_deep_siphon_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_deep_siphon_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_deep_siphon_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_chamber", result_text="You press on to the next area."),
         ]
@@ -1121,8 +1240,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_deep_siphon_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_deep_siphon_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_deep_siphon_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_deep_siphon_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_deep_siphon_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_overlook", result_text="You press on to the next area."),
         ]
@@ -1144,8 +1264,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_deep_siphon_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_deep_siphon_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_deep_siphon_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_deep_siphon_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_deep_siphon_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_sanctum", result_text="You press on to the next area."),
         ]
@@ -1167,8 +1288,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_deep_siphon_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_deep_siphon_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_deep_siphon_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_deep_siphon_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_deep_siphon_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_vault", result_text="You press on to the next area."),
         ]
@@ -1189,9 +1311,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_deep_siphon_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_deep_siphon_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_deep_siphon_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_deep_siphon_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_deep_siphon_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_deep_siphon_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -1217,9 +1343,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_vault_depths_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_vault_depths_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_vault_depths_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_vault_depths_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_vault_depths_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_vault_depths_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_courtyard", result_text="You press on to the next area."),
         ]
@@ -1240,9 +1370,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_vault_depths_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_vault_depths_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_vault_depths_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_vault_depths_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_vault_depths_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_vault_depths_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_quarters", result_text="You press on to the next area."),
         ]
@@ -1264,8 +1398,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_vault_depths_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_vault_depths_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_vault_depths_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_vault_depths_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_vault_depths_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_armory", result_text="You press on to the next area."),
         ]
@@ -1286,9 +1421,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_vault_depths_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_vault_depths_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_vault_depths_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_vault_depths_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_vault_depths_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_vault_depths_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_cellar", result_text="You press on to the next area."),
         ]
@@ -1310,8 +1449,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_vault_depths_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_vault_depths_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_vault_depths_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_vault_depths_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_vault_depths_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_passage", result_text="You press on to the next area."),
         ]
@@ -1332,9 +1472,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_vault_depths_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_vault_depths_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_vault_depths_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_vault_depths_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_vault_depths_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_vault_depths_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_chamber", result_text="You press on to the next area."),
         ]
@@ -1356,8 +1500,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_vault_depths_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_vault_depths_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_vault_depths_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_vault_depths_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_vault_depths_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_overlook", result_text="You press on to the next area."),
         ]
@@ -1379,8 +1524,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_vault_depths_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_vault_depths_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_vault_depths_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_vault_depths_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_vault_depths_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_sanctum", result_text="You press on to the next area."),
         ]
@@ -1402,8 +1548,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_vault_depths_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_vault_depths_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_vault_depths_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_vault_depths_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_vault_depths_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_vault_depths_vault", result_text="You press on to the next area."),
         ]
@@ -1424,9 +1571,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_vault_depths_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_vault_depths_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_vault_depths_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_vault_depths_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_vault_depths_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_vault_depths_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_vault_depths_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_vault_depths_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_vault_depths_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_vault_depths_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -1452,9 +1603,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_fungal_forest_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_fungal_forest_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_fungal_forest_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_fungal_forest_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_fungal_forest_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_fungal_forest_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_courtyard", result_text="You press on to the next area."),
         ]
@@ -1475,9 +1630,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_fungal_forest_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_fungal_forest_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_fungal_forest_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_fungal_forest_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_fungal_forest_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_fungal_forest_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_quarters", result_text="You press on to the next area."),
         ]
@@ -1499,8 +1658,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_fungal_forest_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_fungal_forest_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_fungal_forest_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_fungal_forest_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_fungal_forest_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_armory", result_text="You press on to the next area."),
         ]
@@ -1521,9 +1681,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_fungal_forest_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_fungal_forest_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_fungal_forest_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_fungal_forest_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_fungal_forest_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_fungal_forest_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_cellar", result_text="You press on to the next area."),
         ]
@@ -1545,8 +1709,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_fungal_forest_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_fungal_forest_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_fungal_forest_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_fungal_forest_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_fungal_forest_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_passage", result_text="You press on to the next area."),
         ]
@@ -1567,9 +1732,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_fungal_forest_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_fungal_forest_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_fungal_forest_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_fungal_forest_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_fungal_forest_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_fungal_forest_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_chamber", result_text="You press on to the next area."),
         ]
@@ -1591,8 +1760,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_fungal_forest_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_fungal_forest_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_fungal_forest_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_fungal_forest_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_fungal_forest_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_overlook", result_text="You press on to the next area."),
         ]
@@ -1614,8 +1784,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_fungal_forest_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_fungal_forest_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_fungal_forest_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_fungal_forest_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_fungal_forest_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_sanctum", result_text="You press on to the next area."),
         ]
@@ -1637,8 +1808,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_fungal_forest_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_fungal_forest_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_fungal_forest_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_fungal_forest_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_fungal_forest_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_fungal_forest_vault", result_text="You press on to the next area."),
         ]
@@ -1659,9 +1831,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_fungal_forest_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_fungal_forest_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_fungal_forest_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_fungal_forest_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_fungal_forest_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_fungal_forest_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_fungal_forest_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_fungal_forest_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_fungal_forest_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_fungal_forest_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -1687,9 +1863,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_sub_wharf_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_sub_wharf_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_sub_wharf_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_sub_wharf_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_sub_wharf_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_sub_wharf_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_courtyard", result_text="You press on to the next area."),
         ]
@@ -1710,9 +1890,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_sub_wharf_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_sub_wharf_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_sub_wharf_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_sub_wharf_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_sub_wharf_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_sub_wharf_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_quarters", result_text="You press on to the next area."),
         ]
@@ -1734,8 +1918,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_sub_wharf_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_sub_wharf_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_sub_wharf_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_sub_wharf_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_sub_wharf_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_armory", result_text="You press on to the next area."),
         ]
@@ -1756,9 +1941,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_sub_wharf_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_sub_wharf_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_sub_wharf_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_sub_wharf_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_sub_wharf_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_sub_wharf_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_cellar", result_text="You press on to the next area."),
         ]
@@ -1780,8 +1969,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_sub_wharf_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_sub_wharf_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_sub_wharf_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_sub_wharf_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_sub_wharf_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_passage", result_text="You press on to the next area."),
         ]
@@ -1802,9 +1992,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_sub_wharf_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_sub_wharf_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_sub_wharf_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_sub_wharf_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_sub_wharf_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_sub_wharf_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_chamber", result_text="You press on to the next area."),
         ]
@@ -1826,8 +2020,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_sub_wharf_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_sub_wharf_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_sub_wharf_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_sub_wharf_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_sub_wharf_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_overlook", result_text="You press on to the next area."),
         ]
@@ -1849,8 +2044,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_sub_wharf_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_sub_wharf_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_sub_wharf_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_sub_wharf_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_sub_wharf_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_sanctum", result_text="You press on to the next area."),
         ]
@@ -1872,8 +2068,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_sub_wharf_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_sub_wharf_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_sub_wharf_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_sub_wharf_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_sub_wharf_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_sub_wharf_vault", result_text="You press on to the next area."),
         ]
@@ -1894,9 +2091,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_sub_wharf_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_sub_wharf_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_sub_wharf_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_sub_wharf_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_sub_wharf_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_sub_wharf_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_sub_wharf_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_sub_wharf_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_sub_wharf_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_sub_wharf_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -1922,9 +2123,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_geyser_basin_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_geyser_basin_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_geyser_basin_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_geyser_basin_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_geyser_basin_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_geyser_basin_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_courtyard", result_text="You press on to the next area."),
         ]
@@ -1945,9 +2150,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_geyser_basin_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_geyser_basin_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_geyser_basin_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_geyser_basin_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_geyser_basin_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_geyser_basin_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_quarters", result_text="You press on to the next area."),
         ]
@@ -1969,8 +2178,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_geyser_basin_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_geyser_basin_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_geyser_basin_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_geyser_basin_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_geyser_basin_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_armory", result_text="You press on to the next area."),
         ]
@@ -1991,9 +2201,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_geyser_basin_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_geyser_basin_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_geyser_basin_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_geyser_basin_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_geyser_basin_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_geyser_basin_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_cellar", result_text="You press on to the next area."),
         ]
@@ -2015,8 +2229,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_geyser_basin_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_geyser_basin_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_geyser_basin_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_geyser_basin_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_geyser_basin_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_passage", result_text="You press on to the next area."),
         ]
@@ -2037,9 +2252,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_geyser_basin_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_geyser_basin_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_geyser_basin_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_geyser_basin_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_geyser_basin_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_geyser_basin_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_chamber", result_text="You press on to the next area."),
         ]
@@ -2061,8 +2280,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_geyser_basin_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_geyser_basin_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_geyser_basin_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_geyser_basin_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_geyser_basin_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_overlook", result_text="You press on to the next area."),
         ]
@@ -2084,8 +2304,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_geyser_basin_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_geyser_basin_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_geyser_basin_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_geyser_basin_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_geyser_basin_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_sanctum", result_text="You press on to the next area."),
         ]
@@ -2107,8 +2328,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_geyser_basin_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_geyser_basin_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_geyser_basin_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_geyser_basin_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_geyser_basin_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_geyser_basin_vault", result_text="You press on to the next area."),
         ]
@@ -2129,9 +2351,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_geyser_basin_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_geyser_basin_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_geyser_basin_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_geyser_basin_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_geyser_basin_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_geyser_basin_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_geyser_basin_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_geyser_basin_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_geyser_basin_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_geyser_basin_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]
@@ -2157,9 +2383,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_echoing_dome_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="sunken_hollows_echoing_dome_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="sunken_hollows_echoing_dome_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="sunken_hollows_echoing_dome_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="sunken_hollows_echoing_dome_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="sunken_hollows_echoing_dome_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_courtyard", result_text="You press on to the next area."),
         ]
@@ -2180,9 +2410,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_echoing_dome_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="sunken_hollows_echoing_dome_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="sunken_hollows_echoing_dome_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="sunken_hollows_echoing_dome_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="sunken_hollows_echoing_dome_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="sunken_hollows_echoing_dome_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_quarters", result_text="You press on to the next area."),
         ]
@@ -2204,8 +2438,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="sunken_hollows_echoing_dome_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="sunken_hollows_echoing_dome_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="sunken_hollows_echoing_dome_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="sunken_hollows_echoing_dome_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="sunken_hollows_echoing_dome_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_armory", result_text="You press on to the next area."),
         ]
@@ -2226,9 +2461,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_echoing_dome_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="sunken_hollows_echoing_dome_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="sunken_hollows_echoing_dome_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="sunken_hollows_echoing_dome_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="sunken_hollows_echoing_dome_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="sunken_hollows_echoing_dome_armory_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_quarters", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_armory_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_cellar", result_text="You press on to the next area."),
         ]
@@ -2250,8 +2489,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="sunken_hollows_echoing_dome_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="sunken_hollows_echoing_dome_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="sunken_hollows_echoing_dome_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="sunken_hollows_echoing_dome_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="sunken_hollows_echoing_dome_cellar_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_armory", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_cellar_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_passage", result_text="You press on to the next area."),
         ]
@@ -2272,9 +2512,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_echoing_dome_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="sunken_hollows_echoing_dome_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="sunken_hollows_echoing_dome_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="sunken_hollows_echoing_dome_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="sunken_hollows_echoing_dome_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="sunken_hollows_echoing_dome_passage_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_cellar", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_passage_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_chamber", result_text="You press on to the next area."),
         ]
@@ -2296,8 +2540,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="sunken_hollows_echoing_dome_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="sunken_hollows_echoing_dome_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="sunken_hollows_echoing_dome_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="sunken_hollows_echoing_dome_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="sunken_hollows_echoing_dome_chamber_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_passage", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_chamber_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_overlook", result_text="You press on to the next area."),
         ]
@@ -2319,8 +2564,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="sunken_hollows_echoing_dome_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="sunken_hollows_echoing_dome_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="sunken_hollows_echoing_dome_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="sunken_hollows_echoing_dome_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="sunken_hollows_echoing_dome_overlook_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_chamber", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_overlook_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_sanctum", result_text="You press on to the next area."),
         ]
@@ -2342,8 +2588,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="sunken_hollows_echoing_dome_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="sunken_hollows_echoing_dome_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="sunken_hollows_echoing_dome_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="sunken_hollows_echoing_dome_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="sunken_hollows_echoing_dome_sanctum_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_overlook", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_sanctum_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_vault", result_text="You press on to the next area."),
         ]
@@ -2364,9 +2611,13 @@ def build_sunken_hollows_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_echoing_dome_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="sunken_hollows_echoing_dome_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="sunken_hollows_echoing_dome_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="sunken_hollows_echoing_dome_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="sunken_hollows_echoing_dome_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="sunken_hollows_echoing_dome_vault_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_sanctum", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_vault_to_hub", label="Return to Hub", category="movement", target_scene="sunken_hollows_hub", result_text="You return victorious to the hub."),
         ]

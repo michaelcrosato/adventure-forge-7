@@ -22,6 +22,7 @@ def build_scorchwaste_province() -> RegionManifest:
         base_actions=[
             Action(id="scorchwaste_hub_scout", label="Scout hub", category="interaction", result_text="You survey the bustling provincial crossroads."),
             Action(id="scorchwaste_hub_rest", label="Rest at inn", category="interaction", effects=[{"modify_stamina": 5}], result_text="You rest and regain stamina."),
+            Action(id="scorchwaste_hub_board", label="Check notice board", category="interaction", effects=[{"set_flag": {"flag": "scorchwaste_notices_read", "value": True}}, {"log_event": "You read the municipal notice board."}], result_text="You read the pinned municipal notices."),
             Action(id="scorchwaste_to_bazaar", label="Go to Bazaar", category="movement", target_scene="bazaar_center", result_text="You travel along the highway to the Grand Bazaar."),
         ]
     )
@@ -42,9 +43,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_ashen_gate_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_ashen_gate_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_ashen_gate_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_ashen_gate_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_ashen_gate_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_ashen_gate_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_courtyard", result_text="You press on to the next area."),
         ]
@@ -65,9 +70,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_ashen_gate_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_ashen_gate_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_ashen_gate_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_ashen_gate_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_ashen_gate_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_ashen_gate_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_quarters", result_text="You press on to the next area."),
         ]
@@ -89,8 +98,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_ashen_gate_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_ashen_gate_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_ashen_gate_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_ashen_gate_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_ashen_gate_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_armory", result_text="You press on to the next area."),
         ]
@@ -111,9 +121,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_ashen_gate_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_ashen_gate_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_ashen_gate_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_ashen_gate_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_ashen_gate_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_ashen_gate_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_cellar", result_text="You press on to the next area."),
         ]
@@ -135,8 +149,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_ashen_gate_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_ashen_gate_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_ashen_gate_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_ashen_gate_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_ashen_gate_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_passage", result_text="You press on to the next area."),
         ]
@@ -157,9 +172,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_ashen_gate_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_ashen_gate_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_ashen_gate_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_ashen_gate_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_ashen_gate_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_ashen_gate_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_chamber", result_text="You press on to the next area."),
         ]
@@ -181,8 +200,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_ashen_gate_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_ashen_gate_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_ashen_gate_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_ashen_gate_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_ashen_gate_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_overlook", result_text="You press on to the next area."),
         ]
@@ -204,8 +224,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_ashen_gate_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_ashen_gate_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_ashen_gate_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_ashen_gate_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_ashen_gate_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_sanctum", result_text="You press on to the next area."),
         ]
@@ -227,8 +248,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_ashen_gate_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_ashen_gate_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_ashen_gate_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_ashen_gate_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_ashen_gate_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_ashen_gate_vault", result_text="You press on to the next area."),
         ]
@@ -249,9 +271,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_ashen_gate_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_ashen_gate_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_ashen_gate_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_ashen_gate_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_ashen_gate_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_ashen_gate_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_ashen_gate_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_ashen_gate_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_ashen_gate_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_ashen_gate_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -277,9 +303,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_mirage_camp_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_mirage_camp_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_mirage_camp_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_mirage_camp_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_mirage_camp_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_mirage_camp_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_courtyard", result_text="You press on to the next area."),
         ]
@@ -300,9 +330,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_mirage_camp_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_mirage_camp_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_mirage_camp_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_mirage_camp_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_mirage_camp_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_mirage_camp_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_quarters", result_text="You press on to the next area."),
         ]
@@ -324,8 +358,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_mirage_camp_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_mirage_camp_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_mirage_camp_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_mirage_camp_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_mirage_camp_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_armory", result_text="You press on to the next area."),
         ]
@@ -346,9 +381,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_mirage_camp_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_mirage_camp_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_mirage_camp_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_mirage_camp_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_mirage_camp_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_mirage_camp_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_cellar", result_text="You press on to the next area."),
         ]
@@ -370,8 +409,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_mirage_camp_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_mirage_camp_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_mirage_camp_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_mirage_camp_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_mirage_camp_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_passage", result_text="You press on to the next area."),
         ]
@@ -392,9 +432,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_mirage_camp_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_mirage_camp_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_mirage_camp_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_mirage_camp_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_mirage_camp_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_mirage_camp_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_chamber", result_text="You press on to the next area."),
         ]
@@ -416,8 +460,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_mirage_camp_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_mirage_camp_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_mirage_camp_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_mirage_camp_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_mirage_camp_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_overlook", result_text="You press on to the next area."),
         ]
@@ -439,8 +484,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_mirage_camp_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_mirage_camp_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_mirage_camp_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_mirage_camp_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_mirage_camp_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_sanctum", result_text="You press on to the next area."),
         ]
@@ -462,8 +508,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_mirage_camp_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_mirage_camp_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_mirage_camp_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_mirage_camp_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_mirage_camp_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_mirage_camp_vault", result_text="You press on to the next area."),
         ]
@@ -484,9 +531,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_mirage_camp_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_mirage_camp_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_mirage_camp_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_mirage_camp_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_mirage_camp_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_mirage_camp_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_mirage_camp_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_mirage_camp_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_mirage_camp_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_mirage_camp_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -512,9 +563,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_buried_tomb_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_buried_tomb_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_buried_tomb_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_buried_tomb_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_buried_tomb_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_buried_tomb_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_courtyard", result_text="You press on to the next area."),
         ]
@@ -535,9 +590,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_buried_tomb_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_buried_tomb_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_buried_tomb_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_buried_tomb_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_buried_tomb_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_buried_tomb_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_quarters", result_text="You press on to the next area."),
         ]
@@ -559,8 +618,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_buried_tomb_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_buried_tomb_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_buried_tomb_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_buried_tomb_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_buried_tomb_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_armory", result_text="You press on to the next area."),
         ]
@@ -581,9 +641,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_buried_tomb_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_buried_tomb_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_buried_tomb_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_buried_tomb_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_buried_tomb_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_buried_tomb_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_cellar", result_text="You press on to the next area."),
         ]
@@ -605,8 +669,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_buried_tomb_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_buried_tomb_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_buried_tomb_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_buried_tomb_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_buried_tomb_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_passage", result_text="You press on to the next area."),
         ]
@@ -627,9 +692,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_buried_tomb_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_buried_tomb_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_buried_tomb_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_buried_tomb_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_buried_tomb_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_buried_tomb_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_chamber", result_text="You press on to the next area."),
         ]
@@ -651,8 +720,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_buried_tomb_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_buried_tomb_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_buried_tomb_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_buried_tomb_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_buried_tomb_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_overlook", result_text="You press on to the next area."),
         ]
@@ -674,8 +744,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_buried_tomb_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_buried_tomb_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_buried_tomb_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_buried_tomb_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_buried_tomb_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_sanctum", result_text="You press on to the next area."),
         ]
@@ -697,8 +768,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_buried_tomb_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_buried_tomb_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_buried_tomb_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_buried_tomb_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_buried_tomb_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_vault", result_text="You press on to the next area."),
         ]
@@ -719,9 +791,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_buried_tomb_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_buried_tomb_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_buried_tomb_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_buried_tomb_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_buried_tomb_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_buried_tomb_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -747,9 +823,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_crater_mine_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_crater_mine_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_crater_mine_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_crater_mine_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_crater_mine_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_crater_mine_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_courtyard", result_text="You press on to the next area."),
         ]
@@ -770,9 +850,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_crater_mine_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_crater_mine_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_crater_mine_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_crater_mine_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_crater_mine_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_crater_mine_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_quarters", result_text="You press on to the next area."),
         ]
@@ -794,8 +878,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_crater_mine_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_crater_mine_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_crater_mine_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_crater_mine_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_crater_mine_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_armory", result_text="You press on to the next area."),
         ]
@@ -816,9 +901,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_crater_mine_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_crater_mine_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_crater_mine_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_crater_mine_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_crater_mine_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_crater_mine_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_cellar", result_text="You press on to the next area."),
         ]
@@ -840,8 +929,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_crater_mine_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_crater_mine_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_crater_mine_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_crater_mine_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_crater_mine_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_passage", result_text="You press on to the next area."),
         ]
@@ -862,9 +952,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_crater_mine_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_crater_mine_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_crater_mine_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_crater_mine_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_crater_mine_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_crater_mine_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_chamber", result_text="You press on to the next area."),
         ]
@@ -886,8 +980,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_crater_mine_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_crater_mine_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_crater_mine_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_crater_mine_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_crater_mine_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_overlook", result_text="You press on to the next area."),
         ]
@@ -909,8 +1004,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_crater_mine_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_crater_mine_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_crater_mine_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_crater_mine_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_crater_mine_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_sanctum", result_text="You press on to the next area."),
         ]
@@ -932,8 +1028,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_crater_mine_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_crater_mine_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_crater_mine_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_crater_mine_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_crater_mine_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_crater_mine_vault", result_text="You press on to the next area."),
         ]
@@ -954,9 +1051,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_crater_mine_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_crater_mine_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_crater_mine_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_crater_mine_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_crater_mine_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_crater_mine_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_crater_mine_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_crater_mine_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_crater_mine_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_crater_mine_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -982,9 +1083,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_salt_pan_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_salt_pan_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_salt_pan_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_salt_pan_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_salt_pan_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_salt_pan_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_courtyard", result_text="You press on to the next area."),
         ]
@@ -1005,9 +1110,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_salt_pan_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_salt_pan_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_salt_pan_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_salt_pan_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_salt_pan_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_salt_pan_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_quarters", result_text="You press on to the next area."),
         ]
@@ -1029,8 +1138,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_salt_pan_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_salt_pan_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_salt_pan_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_salt_pan_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_salt_pan_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_armory", result_text="You press on to the next area."),
         ]
@@ -1051,9 +1161,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_salt_pan_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_salt_pan_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_salt_pan_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_salt_pan_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_salt_pan_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_salt_pan_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_cellar", result_text="You press on to the next area."),
         ]
@@ -1075,8 +1189,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_salt_pan_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_salt_pan_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_salt_pan_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_salt_pan_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_salt_pan_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_passage", result_text="You press on to the next area."),
         ]
@@ -1097,9 +1212,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_salt_pan_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_salt_pan_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_salt_pan_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_salt_pan_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_salt_pan_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_salt_pan_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_chamber", result_text="You press on to the next area."),
         ]
@@ -1121,8 +1240,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_salt_pan_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_salt_pan_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_salt_pan_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_salt_pan_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_salt_pan_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_overlook", result_text="You press on to the next area."),
         ]
@@ -1144,8 +1264,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_salt_pan_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_salt_pan_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_salt_pan_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_salt_pan_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_salt_pan_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_sanctum", result_text="You press on to the next area."),
         ]
@@ -1167,8 +1288,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_salt_pan_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_salt_pan_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_salt_pan_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_salt_pan_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_salt_pan_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_vault", result_text="You press on to the next area."),
         ]
@@ -1189,9 +1311,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_salt_pan_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_salt_pan_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_salt_pan_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_salt_pan_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_salt_pan_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_salt_pan_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -1217,9 +1343,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_sun_shrine_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_sun_shrine_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_sun_shrine_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_sun_shrine_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_sun_shrine_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_sun_shrine_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_courtyard", result_text="You press on to the next area."),
         ]
@@ -1240,9 +1370,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_sun_shrine_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_sun_shrine_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_sun_shrine_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_sun_shrine_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_sun_shrine_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_sun_shrine_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_quarters", result_text="You press on to the next area."),
         ]
@@ -1264,8 +1398,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_sun_shrine_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_sun_shrine_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_sun_shrine_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_sun_shrine_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_sun_shrine_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_armory", result_text="You press on to the next area."),
         ]
@@ -1286,9 +1421,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_sun_shrine_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_sun_shrine_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_sun_shrine_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_sun_shrine_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_sun_shrine_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_sun_shrine_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_cellar", result_text="You press on to the next area."),
         ]
@@ -1310,8 +1449,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_sun_shrine_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_sun_shrine_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_sun_shrine_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_sun_shrine_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_sun_shrine_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_passage", result_text="You press on to the next area."),
         ]
@@ -1332,9 +1472,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_sun_shrine_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_sun_shrine_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_sun_shrine_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_sun_shrine_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_sun_shrine_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_sun_shrine_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_chamber", result_text="You press on to the next area."),
         ]
@@ -1356,8 +1500,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_sun_shrine_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_sun_shrine_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_sun_shrine_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_sun_shrine_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_sun_shrine_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_overlook", result_text="You press on to the next area."),
         ]
@@ -1379,8 +1524,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_sun_shrine_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_sun_shrine_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_sun_shrine_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_sun_shrine_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_sun_shrine_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_sanctum", result_text="You press on to the next area."),
         ]
@@ -1402,8 +1548,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_sun_shrine_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_sun_shrine_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_sun_shrine_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_sun_shrine_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_sun_shrine_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_sun_shrine_vault", result_text="You press on to the next area."),
         ]
@@ -1424,9 +1571,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_sun_shrine_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_sun_shrine_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_sun_shrine_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_sun_shrine_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_sun_shrine_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_sun_shrine_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_sun_shrine_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_sun_shrine_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_sun_shrine_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_sun_shrine_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -1452,9 +1603,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_canyon_oasis_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_canyon_oasis_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_canyon_oasis_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_canyon_oasis_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_canyon_oasis_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_canyon_oasis_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_courtyard", result_text="You press on to the next area."),
         ]
@@ -1475,9 +1630,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_canyon_oasis_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_canyon_oasis_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_canyon_oasis_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_canyon_oasis_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_canyon_oasis_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_canyon_oasis_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_quarters", result_text="You press on to the next area."),
         ]
@@ -1499,8 +1658,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_canyon_oasis_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_canyon_oasis_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_canyon_oasis_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_canyon_oasis_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_canyon_oasis_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_armory", result_text="You press on to the next area."),
         ]
@@ -1521,9 +1681,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_canyon_oasis_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_canyon_oasis_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_canyon_oasis_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_canyon_oasis_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_canyon_oasis_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_canyon_oasis_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_cellar", result_text="You press on to the next area."),
         ]
@@ -1545,8 +1709,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_canyon_oasis_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_canyon_oasis_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_canyon_oasis_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_canyon_oasis_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_canyon_oasis_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_passage", result_text="You press on to the next area."),
         ]
@@ -1567,9 +1732,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_canyon_oasis_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_canyon_oasis_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_canyon_oasis_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_canyon_oasis_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_canyon_oasis_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_canyon_oasis_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_chamber", result_text="You press on to the next area."),
         ]
@@ -1591,8 +1760,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_canyon_oasis_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_canyon_oasis_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_canyon_oasis_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_canyon_oasis_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_canyon_oasis_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_overlook", result_text="You press on to the next area."),
         ]
@@ -1614,8 +1784,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_canyon_oasis_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_canyon_oasis_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_canyon_oasis_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_canyon_oasis_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_canyon_oasis_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_sanctum", result_text="You press on to the next area."),
         ]
@@ -1637,8 +1808,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_canyon_oasis_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_canyon_oasis_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_canyon_oasis_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_canyon_oasis_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_canyon_oasis_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_vault", result_text="You press on to the next area."),
         ]
@@ -1659,9 +1831,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_canyon_oasis_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_canyon_oasis_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_canyon_oasis_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_canyon_oasis_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_canyon_oasis_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_canyon_oasis_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -1687,9 +1863,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_skiff_graveyard_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_skiff_graveyard_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_skiff_graveyard_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_skiff_graveyard_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_skiff_graveyard_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_skiff_graveyard_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_courtyard", result_text="You press on to the next area."),
         ]
@@ -1710,9 +1890,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_skiff_graveyard_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_skiff_graveyard_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_skiff_graveyard_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_skiff_graveyard_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_skiff_graveyard_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_skiff_graveyard_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_quarters", result_text="You press on to the next area."),
         ]
@@ -1734,8 +1918,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_skiff_graveyard_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_skiff_graveyard_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_skiff_graveyard_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_skiff_graveyard_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_skiff_graveyard_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_armory", result_text="You press on to the next area."),
         ]
@@ -1756,9 +1941,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_skiff_graveyard_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_skiff_graveyard_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_skiff_graveyard_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_skiff_graveyard_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_skiff_graveyard_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_skiff_graveyard_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_cellar", result_text="You press on to the next area."),
         ]
@@ -1780,8 +1969,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_skiff_graveyard_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_skiff_graveyard_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_skiff_graveyard_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_skiff_graveyard_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_skiff_graveyard_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_passage", result_text="You press on to the next area."),
         ]
@@ -1802,9 +1992,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_skiff_graveyard_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_skiff_graveyard_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_skiff_graveyard_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_skiff_graveyard_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_skiff_graveyard_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_skiff_graveyard_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_chamber", result_text="You press on to the next area."),
         ]
@@ -1826,8 +2020,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_skiff_graveyard_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_skiff_graveyard_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_skiff_graveyard_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_skiff_graveyard_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_skiff_graveyard_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_overlook", result_text="You press on to the next area."),
         ]
@@ -1849,8 +2044,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_skiff_graveyard_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_skiff_graveyard_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_skiff_graveyard_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_skiff_graveyard_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_skiff_graveyard_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_sanctum", result_text="You press on to the next area."),
         ]
@@ -1872,8 +2068,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_skiff_graveyard_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_skiff_graveyard_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_skiff_graveyard_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_skiff_graveyard_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_skiff_graveyard_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_skiff_graveyard_vault", result_text="You press on to the next area."),
         ]
@@ -1894,9 +2091,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_skiff_graveyard_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_skiff_graveyard_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_skiff_graveyard_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_skiff_graveyard_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_skiff_graveyard_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_skiff_graveyard_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_skiff_graveyard_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_skiff_graveyard_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_skiff_graveyard_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_skiff_graveyard_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -1922,9 +2123,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_dune_ridge_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_dune_ridge_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_dune_ridge_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_dune_ridge_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_dune_ridge_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_dune_ridge_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_courtyard", result_text="You press on to the next area."),
         ]
@@ -1945,9 +2150,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_dune_ridge_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_dune_ridge_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_dune_ridge_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_dune_ridge_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_dune_ridge_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_dune_ridge_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_quarters", result_text="You press on to the next area."),
         ]
@@ -1969,8 +2178,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_dune_ridge_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_dune_ridge_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_dune_ridge_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_dune_ridge_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_dune_ridge_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_armory", result_text="You press on to the next area."),
         ]
@@ -1991,9 +2201,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_dune_ridge_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_dune_ridge_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_dune_ridge_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_dune_ridge_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_dune_ridge_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_dune_ridge_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_cellar", result_text="You press on to the next area."),
         ]
@@ -2015,8 +2229,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_dune_ridge_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_dune_ridge_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_dune_ridge_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_dune_ridge_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_dune_ridge_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_passage", result_text="You press on to the next area."),
         ]
@@ -2037,9 +2252,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_dune_ridge_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_dune_ridge_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_dune_ridge_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_dune_ridge_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_dune_ridge_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_dune_ridge_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_chamber", result_text="You press on to the next area."),
         ]
@@ -2061,8 +2280,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_dune_ridge_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_dune_ridge_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_dune_ridge_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_dune_ridge_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_dune_ridge_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_overlook", result_text="You press on to the next area."),
         ]
@@ -2084,8 +2304,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_dune_ridge_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_dune_ridge_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_dune_ridge_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_dune_ridge_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_dune_ridge_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_sanctum", result_text="You press on to the next area."),
         ]
@@ -2107,8 +2328,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_dune_ridge_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_dune_ridge_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_dune_ridge_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_dune_ridge_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_dune_ridge_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_dune_ridge_vault", result_text="You press on to the next area."),
         ]
@@ -2129,9 +2351,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_dune_ridge_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_dune_ridge_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_dune_ridge_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_dune_ridge_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_dune_ridge_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_dune_ridge_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_dune_ridge_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_dune_ridge_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_dune_ridge_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_dune_ridge_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]
@@ -2157,9 +2383,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_nomad_well_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="scorchwaste_nomad_well_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="scorchwaste_nomad_well_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="scorchwaste_nomad_well_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="scorchwaste_nomad_well_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="scorchwaste_nomad_well_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_courtyard", result_text="You press on to the next area."),
         ]
@@ -2180,9 +2410,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_nomad_well_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="scorchwaste_nomad_well_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="scorchwaste_nomad_well_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="scorchwaste_nomad_well_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="scorchwaste_nomad_well_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="scorchwaste_nomad_well_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_quarters", result_text="You press on to the next area."),
         ]
@@ -2204,8 +2438,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="scorchwaste_nomad_well_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="scorchwaste_nomad_well_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="scorchwaste_nomad_well_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="scorchwaste_nomad_well_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="scorchwaste_nomad_well_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_armory", result_text="You press on to the next area."),
         ]
@@ -2226,9 +2461,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_nomad_well_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="scorchwaste_nomad_well_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="scorchwaste_nomad_well_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="scorchwaste_nomad_well_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="scorchwaste_nomad_well_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="scorchwaste_nomad_well_armory_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_quarters", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_armory_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_cellar", result_text="You press on to the next area."),
         ]
@@ -2250,8 +2489,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="scorchwaste_nomad_well_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="scorchwaste_nomad_well_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="scorchwaste_nomad_well_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="scorchwaste_nomad_well_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="scorchwaste_nomad_well_cellar_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_armory", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_cellar_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_passage", result_text="You press on to the next area."),
         ]
@@ -2272,9 +2512,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_nomad_well_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="scorchwaste_nomad_well_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="scorchwaste_nomad_well_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="scorchwaste_nomad_well_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="scorchwaste_nomad_well_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="scorchwaste_nomad_well_passage_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_cellar", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_passage_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_chamber", result_text="You press on to the next area."),
         ]
@@ -2296,8 +2540,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="scorchwaste_nomad_well_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="scorchwaste_nomad_well_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="scorchwaste_nomad_well_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="scorchwaste_nomad_well_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="scorchwaste_nomad_well_chamber_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_passage", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_chamber_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_overlook", result_text="You press on to the next area."),
         ]
@@ -2319,8 +2564,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="scorchwaste_nomad_well_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="scorchwaste_nomad_well_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="scorchwaste_nomad_well_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="scorchwaste_nomad_well_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="scorchwaste_nomad_well_overlook_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_chamber", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_overlook_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_sanctum", result_text="You press on to the next area."),
         ]
@@ -2342,8 +2588,9 @@ def build_scorchwaste_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="scorchwaste_nomad_well_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="scorchwaste_nomad_well_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="scorchwaste_nomad_well_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="scorchwaste_nomad_well_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="scorchwaste_nomad_well_sanctum_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_overlook", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_sanctum_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_vault", result_text="You press on to the next area."),
         ]
@@ -2364,9 +2611,13 @@ def build_scorchwaste_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'scorchwaste_nomad_well_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="scorchwaste_nomad_well_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="scorchwaste_nomad_well_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="scorchwaste_nomad_well_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="scorchwaste_nomad_well_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="scorchwaste_nomad_well_vault_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_sanctum", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_vault_to_hub", label="Return to Hub", category="movement", target_scene="scorchwaste_hub", result_text="You return victorious to the hub."),
         ]

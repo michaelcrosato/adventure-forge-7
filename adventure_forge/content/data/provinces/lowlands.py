@@ -22,6 +22,7 @@ def build_lowlands_province() -> RegionManifest:
         base_actions=[
             Action(id="lowlands_hub_scout", label="Scout hub", category="interaction", result_text="You survey the bustling provincial crossroads."),
             Action(id="lowlands_hub_rest", label="Rest at inn", category="interaction", effects=[{"modify_stamina": 5}], result_text="You rest and regain stamina."),
+            Action(id="lowlands_hub_board", label="Check notice board", category="interaction", effects=[{"set_flag": {"flag": "lowlands_notices_read", "value": True}}, {"log_event": "You read the municipal notice board."}], result_text="You read the pinned municipal notices."),
             Action(id="lowlands_to_bazaar", label="Go to Bazaar", category="movement", target_scene="bazaar_center", result_text="You travel along the highway to the Grand Bazaar."),
         ]
     )
@@ -42,9 +43,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_oakhaven_port_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_oakhaven_port_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_oakhaven_port_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_oakhaven_port_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_oakhaven_port_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_oakhaven_port_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_courtyard", result_text="You press on to the next area."),
         ]
@@ -65,9 +70,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_oakhaven_port_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_oakhaven_port_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_oakhaven_port_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_oakhaven_port_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_oakhaven_port_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_oakhaven_port_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_gate", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_quarters", result_text="You press on to the next area."),
         ]
@@ -89,8 +98,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_oakhaven_port_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_oakhaven_port_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_oakhaven_port_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_oakhaven_port_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_oakhaven_port_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_armory", result_text="You press on to the next area."),
         ]
@@ -111,9 +121,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_oakhaven_port_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_oakhaven_port_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_oakhaven_port_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_oakhaven_port_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_oakhaven_port_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_oakhaven_port_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_cellar", result_text="You press on to the next area."),
         ]
@@ -135,8 +149,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_oakhaven_port_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_oakhaven_port_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_oakhaven_port_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_oakhaven_port_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_oakhaven_port_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_armory", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_passage", result_text="You press on to the next area."),
         ]
@@ -157,9 +172,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_oakhaven_port_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_oakhaven_port_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_oakhaven_port_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_oakhaven_port_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_oakhaven_port_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_oakhaven_port_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_chamber", result_text="You press on to the next area."),
         ]
@@ -181,8 +200,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_oakhaven_port_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_oakhaven_port_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_oakhaven_port_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_oakhaven_port_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_oakhaven_port_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_passage", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_overlook", result_text="You press on to the next area."),
         ]
@@ -204,8 +224,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_oakhaven_port_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_oakhaven_port_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_oakhaven_port_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_oakhaven_port_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_oakhaven_port_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_sanctum", result_text="You press on to the next area."),
         ]
@@ -227,8 +248,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_oakhaven_port_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_oakhaven_port_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_oakhaven_port_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_oakhaven_port_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_oakhaven_port_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_vault", result_text="You press on to the next area."),
         ]
@@ -249,9 +271,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_oakhaven_port_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_oakhaven_port_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_oakhaven_port_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_oakhaven_port_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_oakhaven_port_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_oakhaven_port_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_oakhaven_port_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -277,9 +303,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_thieves_hall_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_thieves_hall_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_thieves_hall_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_thieves_hall_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_thieves_hall_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_thieves_hall_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_courtyard", result_text="You press on to the next area."),
         ]
@@ -300,9 +330,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_thieves_hall_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_thieves_hall_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_thieves_hall_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_thieves_hall_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_thieves_hall_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_thieves_hall_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_gate", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_quarters", result_text="You press on to the next area."),
         ]
@@ -324,8 +358,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_thieves_hall_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_thieves_hall_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_thieves_hall_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_thieves_hall_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_thieves_hall_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_armory", result_text="You press on to the next area."),
         ]
@@ -346,9 +381,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_thieves_hall_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_thieves_hall_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_thieves_hall_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_thieves_hall_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_thieves_hall_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_thieves_hall_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_cellar", result_text="You press on to the next area."),
         ]
@@ -370,8 +409,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_thieves_hall_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_thieves_hall_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_thieves_hall_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_thieves_hall_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_thieves_hall_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_armory", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_passage", result_text="You press on to the next area."),
         ]
@@ -392,9 +432,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_thieves_hall_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_thieves_hall_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_thieves_hall_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_thieves_hall_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_thieves_hall_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_thieves_hall_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_chamber", result_text="You press on to the next area."),
         ]
@@ -416,8 +460,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_thieves_hall_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_thieves_hall_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_thieves_hall_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_thieves_hall_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_thieves_hall_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_passage", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_overlook", result_text="You press on to the next area."),
         ]
@@ -439,8 +484,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_thieves_hall_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_thieves_hall_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_thieves_hall_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_thieves_hall_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_thieves_hall_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_sanctum", result_text="You press on to the next area."),
         ]
@@ -462,8 +508,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_thieves_hall_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_thieves_hall_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_thieves_hall_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_thieves_hall_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_thieves_hall_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_vault", result_text="You press on to the next area."),
         ]
@@ -484,9 +531,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_thieves_hall_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_thieves_hall_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_thieves_hall_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_thieves_hall_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_thieves_hall_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_thieves_hall_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -512,9 +563,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_canal_sluice_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_canal_sluice_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_canal_sluice_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_canal_sluice_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_canal_sluice_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_canal_sluice_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_courtyard", result_text="You press on to the next area."),
         ]
@@ -535,9 +590,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_canal_sluice_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_canal_sluice_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_canal_sluice_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_canal_sluice_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_canal_sluice_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_canal_sluice_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_gate", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_quarters", result_text="You press on to the next area."),
         ]
@@ -559,8 +618,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_canal_sluice_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_canal_sluice_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_canal_sluice_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_canal_sluice_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_canal_sluice_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_armory", result_text="You press on to the next area."),
         ]
@@ -581,9 +641,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_canal_sluice_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_canal_sluice_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_canal_sluice_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_canal_sluice_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_canal_sluice_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_canal_sluice_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_cellar", result_text="You press on to the next area."),
         ]
@@ -605,8 +669,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_canal_sluice_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_canal_sluice_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_canal_sluice_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_canal_sluice_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_canal_sluice_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_armory", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_passage", result_text="You press on to the next area."),
         ]
@@ -627,9 +692,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_canal_sluice_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_canal_sluice_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_canal_sluice_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_canal_sluice_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_canal_sluice_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_canal_sluice_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_chamber", result_text="You press on to the next area."),
         ]
@@ -651,8 +720,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_canal_sluice_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_canal_sluice_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_canal_sluice_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_canal_sluice_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_canal_sluice_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_passage", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_overlook", result_text="You press on to the next area."),
         ]
@@ -674,8 +744,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_canal_sluice_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_canal_sluice_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_canal_sluice_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_canal_sluice_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_canal_sluice_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_sanctum", result_text="You press on to the next area."),
         ]
@@ -697,8 +768,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_canal_sluice_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_canal_sluice_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_canal_sluice_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_canal_sluice_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_canal_sluice_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_canal_sluice_vault", result_text="You press on to the next area."),
         ]
@@ -719,9 +791,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_canal_sluice_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_canal_sluice_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_canal_sluice_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_canal_sluice_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_canal_sluice_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_canal_sluice_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_canal_sluice_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_canal_sluice_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_canal_sluice_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_canal_sluice_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -747,9 +823,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_dock_tavern_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_dock_tavern_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_dock_tavern_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_dock_tavern_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_dock_tavern_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_dock_tavern_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_courtyard", result_text="You press on to the next area."),
         ]
@@ -770,9 +850,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_dock_tavern_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_dock_tavern_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_dock_tavern_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_dock_tavern_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_dock_tavern_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_dock_tavern_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_gate", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_quarters", result_text="You press on to the next area."),
         ]
@@ -794,8 +878,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_dock_tavern_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_dock_tavern_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_dock_tavern_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_dock_tavern_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_dock_tavern_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_armory", result_text="You press on to the next area."),
         ]
@@ -816,9 +901,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_dock_tavern_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_dock_tavern_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_dock_tavern_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_dock_tavern_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_dock_tavern_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_dock_tavern_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_cellar", result_text="You press on to the next area."),
         ]
@@ -840,8 +929,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_dock_tavern_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_dock_tavern_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_dock_tavern_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_dock_tavern_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_dock_tavern_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_armory", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_passage", result_text="You press on to the next area."),
         ]
@@ -862,9 +952,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_dock_tavern_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_dock_tavern_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_dock_tavern_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_dock_tavern_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_dock_tavern_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_dock_tavern_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_chamber", result_text="You press on to the next area."),
         ]
@@ -886,8 +980,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_dock_tavern_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_dock_tavern_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_dock_tavern_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_dock_tavern_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_dock_tavern_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_passage", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_overlook", result_text="You press on to the next area."),
         ]
@@ -909,8 +1004,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_dock_tavern_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_dock_tavern_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_dock_tavern_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_dock_tavern_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_dock_tavern_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_sanctum", result_text="You press on to the next area."),
         ]
@@ -932,8 +1028,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_dock_tavern_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_dock_tavern_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_dock_tavern_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_dock_tavern_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_dock_tavern_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_vault", result_text="You press on to the next area."),
         ]
@@ -954,9 +1051,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_dock_tavern_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_dock_tavern_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_dock_tavern_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_dock_tavern_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_dock_tavern_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_dock_tavern_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -982,9 +1083,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_cloth_market_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_cloth_market_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_cloth_market_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_cloth_market_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_cloth_market_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_cloth_market_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_cloth_market_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_courtyard", result_text="You press on to the next area."),
         ]
@@ -1005,9 +1110,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_cloth_market_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_cloth_market_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_cloth_market_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_cloth_market_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_cloth_market_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_cloth_market_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_cloth_market_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_gate", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_quarters", result_text="You press on to the next area."),
         ]
@@ -1029,8 +1138,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_cloth_market_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_cloth_market_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_cloth_market_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_cloth_market_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_cloth_market_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_armory", result_text="You press on to the next area."),
         ]
@@ -1051,9 +1161,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_cloth_market_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_cloth_market_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_cloth_market_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_cloth_market_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_cloth_market_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_cloth_market_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_cloth_market_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_cellar", result_text="You press on to the next area."),
         ]
@@ -1075,8 +1189,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_cloth_market_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_cloth_market_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_cloth_market_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_cloth_market_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_cloth_market_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_armory", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_passage", result_text="You press on to the next area."),
         ]
@@ -1097,9 +1212,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_cloth_market_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_cloth_market_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_cloth_market_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_cloth_market_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_cloth_market_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_cloth_market_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_cloth_market_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_chamber", result_text="You press on to the next area."),
         ]
@@ -1121,8 +1240,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_cloth_market_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_cloth_market_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_cloth_market_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_cloth_market_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_cloth_market_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_passage", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_overlook", result_text="You press on to the next area."),
         ]
@@ -1144,8 +1264,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_cloth_market_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_cloth_market_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_cloth_market_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_cloth_market_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_cloth_market_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_sanctum", result_text="You press on to the next area."),
         ]
@@ -1167,8 +1288,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_cloth_market_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_cloth_market_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_cloth_market_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_cloth_market_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_cloth_market_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_vault", result_text="You press on to the next area."),
         ]
@@ -1189,9 +1311,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_cloth_market_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_cloth_market_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_cloth_market_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_cloth_market_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_cloth_market_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_cloth_market_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_cloth_market_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -1217,9 +1343,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_smuggler_cove_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_smuggler_cove_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_smuggler_cove_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_smuggler_cove_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_smuggler_cove_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_smuggler_cove_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_courtyard", result_text="You press on to the next area."),
         ]
@@ -1240,9 +1370,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_smuggler_cove_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_smuggler_cove_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_smuggler_cove_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_smuggler_cove_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_smuggler_cove_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_smuggler_cove_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_gate", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_quarters", result_text="You press on to the next area."),
         ]
@@ -1264,8 +1398,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_smuggler_cove_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_smuggler_cove_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_smuggler_cove_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_smuggler_cove_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_smuggler_cove_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_armory", result_text="You press on to the next area."),
         ]
@@ -1286,9 +1421,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_smuggler_cove_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_smuggler_cove_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_smuggler_cove_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_smuggler_cove_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_smuggler_cove_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_smuggler_cove_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_cellar", result_text="You press on to the next area."),
         ]
@@ -1310,8 +1449,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_smuggler_cove_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_smuggler_cove_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_smuggler_cove_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_smuggler_cove_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_smuggler_cove_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_armory", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_passage", result_text="You press on to the next area."),
         ]
@@ -1332,9 +1472,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_smuggler_cove_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_smuggler_cove_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_smuggler_cove_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_smuggler_cove_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_smuggler_cove_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_smuggler_cove_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_chamber", result_text="You press on to the next area."),
         ]
@@ -1356,8 +1500,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_smuggler_cove_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_smuggler_cove_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_smuggler_cove_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_smuggler_cove_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_smuggler_cove_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_passage", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_overlook", result_text="You press on to the next area."),
         ]
@@ -1379,8 +1524,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_smuggler_cove_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_smuggler_cove_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_smuggler_cove_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_smuggler_cove_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_smuggler_cove_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_sanctum", result_text="You press on to the next area."),
         ]
@@ -1402,8 +1548,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_smuggler_cove_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_smuggler_cove_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_smuggler_cove_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_smuggler_cove_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_smuggler_cove_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_smuggler_cove_vault", result_text="You press on to the next area."),
         ]
@@ -1424,9 +1571,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_smuggler_cove_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_smuggler_cove_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_smuggler_cove_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_smuggler_cove_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_smuggler_cove_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_smuggler_cove_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_smuggler_cove_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_smuggler_cove_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_smuggler_cove_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_smuggler_cove_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -1452,9 +1603,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_brewery_vault_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_brewery_vault_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_brewery_vault_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_brewery_vault_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_brewery_vault_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_brewery_vault_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_courtyard", result_text="You press on to the next area."),
         ]
@@ -1475,9 +1630,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_brewery_vault_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_brewery_vault_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_brewery_vault_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_brewery_vault_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_brewery_vault_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_brewery_vault_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_gate", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_quarters", result_text="You press on to the next area."),
         ]
@@ -1499,8 +1658,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_brewery_vault_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_brewery_vault_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_brewery_vault_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_brewery_vault_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_brewery_vault_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_armory", result_text="You press on to the next area."),
         ]
@@ -1521,9 +1681,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_brewery_vault_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_brewery_vault_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_brewery_vault_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_brewery_vault_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_brewery_vault_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_brewery_vault_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_cellar", result_text="You press on to the next area."),
         ]
@@ -1545,8 +1709,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_brewery_vault_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_brewery_vault_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_brewery_vault_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_brewery_vault_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_brewery_vault_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_armory", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_passage", result_text="You press on to the next area."),
         ]
@@ -1567,9 +1732,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_brewery_vault_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_brewery_vault_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_brewery_vault_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_brewery_vault_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_brewery_vault_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_brewery_vault_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_chamber", result_text="You press on to the next area."),
         ]
@@ -1591,8 +1760,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_brewery_vault_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_brewery_vault_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_brewery_vault_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_brewery_vault_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_brewery_vault_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_passage", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_overlook", result_text="You press on to the next area."),
         ]
@@ -1614,8 +1784,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_brewery_vault_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_brewery_vault_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_brewery_vault_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_brewery_vault_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_brewery_vault_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_sanctum", result_text="You press on to the next area."),
         ]
@@ -1637,8 +1808,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_brewery_vault_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_brewery_vault_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_brewery_vault_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_brewery_vault_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_brewery_vault_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_brewery_vault_vault", result_text="You press on to the next area."),
         ]
@@ -1659,9 +1831,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_brewery_vault_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_brewery_vault_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_brewery_vault_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_brewery_vault_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_brewery_vault_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_brewery_vault_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_brewery_vault_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_brewery_vault_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_brewery_vault_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_brewery_vault_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -1687,9 +1863,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_bell_tower_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_bell_tower_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_bell_tower_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_bell_tower_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_bell_tower_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_bell_tower_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_bell_tower_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_courtyard", result_text="You press on to the next area."),
         ]
@@ -1710,9 +1890,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_bell_tower_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_bell_tower_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_bell_tower_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_bell_tower_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_bell_tower_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_bell_tower_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_bell_tower_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_gate", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_quarters", result_text="You press on to the next area."),
         ]
@@ -1734,8 +1918,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_bell_tower_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_bell_tower_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_bell_tower_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_bell_tower_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_bell_tower_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_bell_tower_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_armory", result_text="You press on to the next area."),
         ]
@@ -1756,9 +1941,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_bell_tower_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_bell_tower_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_bell_tower_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_bell_tower_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_bell_tower_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_bell_tower_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_bell_tower_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_cellar", result_text="You press on to the next area."),
         ]
@@ -1780,8 +1969,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_bell_tower_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_bell_tower_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_bell_tower_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_bell_tower_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_bell_tower_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_bell_tower_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_armory", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_passage", result_text="You press on to the next area."),
         ]
@@ -1802,9 +1992,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_bell_tower_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_bell_tower_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_bell_tower_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_bell_tower_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_bell_tower_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_bell_tower_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_bell_tower_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_chamber", result_text="You press on to the next area."),
         ]
@@ -1826,8 +2020,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_bell_tower_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_bell_tower_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_bell_tower_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_bell_tower_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_bell_tower_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_bell_tower_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_passage", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_overlook", result_text="You press on to the next area."),
         ]
@@ -1849,8 +2044,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_bell_tower_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_bell_tower_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_bell_tower_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_bell_tower_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_bell_tower_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_bell_tower_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_sanctum", result_text="You press on to the next area."),
         ]
@@ -1872,8 +2068,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_bell_tower_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_bell_tower_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_bell_tower_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_bell_tower_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_bell_tower_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_bell_tower_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_bell_tower_vault", result_text="You press on to the next area."),
         ]
@@ -1894,9 +2091,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_bell_tower_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_bell_tower_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_bell_tower_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_bell_tower_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_bell_tower_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_bell_tower_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_bell_tower_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_bell_tower_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_bell_tower_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_bell_tower_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -1922,9 +2123,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_customs_house_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_customs_house_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_customs_house_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_customs_house_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_customs_house_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_customs_house_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_customs_house_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_courtyard", result_text="You press on to the next area."),
         ]
@@ -1945,9 +2150,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_customs_house_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_customs_house_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_customs_house_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_customs_house_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_customs_house_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_customs_house_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_customs_house_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_gate", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_quarters", result_text="You press on to the next area."),
         ]
@@ -1969,8 +2178,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_customs_house_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_customs_house_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_customs_house_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_customs_house_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_customs_house_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_armory", result_text="You press on to the next area."),
         ]
@@ -1991,9 +2201,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_customs_house_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_customs_house_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_customs_house_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_customs_house_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_customs_house_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_customs_house_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_customs_house_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_cellar", result_text="You press on to the next area."),
         ]
@@ -2015,8 +2229,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_customs_house_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_customs_house_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_customs_house_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_customs_house_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_customs_house_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_armory", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_passage", result_text="You press on to the next area."),
         ]
@@ -2037,9 +2252,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_customs_house_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_customs_house_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_customs_house_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_customs_house_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_customs_house_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_customs_house_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_customs_house_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_chamber", result_text="You press on to the next area."),
         ]
@@ -2061,8 +2280,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_customs_house_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_customs_house_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_customs_house_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_customs_house_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_customs_house_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_passage", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_overlook", result_text="You press on to the next area."),
         ]
@@ -2084,8 +2304,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_customs_house_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_customs_house_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_customs_house_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_customs_house_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_customs_house_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_sanctum", result_text="You press on to the next area."),
         ]
@@ -2107,8 +2328,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_customs_house_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_customs_house_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_customs_house_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_customs_house_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_customs_house_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_vault", result_text="You press on to the next area."),
         ]
@@ -2129,9 +2351,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_customs_house_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_customs_house_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_customs_house_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_customs_house_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_customs_house_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_customs_house_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_customs_house_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]
@@ -2157,9 +2383,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_potters_quay_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_potters_quay_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect gate."),
-            Action(id="lowlands_potters_quay_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to check locks."),
+            Action(id="lowlands_potters_quay_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
+            Action(id="lowlands_potters_quay_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
+            Action(id="lowlands_potters_quay_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
             Action(id="lowlands_potters_quay_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_courtyard", result_text="You press on to the next area."),
         ]
@@ -2180,9 +2410,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_potters_quay_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_potters_quay_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search yard."),
-            Action(id="lowlands_potters_quay_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey area."),
+            Action(id="lowlands_potters_quay_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
+            Action(id="lowlands_potters_quay_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
+            Action(id="lowlands_potters_quay_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
             Action(id="lowlands_potters_quay_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_gate", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_quarters", result_text="You press on to the next area."),
         ]
@@ -2204,8 +2438,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_potters_quay_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search bunks."),
-            Action(id="lowlands_potters_quay_quarters_act_1", label="Rest briefly", category="interaction", result_text="You proceed to rest briefly."),
+            Action(id="lowlands_potters_quay_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
+            Action(id="lowlands_potters_quay_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
+            Action(id="lowlands_potters_quay_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
             Action(id="lowlands_potters_quay_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_armory", result_text="You press on to the next area."),
         ]
@@ -2226,9 +2461,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_potters_quay_armory_supply_chest', 'name': 'Supply Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_potters_quay_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inspect supplies."),
-            Action(id="lowlands_potters_quay_armory_act_1", label="Take provisions", category="interaction", result_text="You proceed to take provisions."),
+            Action(id="lowlands_potters_quay_armory_act_0", label="Inspect supplies", category="interaction", result_text="You carefully inventory the stacked rations."),
+            Action(id="lowlands_potters_quay_armory_act_1", label="Take provisions", category="interaction", effects=[{'modify_stamina': 2}, {'log_event': 'You gathered emergency trail rations.'}], result_text="You proceed to gather field rations."),
+            Action(id="lowlands_potters_quay_armory_act_2", label="Inspect weapon rack", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_armory_weapons_checked', 'value': True}}, {'log_event': 'You inspected the weapon racks.'}], result_text="You inspect the blunted training blades."),
             Action(id="lowlands_potters_quay_armory_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_quarters", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_armory_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_cellar", result_text="You press on to the next area."),
         ]
@@ -2250,8 +2489,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_potters_quay_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully check barrels."),
-            Action(id="lowlands_potters_quay_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to search crates."),
+            Action(id="lowlands_potters_quay_cellar_act_0", label="Check barrels", category="interaction", result_text="You carefully inspect the wooden casks."),
+            Action(id="lowlands_potters_quay_cellar_act_1", label="Search crates", category="interaction", result_text="You proceed to pry open packing crates."),
+            Action(id="lowlands_potters_quay_cellar_act_2", label="Inspect cask", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_cellar_cask_checked', 'value': True}}, {'log_event': 'You inspected the storage barrels.'}], result_text="You inspect the aged storage barrels."),
             Action(id="lowlands_potters_quay_cellar_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_armory", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_cellar_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_passage", result_text="You press on to the next area."),
         ]
@@ -2272,9 +2512,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_potters_quay_passage_brazier', 'name': 'Wall Brazier', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="lowlands_potters_quay_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check walls."),
-            Action(id="lowlands_potters_quay_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to search floor."),
+            Action(id="lowlands_potters_quay_passage_act_0", label="Check walls", category="interaction", result_text="You carefully check masonry for hidden seams."),
+            Action(id="lowlands_potters_quay_passage_act_1", label="Search floor", category="interaction", result_text="You proceed to look for tripwires on the flagstones."),
+            Action(id="lowlands_potters_quay_passage_act_2", label="Inspect sconce", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_passage_sconce_adjusted', 'value': True}}, {'log_event': 'You adjusted the wall sconce.'}], result_text="You adjust the flickering tallow torch."),
             Action(id="lowlands_potters_quay_passage_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_cellar", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_passage_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_chamber", result_text="You press on to the next area."),
         ]
@@ -2296,8 +2540,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_potters_quay_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully examine desk."),
-            Action(id="lowlands_potters_quay_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to read ledger."),
+            Action(id="lowlands_potters_quay_chamber_act_0", label="Examine desk", category="interaction", result_text="You carefully inspect the carved desk drawers."),
+            Action(id="lowlands_potters_quay_chamber_act_1", label="Read ledger", category="interaction", result_text="You proceed to scan recent accounting entries."),
+            Action(id="lowlands_potters_quay_chamber_act_2", label="Study road map", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_chamber_map_studied', 'value': True}}, {'log_event': 'You studied the regional map.'}], result_text="You examine the regional road map."),
             Action(id="lowlands_potters_quay_chamber_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_passage", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_chamber_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_overlook", result_text="You press on to the next area."),
         ]
@@ -2319,8 +2564,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_potters_quay_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scout terrain."),
-            Action(id="lowlands_potters_quay_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to watch horizon."),
+            Action(id="lowlands_potters_quay_overlook_act_0", label="Scout terrain", category="interaction", result_text="You carefully scan terrain features below."),
+            Action(id="lowlands_potters_quay_overlook_act_1", label="Watch horizon", category="interaction", result_text="You proceed to monitor distant movement."),
+            Action(id="lowlands_potters_quay_overlook_act_2", label="Study approach road", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_overlook_road_scouted', 'value': True}}, {'log_event': 'You scouted the approach road.'}], result_text="You study the winding approach road."),
             Action(id="lowlands_potters_quay_overlook_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_chamber", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_overlook_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_sanctum", result_text="You press on to the next area."),
         ]
@@ -2342,8 +2588,9 @@ def build_lowlands_province() -> RegionManifest:
             ),
         ],
         base_actions=[
-            Action(id="lowlands_potters_quay_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully examine altar."),
-            Action(id="lowlands_potters_quay_sanctum_act_1", label="Offer prayer", category="interaction", result_text="You proceed to offer prayer."),
+            Action(id="lowlands_potters_quay_sanctum_act_0", label="Examine altar", category="interaction", result_text="You carefully inspect religious engravings."),
+            Action(id="lowlands_potters_quay_sanctum_act_1", label="Offer prayer", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to speak a silent devotion."),
+            Action(id="lowlands_potters_quay_sanctum_act_2", label="Light candle", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_sanctum_candle_lit', 'value': True}}, {'log_event': 'A quiet moment of calm restores focus.'}], result_text="You light a small clay votive candle."),
             Action(id="lowlands_potters_quay_sanctum_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_overlook", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_sanctum_to_next", label="Press forward", category="movement", target_scene="lowlands_potters_quay_vault", result_text="You press on to the next area."),
         ]
@@ -2364,9 +2611,13 @@ def build_lowlands_province() -> RegionManifest:
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'lowlands_potters_quay_vault_iron_chest', 'name': 'Iron Chest', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="lowlands_potters_quay_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully inspect chests."),
-            Action(id="lowlands_potters_quay_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search shadows."),
+            Action(id="lowlands_potters_quay_vault_act_0", label="Inspect chests", category="interaction", result_text="You carefully examine the iron chest bands."),
+            Action(id="lowlands_potters_quay_vault_act_1", label="Search shadows", category="interaction", result_text="You proceed to search deep corner recesses."),
+            Action(id="lowlands_potters_quay_vault_act_2", label="Examine lock", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_potters_quay_vault_lock_examined', 'value': True}}, {'log_event': 'You inspected the vault lock.'}], result_text="You inspect the heavy brass lock tumbler."),
             Action(id="lowlands_potters_quay_vault_to_prev", label="Return back", category="movement", target_scene="lowlands_potters_quay_sanctum", result_text="You retrace your steps."),
             Action(id="lowlands_potters_quay_vault_to_hub", label="Return to Hub", category="movement", target_scene="lowlands_hub", result_text="You return victorious to the hub."),
         ]

@@ -100,17 +100,127 @@ PROVINCE_CONFIGS = [
     }
 ]
 
-SUB_NODE_NAMES = [
-    ("gate", "Outer Gate", "Iron bars secure the heavy timber entrance.", "Inspect gate", "Check locks"),
-    ("courtyard", "Main Courtyard", "Cobblestones show heavy cart wheel wear.", "Search yard", "Survey area"),
-    ("quarters", "Living Quarters", "Rows of wooden bunks line the walls.", "Search bunks", "Rest briefly"),
-    ("armory", "Supply Depot", "Crates of rations and tools stand stacked.", "Inspect supplies", "Take provisions"),
-    ("cellar", "Lower Cellar", "Damp air smells of cool earth and storage.", "Check barrels", "Search crates"),
-    ("passage", "Stone Corridor", "Wall sconces hold flickering tallow candles.", "Check walls", "Search floor"),
-    ("chamber", "Inner Chamber", "A sturdy oak desk holds ledgers and maps.", "Examine desk", "Read ledger"),
-    ("overlook", "High Overlook", "A stone ledge provides a clear view.", "Scout terrain", "Watch horizon"),
-    ("sanctum", "Inner Sanctum", "A stone altar stands in quiet reverence.", "Examine altar", "Offer prayer"),
-    ("vault", "Deep Vault", "Iron-banded chests sit in deep shadows.", "Inspect chests", "Search shadows"),
+SUB_NODE_CONFIGS = [
+    {
+        "key": "gate",
+        "label": "Outer Gate",
+        "desc": "Iron bars secure the heavy timber entrance.",
+        "actions": [
+            ("Inspect gate", "You carefully inspect the heavy entrance.", []),
+            ("Check locks", "You proceed to inspect the lock mechanism.", []),
+            ("Inspect hinges", "You inspect the reinforced iron hinges.", [{"set_flag": {"flag": "{sc_id}_hinges_checked", "value": True}}, {"log_event": "You checked the iron hinges."}]),
+        ],
+        "entities": [
+            {"id": "{sc_id}_grate", "name": "Iron Grate", "tags": ["lockable"], "initial_state": "locked"}
+        ]
+    },
+    {
+        "key": "courtyard",
+        "label": "Main Courtyard",
+        "desc": "Cobblestones show heavy cart wheel wear.",
+        "actions": [
+            ("Search yard", "You carefully search the courtyard perimeter.", []),
+            ("Survey area", "You proceed to survey the open ground.", []),
+            ("Inspect cart", "You search the weathered wagon bed.", [{"set_flag": {"flag": "{sc_id}_cart_checked", "value": True}}, {"log_event": "You checked the supply cart."}]),
+        ],
+        "entities": [
+            {"id": "{sc_id}_hay_cart", "name": "Hay Cart", "tags": ["flammable"], "initial_state": "intact"}
+        ]
+    },
+    {
+        "key": "quarters",
+        "label": "Living Quarters",
+        "desc": "Rows of wooden bunks line the walls.",
+        "actions": [
+            ("Search bunks", "You carefully search beneath the rough bunks.", []),
+            ("Rest briefly", "You proceed to catch your breath.", [{"modify_stamina": 1}]),
+            ("Search footlocker", "You search through a wooden footlocker.", [{"set_flag": {"flag": "{sc_id}_footlocker_searched", "value": True}}, {"log_event": "You searched the barracks footlocker."}]),
+        ],
+        "entities": []
+    },
+    {
+        "key": "armory",
+        "label": "Supply Depot",
+        "desc": "Crates of rations and tools stand stacked.",
+        "actions": [
+            ("Inspect supplies", "You carefully inventory the stacked rations.", []),
+            ("Take provisions", "You proceed to gather field rations.", [{"modify_stamina": 2}, {"log_event": "You gathered emergency trail rations."}]),
+            ("Inspect weapon rack", "You inspect the blunted training blades.", [{"set_flag": {"flag": "{sc_id}_weapons_checked", "value": True}}, {"log_event": "You inspected the weapon racks."}]),
+        ],
+        "entities": [
+            {"id": "{sc_id}_supply_chest", "name": "Supply Chest", "tags": ["lockable"], "initial_state": "locked"}
+        ]
+    },
+    {
+        "key": "cellar",
+        "label": "Lower Cellar",
+        "desc": "Damp air smells of cool earth and storage.",
+        "actions": [
+            ("Check barrels", "You carefully inspect the wooden casks.", []),
+            ("Search crates", "You proceed to pry open packing crates.", []),
+            ("Inspect cask", "You inspect the aged storage barrels.", [{"set_flag": {"flag": "{sc_id}_cask_checked", "value": True}}, {"log_event": "You inspected the storage barrels."}]),
+        ],
+        "entities": []
+    },
+    {
+        "key": "passage",
+        "label": "Stone Corridor",
+        "desc": "Wall sconces hold flickering tallow candles.",
+        "actions": [
+            ("Check walls", "You carefully check masonry for hidden seams.", []),
+            ("Search floor", "You proceed to look for tripwires on the flagstones.", []),
+            ("Inspect sconce", "You adjust the flickering tallow torch.", [{"set_flag": {"flag": "{sc_id}_sconce_adjusted", "value": True}}, {"log_event": "You adjusted the wall sconce."}]),
+        ],
+        "entities": [
+            {"id": "{sc_id}_brazier", "name": "Wall Brazier", "tags": ["flammable"], "initial_state": "intact"}
+        ]
+    },
+    {
+        "key": "chamber",
+        "label": "Inner Chamber",
+        "desc": "A sturdy oak desk holds ledgers and maps.",
+        "actions": [
+            ("Examine desk", "You carefully inspect the carved desk drawers.", []),
+            ("Read ledger", "You proceed to scan recent accounting entries.", []),
+            ("Study road map", "You examine the regional road map.", [{"set_flag": {"flag": "{sc_id}_map_studied", "value": True}}, {"log_event": "You studied the regional map."}]),
+        ],
+        "entities": []
+    },
+    {
+        "key": "overlook",
+        "label": "High Overlook",
+        "desc": "A stone ledge provides a clear view.",
+        "actions": [
+            ("Scout terrain", "You carefully scan terrain features below.", []),
+            ("Watch horizon", "You proceed to monitor distant movement.", []),
+            ("Study approach road", "You study the winding approach road.", [{"set_flag": {"flag": "{sc_id}_road_scouted", "value": True}}, {"log_event": "You scouted the approach road."}]),
+        ],
+        "entities": []
+    },
+    {
+        "key": "sanctum",
+        "label": "Inner Sanctum",
+        "desc": "A stone altar stands in quiet reverence.",
+        "actions": [
+            ("Examine altar", "You carefully inspect religious engravings.", []),
+            ("Offer prayer", "You proceed to speak a silent devotion.", [{"modify_stamina": 1}]),
+            ("Light candle", "You light a small clay votive candle.", [{"set_flag": {"flag": "{sc_id}_candle_lit", "value": True}}, {"log_event": "A quiet moment of calm restores focus."}]),
+        ],
+        "entities": []
+    },
+    {
+        "key": "vault",
+        "label": "Deep Vault",
+        "desc": "Iron-banded chests sit in deep shadows.",
+        "actions": [
+            ("Inspect chests", "You carefully examine the iron chest bands.", []),
+            ("Search shadows", "You proceed to search deep corner recesses.", []),
+            ("Examine lock", "You inspect the heavy brass lock tumbler.", [{"set_flag": {"flag": "{sc_id}_lock_examined", "value": True}}, {"log_event": "You inspected the vault lock."}]),
+        ],
+        "entities": [
+            {"id": "{sc_id}_iron_chest", "name": "Iron Chest", "tags": ["lockable"], "initial_state": "locked"}
+        ]
+    },
 ]
 
 
@@ -152,6 +262,7 @@ def generate_province_code(prov):
         f'        base_actions=[',
         f'            Action(id="{prov_id}_hub_scout", label="Scout hub", category="interaction", result_text="You survey the bustling provincial crossroads."),',
         f'            Action(id="{prov_id}_hub_rest", label="Rest at inn", category="interaction", effects=[{{"modify_stamina": 5}}], result_text="You rest and regain stamina."),',
+        f'            Action(id="{prov_id}_hub_board", label="Check notice board", category="interaction", effects=[{{"set_flag": {{"flag": "{prov_id}_notices_read", "value": True}}}}, {{"log_event": "You read the municipal notice board."}}], result_text="You read the pinned municipal notices."),',
         f'            Action(id="{prov_id}_to_bazaar", label="Go to Bazaar", category="movement", target_scene="bazaar_center", result_text="You travel along the highway to the Grand Bazaar."),',
         f'        ]',
         f'    )',
@@ -166,10 +277,15 @@ def generate_province_code(prov):
         poi_label = poi[4] if len(poi) > 4 else format_action_label(poi_name)
 
         lines.append(f'    # POI: {poi_name} (10 nodes)')
-        for node_idx, (sub_key, sub_label, sub_desc, act1, act2) in enumerate(SUB_NODE_NAMES):
+        for node_idx, cfg in enumerate(SUB_NODE_CONFIGS):
+            sub_key = cfg["key"]
+            sub_label = cfg["label"]
+            sub_desc = cfg["desc"]
             sc_id = f"{prov_id}_{poi_key}_{sub_key}"
-            prev_id = f"{prov_id}_{poi_key}_{SUB_NODE_NAMES[node_idx-1][0]}" if node_idx > 0 else f"{prov_id}_hub"
-            next_id = f"{prov_id}_{poi_key}_{SUB_NODE_NAMES[node_idx+1][0]}" if node_idx < len(SUB_NODE_NAMES) - 1 else None
+            prev_sub_key = SUB_NODE_CONFIGS[node_idx-1]["key"]
+            next_sub_key = SUB_NODE_CONFIGS[node_idx+1]["key"] if node_idx < len(SUB_NODE_CONFIGS) - 1 else None
+            prev_id = f"{prov_id}_{poi_key}_{prev_sub_key}" if node_idx > 0 else f"{prov_id}_hub"
+            next_id = f"{prov_id}_{poi_key}_{next_sub_key}" if next_sub_key else None
 
             # Special case for reach_frost_cavern_sanctum night_eyed dynamic description
             night_eyed_text = "Your keen eyes track motion in the dark."
@@ -191,9 +307,35 @@ def generate_province_code(prov):
             lines.append('                text="You note tactical cover and exit routes."')
             lines.append('            ),')
             lines.append('        ],')
+
+            if cfg["entities"]:
+                lines.append('        entities=[')
+                for ent in cfg["entities"]:
+                    formatted_ent = {}
+                    for ek, ev in ent.items():
+                        if isinstance(ev, str):
+                            formatted_ent[ek] = ev.format(sc_id=sc_id)
+                        else:
+                            formatted_ent[ek] = ev
+                    lines.append(f'            {repr(formatted_ent)},')
+                lines.append('        ],')
+
             lines.append('        base_actions=[')
-            lines.append(f'            Action(id="{sc_id}_act_0", label="{act1}", category="interaction", result_text="You carefully {act1.lower()}."),')
-            lines.append(f'            Action(id="{sc_id}_act_1", label="{act2}", category="interaction", result_text="You proceed to {act2.lower()}."),')
+            for a_idx, (act_lbl, act_res, act_effs) in enumerate(cfg["actions"]):
+                eff_arg = ""
+                if act_effs:
+                    formatted_effs = []
+                    for eff in act_effs:
+                        new_eff = {}
+                        for k, v in eff.items():
+                            if k == "set_flag":
+                                new_eff["set_flag"] = {"flag": v["flag"].format(sc_id=sc_id), "value": v["value"]}
+                            else:
+                                new_eff[k] = v
+                        formatted_effs.append(new_eff)
+                    eff_arg = f'effects={repr(formatted_effs)}, '
+                lines.append(f'            Action(id="{sc_id}_act_{a_idx}", label="{act_lbl}", category="interaction", {eff_arg}result_text="{act_res}"),')
+
             lines.append(f'            Action(id="{sc_id}_to_prev", label="Return back", category="movement", target_scene="{prev_id}", result_text="You retrace your steps."),')
             if next_id:
                 lines.append(f'            Action(id="{sc_id}_to_next", label="Press forward", category="movement", target_scene="{next_id}", result_text="You press on to the next area."),')
@@ -236,6 +378,7 @@ def generate_province_code(prov):
                 lines.append('        base_actions=[')
                 lines.append('            Action(id="reach_secret_shrine_act_0", label="Pray at icon", category="interaction", effects=[{"modify_stamina": 3}, {"log_event": "A tranquil mountain stillness restores your focus."}], result_text="You offer a silent prayer before the frost icon."),')
                 lines.append('            Action(id="reach_secret_shrine_act_1", label="Search ice dais", category="interaction", effects=[{"add_item": "ice_lotus"}, {"log_event": "You gathered a frozen alpine blossom."}], result_text="You discover a preserved ice lotus tucked beneath the pedestal."),')
+                lines.append('            Action(id="reach_secret_shrine_act_2", label="Study frost runes", category="interaction", effects=[{"log_event": "You traced the cold geometric carvings."}], result_text="Faint chill numbs your fingertips as you touch the runes."),')
                 lines.append('            Action(id="reach_secret_shrine_to_sanctum", label="Return to sanctum", category="movement", target_scene="reach_frost_cavern_sanctum", result_text="You retrace your steps through the crevasse."),')
                 lines.append('        ]')
                 lines.append('    )')
