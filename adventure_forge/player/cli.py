@@ -15,7 +15,7 @@ from adventure_forge.content.loader import build_world_registry
 
 
 def render_ui(obs, page: int = 0, page_size: int = 15):
-    """Render a clean, high-velocity, action-first player screen."""
+    """Render a clean, high-velocity, action-first player screen with categorized pagination."""
     print("\n" + "=" * 65)
     print(f" {obs.title.upper()}  [{obs.region_id}]")
     print("=" * 65)
@@ -28,81 +28,55 @@ def render_ui(obs, page: int = 0, page_size: int = 15):
         print()
 
     total_actions = len(obs.legal_actions)
+    total_pages = max(1, (total_actions + page_size - 1) // page_size)
+    page = max(0, min(page, total_pages - 1))
     start_idx = page * page_size
     end_idx = min(start_idx + page_size, total_actions)
     page_actions = obs.legal_actions[start_idx:end_idx]
 
-    print(f"AVAILABLE ACTIONS ({total_actions} total, showing {start_idx + 1}-{end_idx}):")
-    for i, act in enumerate(page_actions, start=start_idx + 1):
-        risk_str = f" [{act['risk'].upper()}]" if act['risk'] != 'low' else ""
-        cost_str = f" (Stamina -{act['stamina_cost']})" if act.get('stamina_cost', 0) > 0 else ""
-        print(f"  [{i:2d}] {act['label']}{risk_str}{cost_str}")
+    if total_actions == 0:
+        print("AVAILABLE ACTIONS (0 total | Page 1 of 1):")
+        print("  No actions available.")
+    else:
+        print(f"AVAILABLE ACTIONS ({total_actions} total | Page {page + 1} of {total_pages} | Showing {start_idx + 1}-{end_idx}):")
+        current_cat = None
+        for i, act in enumerate(page_actions, start=start_idx + 1):
+            cat = act.get("category", "interaction").replace("_", " ").upper()
+            if cat != current_cat:
+                current_cat = cat
+                print(f"\n  [{current_cat}]")
+            risk_str = f" [{act['risk'].upper()}]" if act.get('risk') and act['risk'] != 'low' else ""
+            cost_str = f" (Stamina -{act['stamina_cost']})" if act.get('stamina_cost', 0) > 0 else ""
+            print(f"    [{i:3d}] {act['label']}{risk_str}{cost_str}")
 
     print("-" * 65)
     nav_hints = []
-    if end_idx < total_actions:
+    if page + 1 < total_pages:
         nav_hints.append("'n' for next page")
     if page > 0:
         nav_hints.append("'p' for prev page")
+    if total_pages > 1:
+        nav_hints.append("'page <num>' to jump")
     nav_hints.append("'q' to quit")
     print("Commands: " + ", ".join(nav_hints))
 
 
 def start_new_game(char_preset: str = "cutpurse") -> Tuple[AdventureEngine, GameState]:
+    from adventure_forge.core.character import get_preset
     registry = build_world_registry()
     engine = AdventureEngine(registry)
 
-    if char_preset == "cutpurse":
-        char = CharacterSheet(
-            name="Silas",
-            ancestry="Deep-Dweller",
-            background="cutpurse",
-            attributes={"agility": 14, "strength": 9, "intimidation": 7},
-            skills={"cunning": 4, "stealth": 3},
-            traits=["night_eyed", "streetwise"],
-            flaws=["marked_outlaw"],
-            reputation={"smugglers": 10, "city_watch": -5},
-            markers=["guild_brand"],
-            inventory=["lockpick", "silver_coin"]
-        )
-        start_scene = "warrens_gate"
-        start_region = "lower_warrens"
-    elif char_preset == "noble":
-        char = CharacterSheet(
-            name="Lady Vivienne",
-            ancestry="High-Kin",
-            background="noble_exile",
-            attributes={"agility": 8, "strength": 10, "intimidation": 14},
-            skills={"rhetoric": 4, "cunning": 2},
-            traits=["skeptical"],
-            flaws=["oath_bound"],
-            reputation={"city_watch": 10, "smugglers": -10},
-            markers=["watch_crest"],
-            inventory=["silver_coin", "legal_dossier"]
-        )
-        start_scene = "court_antechamber"
-        start_region = "high_court"
-    else:
-        char = CharacterSheet(
-            name="Garron",
-            ancestry="Ashenborn",
-            background="pit_fighter",
-            attributes={"strength": 16, "agility": 12, "endurance": 14},
-            skills={"athletics": 4, "brawling": 4},
-            traits=["iron_gutted"],
-            flaws=[],
-            reputation={"iron_guard": 5},
-            inventory=["water_skin", "crowbar"]
-        )
-        start_scene = "crags_base"
-        start_region = "iron_crags"
+    try:
+        preset = get_preset(char_preset)
+    except KeyError:
+        preset = get_preset("warrior")
 
     state = GameState(
         build_id="af-build-001",
-        session_id=f"cli-session-{char_preset}",
-        character=char,
-        current_region=start_region,
-        current_scene=start_scene,
+        session_id=f"cli-session-{preset.id}",
+        character=preset.character,
+        current_region=preset.start_region,
+        current_scene=preset.start_scene,
         rng=DeterministicRNG.from_seed(999)
     )
 
@@ -129,7 +103,8 @@ def main():
             print("Session ended.")
             break
         elif choice == "n":
-            if (page + 1) * page_size < len(obs.legal_actions):
+            total_pages = max(1, (len(obs.legal_actions) + page_size - 1) // page_size)
+            if page + 1 < total_pages:
                 page += 1
             else:
                 print("Already on last page.")
@@ -139,6 +114,18 @@ def main():
                 page -= 1
             else:
                 print("Already on first page.")
+            continue
+        elif choice.startswith("page ") or choice.startswith("goto "):
+            parts = choice.split()
+            if len(parts) == 2 and parts[1].isdigit():
+                target_page = int(parts[1]) - 1
+                total_pages = max(1, (len(obs.legal_actions) + page_size - 1) // page_size)
+                if 0 <= target_page < total_pages:
+                    page = target_page
+                else:
+                    print(f"Page must be between 1 and {total_pages}.")
+            else:
+                print("Usage: page <number> or goto <number>")
             continue
 
         if not choice.isdigit():

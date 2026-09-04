@@ -11,6 +11,7 @@ import json
 import os
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.flywheel.playtester import BlindPlaytester, SessionTelemetry
+from adventure_forge.flywheel.triage import triage_session_telemetry
 from adventure_forge.verification.verify import run_all_verification
 
 
@@ -22,6 +23,7 @@ class FlywheelCycleSummary:
     avg_retention: float
     total_decisions: int
     hotspots: List[str] = field(default_factory=list)
+    triage_results: List[Dict[str, Any]] = field(default_factory=list)
 
 
 class OrchestratorManager:
@@ -62,10 +64,15 @@ class OrchestratorManager:
 
         avg_retention = round(total_retention / len(telemetries), 3)
 
-        # Collect hotspots / friction
+        # Collect hotspots / friction and run triage
         hotspots = []
+        triage_results = []
         for tel in telemetries:
             hotspots.extend(tel.friction_notes)
+            if tel.friction_notes:
+                triage_rep = triage_session_telemetry(tel, char, start_scene="crags_base")
+                if triage_rep:
+                    triage_results.append(triage_rep.to_dict())
 
         summary = FlywheelCycleSummary(
             cycle_index=cycle_num,
@@ -73,7 +80,8 @@ class OrchestratorManager:
             sessions_run=len(telemetries),
             avg_retention=avg_retention,
             total_decisions=total_decisions,
-            hotspots=hotspots
+            hotspots=hotspots,
+            triage_results=triage_results
         )
         self.history.append(summary)
         self._record_audit(summary)
@@ -87,5 +95,7 @@ class OrchestratorManager:
                 "sessions_run": summary.sessions_run,
                 "avg_retention": summary.avg_retention,
                 "total_decisions": summary.total_decisions,
-                "hotspots": summary.hotspots
+                "hotspots": summary.hotspots,
+                "triage_results": summary.triage_results
             }) + "\n")
+
