@@ -58,6 +58,7 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
 
     max_steps = 10000
     steps_taken = 0
+    actions_stepped = 0
 
     while queue and steps_taken < max_steps:
         state = queue.popleft()
@@ -71,7 +72,22 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
             if act_id.startswith("barter_") or act_id.startswith("inspect_"):
                 continue
 
-            next_state, next_obs = engine.step(state, act_id)
+            actions_stepped += 1
+            try:
+                next_state, next_obs = engine.step(state, act_id)
+            except Exception as exc:
+                stats = {
+                    "total_scenes": len(all_target_scenes),
+                    "visited_scenes": len(visited_scenes),
+                    "unvisited_scenes": list(all_target_scenes - visited_scenes),
+                    "steps_taken": steps_taken,
+                    "actions_stepped": actions_stepped,
+                    "failed_scene": state.current_scene,
+                    "failed_action": act_id,
+                    "error": str(exc),
+                }
+                return False, f"Action execution crashed at scene '{state.current_scene}', action '{act_id}': {exc}", stats
+
             if not next_obs.success:
                 continue
 
@@ -82,15 +98,13 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
                 if not next_obs.is_terminal:
                     queue.append(next_state)
 
-        if len(visited_scenes) >= len(all_target_scenes):
-            break
-
     unvisited = all_target_scenes - visited_scenes
     stats = {
         "total_scenes": len(all_target_scenes),
         "visited_scenes": len(visited_scenes),
         "unvisited_scenes": list(unvisited),
         "steps_taken": steps_taken,
+        "actions_stepped": actions_stepped,
         "unique_states_explored": len(visited_state_hashes),
     }
 

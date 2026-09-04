@@ -1905,7 +1905,7 @@ def build_reach_province() -> RegionManifest:
         ],
         base_actions=[
             Action(id="reach_secret_shrine_act_0", label="Pray at icon", category="interaction", effects=[{"modify_stamina": 3}, {"log_event": "A tranquil mountain stillness restores your focus."}], result_text="You offer a silent prayer before the frost icon."),
-            Action(id="reach_secret_shrine_act_1", label="Search ice dais", category="interaction", effects=[{"modify_item": {"item": "ice_lotus", "delta": 1}}, {"log_event": "You gathered a frozen alpine blossom."}], result_text="You discover a preserved ice lotus tucked beneath the pedestal."),
+            Action(id="reach_secret_shrine_act_1", label="Search ice dais", category="interaction", effects=[{"add_item": "ice_lotus"}, {"log_event": "You gathered a frozen alpine blossom."}], result_text="You discover a preserved ice lotus tucked beneath the pedestal."),
             Action(id="reach_secret_shrine_to_sanctum", label="Return to sanctum", category="movement", target_scene="reach_frost_cavern_sanctum", result_text="You retrace your steps through the crevasse."),
         ]
     )
