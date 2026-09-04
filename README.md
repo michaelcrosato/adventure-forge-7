@@ -47,6 +47,12 @@ python3 -m adventure_forge.flywheel.loop --cycles 10
 zu-loop run --cycles 10
 ```
 
+## Deployment
+
+Vercel loads the dependency-free ASGI application in `app.py`. The root path
+provides a small landing page, and `/health` reports deployment health. The
+game, verification bar, flywheel, and MCP server remain command-line surfaces.
+
 ---
 
 ## Architecture & Roadmap
