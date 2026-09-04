@@ -288,81 +288,73 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     # POI: Shadow Cellar (10 nodes)
+    # Encounter 4 - Stage 1: Assessment / Approach
     scenes["lowlands_thieves_hall_gate"] = SceneNode(
         id="lowlands_thieves_hall_gate",
-        title="Shadow Cellar - Outer Gate",
+        title="Shadow Cellar - Hidden Entry",
         region="lowlands",
-        description="Iron bars secure the heavy timber entrance. Masked smugglers barter contraband under dim lamps.",
+        description="Damp moss covers the underground cellar steps. Masked smugglers drink spiced ale under tallow lamps. A lookout sharpens a boot knife.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"background_is": "cutpurse"},
+                text="The lookout greets you with a covert guild finger tap."
             ),
         ],
         entities=[
-            {'id': 'lowlands_thieves_hall_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "lowlands_thief_cellar_gate_grate", "name": "Cellar Grate", "tags": ["lockable"], "initial_state": "locked"},
+            {"id": "lowlands_thief_ale_barrel", "name": "Ale Barrel", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="lowlands_thieves_hall_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="lowlands_thieves_hall_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="lowlands_thief_whisper_code", label="Whisper password", category="social", condition={"has_marker": "guild_brand"}, target_scene="lowlands_thieves_hall_courtyard", result_text="The lookout nods and unbolts the heavy cellar door."),
+            Action(id="lowlands_thief_slip_past", label="Sneak past lookout", category="trait_exploit", condition={"min_skill": {"skill": "stealth", "value": 3}}, target_scene="lowlands_thieves_hall_courtyard", result_text="You slip behind the wine casks unseen."),
+            Action(id="lowlands_thief_listen_rumors", label="Listen to rumors", category="interaction", effects=[{"log_event": "You learned that the syndicate strongbox holds watch rosters."}], result_text="You overhear guards discussing patrol schedules."),
             Action(id="lowlands_thieves_hall_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 4 - Stage 2: Engagement / Climax
     scenes["lowlands_thieves_hall_courtyard"] = SceneNode(
         id="lowlands_thieves_hall_courtyard",
-        title="Shadow Cellar - Main Courtyard",
+        title="Shadow Cellar - Vault Alcove",
         region="lowlands",
-        description="Cobblestones show heavy cart wheel wear. Masked smugglers barter contraband under dim lamps.",
+        description="Torch shadows dance across damp limestone arches. An iron-banded strongbox sits upon a stone pedestal. A sleeping guard dog rests on a sack.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "light_fingers"},
+                text="Your nimble fingers can bypass the chest tumblers silently."
             ),
         ],
         entities=[
-            {'id': 'lowlands_thieves_hall_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "lowlands_thief_syndicate_strongbox", "name": "Syndicate Strongbox", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="lowlands_thieves_hall_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="lowlands_thieves_hall_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="lowlands_thief_pick_chest", label="Pick strongbox lock", category="item_affordance", condition={"has_item": "lockpick"}, effects=[{"set_flag": {"flag": "strongbox_opened", "value": True}}, {"log_event": "You picked open the syndicate strongbox."}], target_scene="lowlands_thieves_hall_quarters", result_text="The lock clicks open without disturbing the dog."),
+            Action(id="lowlands_thief_force_chest", label="Force strongbox lock", category="systemic", condition={"has_item": "crowbar"}, stamina_cost=2, effects=[{"set_flag": {"flag": "strongbox_opened", "value": True}}, {"modify_health": -2}, {"log_event": "You forced the box but the barking dog bit you."}], target_scene="lowlands_thieves_hall_quarters", result_text="The latch snaps with a bang and the dog bites your boot."),
             Action(id="lowlands_thieves_hall_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_gate", result_text="You retrace your steps."),
             Action(id="lowlands_thieves_hall_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 4 - Stage 3: Resolution / Consequences
     scenes["lowlands_thieves_hall_quarters"] = SceneNode(
         id="lowlands_thieves_hall_quarters",
-        title="Shadow Cellar - Living Quarters",
+        title="Shadow Cellar - Escape Sluice",
         region="lowlands",
-        description="Rows of wooden bunks line the walls. Masked smugglers barter contraband under dim lamps.",
+        description="A wooden trapdoor opens above a subterranean canal sluice. Cold water rushes beneath an iron rung ladder. Freedom lies through the water tunnel.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "strongbox_opened", "value": True}},
+                text="You clutch the stolen watch patrol ledger tightly."
             ),
         ],
+        entities=[
+            {"id": "lowlands_thief_sluice_trapdoor", "name": "Sluice Trapdoor", "tags": ["lockable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="lowlands_thieves_hall_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="lowlands_thieves_hall_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="lowlands_thieves_hall_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_thieves_hall_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="lowlands_thief_take_ledger", label="Take watch ledger", category="interaction", condition={"flag_is": {"flag": "strongbox_opened", "value": True}, "lacks_flag": "patrol_ledger_taken"}, effects=[{"add_item": "watch_patrol_ledger"}, {"set_flag": {"flag": "patrol_ledger_taken", "value": True}}, {"modify_reputation": {"faction": "smugglers", "value": 25}}, {"log_event": "You secured the confidential watch patrol ledger."}], result_text="You slide the leather ledger into your tunic."),
             Action(id="lowlands_thieves_hall_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_thieves_hall_courtyard", result_text="You retrace your steps."),
-            Action(id="lowlands_thieves_hall_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_armory", result_text="You press on to the next area."),
+            Action(id="lowlands_thieves_hall_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_thieves_hall_armory", result_text="You press on to the supply depot."),
         ]
     )
 
@@ -2108,81 +2100,78 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     # POI: River Customs Gate (10 nodes)
+    # Encounter 3 - Stage 1: Assessment / Approach
     scenes["lowlands_customs_house_gate"] = SceneNode(
         id="lowlands_customs_house_gate",
-        title="River Customs Gate - Outer Gate",
+        title="River Customs - Inspection Wharf",
         region="lowlands",
-        description="Iron bars secure the heavy timber entrance. Clerks stamp cargo manifests behind iron bars.",
+        description="Moored cargo barges line the stone quay. Armed city watchmen inspect crates with iron crowbars. Disgruntled river boatmen queue before the gate.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"background_is": "cutpurse"},
+                text="You notice an unguarded cargo gangplank behind stacked fish barrels."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_flaw": "marked_outlaw"},
+                text="Watch guards hold wanted posters matching your description."
             ),
         ],
         entities=[
-            {'id': 'lowlands_customs_house_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "lowlands_customs_turnstile", "name": "Customs Turnstile", "tags": ["lockable"], "initial_state": "locked"},
+            {"id": "lowlands_customs_cargo_crates", "name": "Cargo Crates", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="lowlands_customs_house_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="lowlands_customs_house_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="lowlands_customs_queue", label="Join inspection line", category="interaction", result_text="You wait patiently among grumbling deckhands."),
+            Action(id="lowlands_customs_bribe_guard", label="Bribe gate guard", category="social", condition={"min_skill": {"skill": "cunning", "value": 2}}, effects=[{"set_flag": {"flag": "customs_bribe_paid", "value": True}}, {"log_event": "You slipped silver into the sergeant palm."}], target_scene="lowlands_customs_house_courtyard", result_text="The guard pockets the coin and waves you through."),
+            Action(id="lowlands_customs_show_pass", label="Present cargo pass", category="item_affordance", condition={"has_item": "legal_dossier"}, target_scene="lowlands_customs_house_courtyard", result_text="The clerk stamps your clearance without a second glance."),
             Action(id="lowlands_customs_house_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 3 - Stage 2: Engagement / Climax
     scenes["lowlands_customs_house_courtyard"] = SceneNode(
         id="lowlands_customs_house_courtyard",
-        title="River Customs Gate - Main Courtyard",
+        title="River Customs - Weigh Station",
         region="lowlands",
-        description="Cobblestones show heavy cart wheel wear. Clerks stamp cargo manifests behind iron bars.",
+        description="Large brass scales hang from the timber ceiling. Senior Inspector Vance reviews river manifests at a high cedar desk.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_skill": {"skill": "rhetoric", "value": 3}},
+                text="You spot legal loopholes in the municipal trade code."
             ),
         ],
         entities=[
-            {'id': 'lowlands_customs_house_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "lowlands_customs_weigh_ledger", "name": "Weigh Ledger", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_customs_house_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="lowlands_customs_house_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="lowlands_customs_house_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="lowlands_customs_bluff_vance", label="Bluff the inspector", category="social", condition={"min_skill": {"skill": "rhetoric", "value": 3}}, effects=[{"set_flag": {"flag": "customs_cleared", "value": True}}, {"modify_reputation": {"faction": "smugglers", "value": 15}}, {"log_event": "You outwitted the customs inspector with flawless rhetoric."}], target_scene="lowlands_customs_house_quarters", result_text="Vance rubs his temples and signs your clearance seal."),
+            Action(id="lowlands_customs_show_brand", label="Flash guild brand", category="trait_exploit", condition={"has_marker": "guild_brand"}, effects=[{"set_flag": {"flag": "customs_cleared", "value": True}}, {"log_event": "The inspector recognized the covert syndicate brand."}], target_scene="lowlands_customs_house_quarters", result_text="Vance gives a subtle nod and opens the inner grille."),
             Action(id="lowlands_customs_house_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_gate", result_text="You retrace your steps."),
             Action(id="lowlands_customs_house_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 3 - Stage 3: Resolution / Consequences
     scenes["lowlands_customs_house_quarters"] = SceneNode(
         id="lowlands_customs_house_quarters",
-        title="River Customs Gate - Living Quarters",
+        title="River Customs - Master Vault",
         region="lowlands",
-        description="Rows of wooden bunks line the walls. Clerks stamp cargo manifests behind iron bars.",
+        description="Seized contraband barrels sit stacked behind iron mesh doors. Canal water slaps against the stone watergate below. An exit leads to the river locks.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "customs_cleared", "value": True}},
+                text="The stamped lock clearance permits free barge travel."
             ),
         ],
+        entities=[
+            {"id": "lowlands_customs_contraband_locker", "name": "Contraband Locker", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="lowlands_customs_house_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="lowlands_customs_house_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="lowlands_customs_house_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_customs_house_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="lowlands_customs_take_stamp", label="Take clearance stamp", category="interaction", condition={"lacks_flag": "customs_stamp_taken"}, effects=[{"add_item": "customs_stamp"}, {"set_flag": {"flag": "customs_stamp_taken", "value": True}}, {"log_event": "You acquired the official customs clearance stamp."}], result_text="You pocket the brass verification seal."),
+            Action(id="lowlands_customs_inspect_watergate", label="Check watergate", category="interaction", result_text="The heavy iron gate regulates barge passage to the bay."),
             Action(id="lowlands_customs_house_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_customs_house_courtyard", result_text="You retrace your steps."),
-            Action(id="lowlands_customs_house_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_armory", result_text="You press on to the next area."),
+            Action(id="lowlands_customs_house_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_customs_house_armory", result_text="You press on to the supply depot."),
         ]
     )
 

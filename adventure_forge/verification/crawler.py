@@ -5,7 +5,7 @@ Performs BFS/DFS exploration of the world graph to prove:
 - No accidental dead-end traps without programmed exits.
 - No crashes during state exploration.
 """
-from typing import Set, Dict, Tuple, Any
+from typing import Set, Dict, Tuple, Any, List
 from collections import deque
 from adventure_forge.core.state import GameState
 from adventure_forge.core.character import CharacterSheet
@@ -42,7 +42,7 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
 
     visited_scenes: Set[str] = set()
     visited_state_hashes: Set[str] = set()
-    queue: deque[GameState] = deque()
+    queue: deque[Tuple[GameState, List[Dict[str, Any]]]] = deque()
 
     initial_state = GameState(
         build_id="af-build-001",
@@ -52,21 +52,20 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
         current_scene="crags_base"
     )
 
-    queue.append(initial_state)
+    init_obs = engine.observe(initial_state)
+    queue.append((initial_state, init_obs.legal_actions))
     visited_scenes.add(initial_state.current_scene)
-    visited_state_hashes.add(initial_state.fingerprint())
+    visited_state_hashes.add(init_obs.fingerprint)
 
     max_steps = 10000
     steps_taken = 0
     actions_stepped = 0
 
     while queue and steps_taken < max_steps:
-        state = queue.popleft()
+        state, legal_actions = queue.popleft()
         steps_taken += 1
 
-        obs = engine.observe(state)
-
-        for act in obs.legal_actions:
+        for act in legal_actions:
             act_id = act["id"]
             # Skip infinite barter loops in stress market during reachability crawl
             if act_id.startswith("barter_") or act_id.startswith("inspect_"):
@@ -94,9 +93,9 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
             scene_id = next_state.current_scene
             if scene_id not in visited_scenes:
                 visited_scenes.add(scene_id)
-                visited_state_hashes.add(next_state.fingerprint())
+                visited_state_hashes.add(next_obs.fingerprint)
                 if not next_obs.is_terminal:
-                    queue.append(next_state)
+                    queue.append((next_state, next_obs.legal_actions))
 
     unvisited = all_target_scenes - visited_scenes
     stats = {

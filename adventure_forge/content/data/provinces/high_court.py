@@ -288,81 +288,78 @@ def build_high_court_province() -> RegionManifest:
     )
 
     # POI: Hall of Justiciars (10 nodes)
+    # Encounter 7 - Stage 1: Assessment / Approach
     scenes["high_court_justiciar_hall_gate"] = SceneNode(
         id="high_court_justiciar_hall_gate",
-        title="Hall of Justiciars - Outer Gate",
+        title="Hall of Justiciars - Bailiff Court",
         region="high_court",
-        description="Iron bars secure the heavy timber entrance. Bailiffs carry sealed legal briefs between courts.",
+        description="Polished white marble arches rise above solemn clerks. Armed palatines in polished steel stand guard before the high courtroom doors.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"background_is": "noble_exile"},
+                text="The court bailiff recognizes the signet of your noble house."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "skeptical"},
+                text="You spot the prosecutor concealing altered court depositions."
             ),
         ],
         entities=[
-            {'id': 'high_court_justiciar_hall_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "high_court_grille", "name": "Court Grille", "tags": ["lockable"], "initial_state": "locked"},
+            {"id": "high_court_scribes_desk", "name": "Scribes Desk", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="high_court_justiciar_hall_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="high_court_justiciar_hall_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="high_court_justiciar_hall_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'high_court_justiciar_hall_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="high_justiciar_read_docket", label="Inspect court docket", category="interaction", result_text="You scan the list of pending treason trials."),
+            Action(id="high_justiciar_present_writ", label="Present sealed writ", category="item_affordance", condition={"has_item": "legal_dossier"}, target_scene="high_court_justiciar_hall_courtyard", result_text="The head bailiff examines the wax seal and bows you in."),
+            Action(id="high_justiciar_plead_standing", label="Demand legal standing", category="social", condition={"min_skill": {"skill": "rhetoric", "value": 3}}, target_scene="high_court_justiciar_hall_courtyard", result_text="Your commanding legal rhetoric compels the guards to open the doors."),
             Action(id="high_court_justiciar_hall_gate_to_prev", label="Return back", category="movement", target_scene="high_court_hub", result_text="You retrace your steps."),
             Action(id="high_court_justiciar_hall_gate_to_next", label="Press forward", category="movement", target_scene="high_court_justiciar_hall_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 7 - Stage 2: Engagement / Climax
     scenes["high_court_justiciar_hall_courtyard"] = SceneNode(
         id="high_court_justiciar_hall_courtyard",
-        title="Hall of Justiciars - Main Courtyard",
+        title="Hall of Justiciars - The Tribunal Bar",
         region="high_court",
-        description="Cobblestones show heavy cart wheel wear. Bailiffs carry sealed legal briefs between courts.",
+        description="Three masked judges sit on a high cedar bench. A harsh clerk reads charges against a merchant.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_skill": {"skill": "rhetoric", "value": 4}},
+                text="You identify fatal logical contradictions in the prosecutor plea."
             ),
         ],
         entities=[
-            {'id': 'high_court_justiciar_hall_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "high_court_evidence_chest", "name": "Evidence Chest", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="high_court_justiciar_hall_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="high_court_justiciar_hall_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="high_court_justiciar_hall_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'high_court_justiciar_hall_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="high_justiciar_object_plea", label="Object to evidence", category="social", condition={"min_skill": {"skill": "rhetoric", "value": 4}}, effects=[{"set_flag": {"flag": "court_verdict_won", "value": True}}, {"modify_reputation": {"faction": "justiciars", "value": 20}}, {"log_event": "You dismantled the false accusations before the magisters."}], target_scene="high_court_justiciar_hall_quarters", result_text="The chief magister silences the prosecutor with a sharp rap of his gavel."),
+            Action(id="high_justiciar_bribe_magister", label="Expose forged papers", category="trait_exploit", condition={"min_skill": {"skill": "cunning", "value": 3}}, effects=[{"set_flag": {"flag": "court_verdict_won", "value": True}}, {"log_event": "You revealed the forged watermarks on the state evidence."}], target_scene="high_court_justiciar_hall_quarters", result_text="The magisters dismiss the indictment and praise your vigilance."),
             Action(id="high_court_justiciar_hall_courtyard_to_prev", label="Return back", category="movement", target_scene="high_court_justiciar_hall_gate", result_text="You retrace your steps."),
             Action(id="high_court_justiciar_hall_courtyard_to_next", label="Press forward", category="movement", target_scene="high_court_justiciar_hall_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 7 - Stage 3: Resolution / Consequences
     scenes["high_court_justiciar_hall_quarters"] = SceneNode(
         id="high_court_justiciar_hall_quarters",
-        title="Hall of Justiciars - Living Quarters",
+        title="Hall of Justiciars - Arch-Justiciar Bench",
         region="high_court",
-        description="Rows of wooden bunks line the walls. Bailiffs carry sealed legal briefs between courts.",
+        description="Guards lead the silent clerk away. Sunlight shines on stone scales above the judge bench.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "court_verdict_won", "value": True}},
+                text="The chief magister signs an authoritative judicial pardon."
             ),
         ],
+        entities=[
+            {"id": "high_court_bench_dais", "name": "Magister Bench", "tags": ["flammable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="high_court_justiciar_hall_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="high_court_justiciar_hall_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="high_court_justiciar_hall_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'high_court_justiciar_hall_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="high_justiciar_take_seal", label="Take judicial seal", category="interaction", condition={"flag_is": {"flag": "court_verdict_won", "value": True}, "lacks_flag": "court_seal_taken"}, effects=[{"add_item": "arch_justiciar_seal"}, {"set_flag": {"flag": "court_seal_taken", "value": True}}, {"add_marker": "court_advocate"}, {"log_event": "You received the official Arch-Justiciar seal of advocacy."}], result_text="The chief clerk stamps your warrant of exoneration."),
+            Action(id="high_justiciar_review_statutes", label="Study legal statutes", category="interaction", result_text="You browse the ancient leather volumes of imperial law."),
             Action(id="high_court_justiciar_hall_quarters_to_prev", label="Return back", category="movement", target_scene="high_court_justiciar_hall_courtyard", result_text="You retrace your steps."),
-            Action(id="high_court_justiciar_hall_quarters_to_next", label="Press forward", category="movement", target_scene="high_court_justiciar_hall_armory", result_text="You press on to the next area."),
+            Action(id="high_court_justiciar_hall_quarters_to_next", label="Press forward", category="movement", target_scene="high_court_justiciar_hall_armory", result_text="You press on to the supply depot."),
         ]
     )
 
@@ -2108,81 +2105,74 @@ def build_high_court_province() -> RegionManifest:
     )
 
     # POI: Ambassador Salon (10 nodes)
+    # Encounter 8 - Stage 1: Assessment / Approach
     scenes["high_court_diplomat_lounge_gate"] = SceneNode(
         id="high_court_diplomat_lounge_gate",
-        title="Ambassador Salon - Outer Gate",
+        title="Ambassador Salon - Velvet Colonnade",
         region="high_court",
-        description="Iron bars secure the heavy timber entrance. Soft chairs sit in the quiet meeting room.",
+        description="Soft lute music floats through velvet curtains. Highborn guests sip plum wine in opulent gilded alcoves. Foreign Envoy Laurent holds court.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"background_is": "noble_exile"},
+                text="Courtiers whisper your ancestral name with hushed curiosity."
             ),
         ],
         entities=[
-            {'id': 'high_court_diplomat_lounge_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "high_court_salon_secretaire", "name": "Inlaid Secretaire", "tags": ["lockable"], "initial_state": "locked"},
+            {"id": "high_court_silk_tapestry", "name": "Silk Drapery", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="high_court_diplomat_lounge_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="high_court_diplomat_lounge_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="high_court_diplomat_lounge_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'high_court_diplomat_lounge_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="high_salon_mingle_guests", label="Mingle with guests", category="interaction", result_text="You chat casually with titled dignitaries."),
+            Action(id="high_salon_offer_toast", label="Offer court toast", category="social", condition={"min_skill": {"skill": "rhetoric", "value": 3}}, target_scene="high_court_diplomat_lounge_courtyard", result_text="Your refined manners catch the eye of Envoy Laurent."),
+            Action(id="high_salon_slip_balcony", label="Step to balcony", category="trait_exploit", condition={"min_skill": {"skill": "stealth", "value": 3}}, target_scene="high_court_diplomat_lounge_courtyard", result_text="You step past the heavy drapery onto the private terrace."),
             Action(id="high_court_diplomat_lounge_gate_to_prev", label="Return back", category="movement", target_scene="high_court_hub", result_text="You retrace your steps."),
             Action(id="high_court_diplomat_lounge_gate_to_next", label="Press forward", category="movement", target_scene="high_court_diplomat_lounge_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 8 - Stage 2: Engagement / Climax
     scenes["high_court_diplomat_lounge_courtyard"] = SceneNode(
         id="high_court_diplomat_lounge_courtyard",
-        title="Ambassador Salon - Main Courtyard",
+        title="Ambassador Salon - Secluded Balcony",
         region="high_court",
-        description="Cobblestones show heavy cart wheel wear. Soft chairs sit in the quiet meeting room.",
+        description="Night air chills the marble terrace. Envoy Laurent leans against the balustrade, swirling wine in a crystal goblet.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "skeptical"},
+                text="You notice Laurent bodyguard hidden in the terrace shadows."
             ),
         ],
         entities=[
-            {'id': 'high_court_diplomat_lounge_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "high_court_terrace_balustrade", "name": "Stone Balustrade", "tags": ["climbable"], "climb_destination": "high_court_diplomat_lounge_quarters"},
         ],
         base_actions=[
-            Action(id="high_court_diplomat_lounge_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="high_court_diplomat_lounge_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="high_court_diplomat_lounge_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'high_court_diplomat_lounge_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="high_salon_parley_laurent", label="Probe Laurent motive", category="social", condition={"min_skill": {"skill": "cunning", "value": 3}}, effects=[{"set_flag": {"flag": "envoy_deal_made", "value": True}}, {"modify_reputation": {"faction": "royal_court", "value": 20}}, {"log_event": "You negotiated a clandestine pact with Envoy Laurent."}], target_scene="high_court_diplomat_lounge_quarters", result_text="Laurent smiles and reveals his diplomatic cipher key."),
+            Action(id="high_salon_blackmail_envoy", label="Blackmail the envoy", category="trait_exploit", condition={"min_skill": {"skill": "rhetoric", "value": 4}}, effects=[{"set_flag": {"flag": "envoy_deal_made", "value": True}}, {"log_event": "You blackmailed Laurent into compliance."}], target_scene="high_court_diplomat_lounge_quarters", result_text="Laurent pales and capitulates to your demands."),
             Action(id="high_court_diplomat_lounge_courtyard_to_prev", label="Return back", category="movement", target_scene="high_court_diplomat_lounge_gate", result_text="You retrace your steps."),
             Action(id="high_court_diplomat_lounge_courtyard_to_next", label="Press forward", category="movement", target_scene="high_court_diplomat_lounge_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 8 - Stage 3: Resolution / Consequences
     scenes["high_court_diplomat_lounge_quarters"] = SceneNode(
         id="high_court_diplomat_lounge_quarters",
-        title="Ambassador Salon - Living Quarters",
+        title="Ambassador Salon - Private Cabinet",
         region="high_court",
-        description="Rows of wooden bunks line the walls. Soft chairs sit in the quiet meeting room.",
+        description="A quiet wood study looks over dark gardens. Red wax seals sit beside a book on the oak desk.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "envoy_deal_made", "value": True}},
+                text="The envoy diplomatic cipher sits unguarded upon the desk."
             ),
         ],
+        entities=[
+            {"id": "high_court_mahogany_desk", "name": "Mahogany Desk", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="high_court_diplomat_lounge_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="high_court_diplomat_lounge_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="high_court_diplomat_lounge_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'high_court_diplomat_lounge_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="high_salon_take_cipher", label="Take cipher key", category="interaction", condition={"flag_is": {"flag": "envoy_deal_made", "value": True}, "lacks_flag": "cipher_key_taken"}, effects=[{"add_item": "royal_cipher_key"}, {"set_flag": {"flag": "cipher_key_taken", "value": True}}, {"log_event": "You acquired the royal diplomatic cipher key."}], result_text="You pocket the carved ivory cipher key."),
+            Action(id="high_salon_inspect_gardens", label="Gaze over gardens", category="interaction", result_text="You look over manicured hedge mazes beneath the stars."),
             Action(id="high_court_diplomat_lounge_quarters_to_prev", label="Return back", category="movement", target_scene="high_court_diplomat_lounge_courtyard", result_text="You retrace your steps."),
-            Action(id="high_court_diplomat_lounge_quarters_to_next", label="Press forward", category="movement", target_scene="high_court_diplomat_lounge_armory", result_text="You press on to the next area."),
+            Action(id="high_court_diplomat_lounge_quarters_to_next", label="Press forward", category="movement", target_scene="high_court_diplomat_lounge_armory", result_text="You press on to the supply depot."),
         ]
     )
 

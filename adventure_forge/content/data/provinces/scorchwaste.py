@@ -548,81 +548,78 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     # POI: Sandswept Crypt (10 nodes)
+    # Encounter 5 - Stage 1: Assessment / Approach
     scenes["scorchwaste_buried_tomb_gate"] = SceneNode(
         id="scorchwaste_buried_tomb_gate",
-        title="Sandswept Crypt - Outer Gate",
+        title="Sandswept Crypt - Sunken Lintel",
         region="scorchwaste",
-        description="Iron bars secure the heavy timber entrance. Wind blows red sand across carved obsidian doors.",
+        description="Searing desert wind blows red sand over carved stone steps. Intense heat ripples rise from the dunes. A half-buried bronze temple door glints.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "heat_hardened"},
+                text="Your weathered skin resists the baking sun."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"ancestry_is": "ashenborn"},
+                text="The desert sun fills your limbs with steady warmth."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_buried_tomb_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "scorch_tomb_sanddrift", "name": "Sand Drift", "tags": ["climbable"], "initial_state": "intact"},
+            {"id": "scorch_tomb_bronze_door", "name": "Bronze Door", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="scorchwaste_buried_tomb_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="scorchwaste_buried_tomb_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="scorch_tomb_drink_water", label="Drink from canteen", category="interaction", condition={"has_item": "water_skin"}, effects=[{"modify_stamina": 3}], result_text="Cool water revives your parched throat."),
+            Action(id="scorch_tomb_clear_sand", label="Clear red sand", category="interaction", stamina_cost=1, effects=[{"set_flag": {"flag": "tomb_steps_cleared", "value": True}}, {"log_event": "You shoveled heavy red sand off the doorway."}], result_text="You clear the buried stone threshold."),
+            Action(id="scorch_tomb_force_door", label="Pry bronze door", category="item_affordance", condition={"has_item": "crowbar"}, target_scene="scorchwaste_buried_tomb_courtyard", result_text="The heavy bronze door screeches open over sand."),
             Action(id="scorchwaste_buried_tomb_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 5 - Stage 2: Engagement / Climax
     scenes["scorchwaste_buried_tomb_courtyard"] = SceneNode(
         id="scorchwaste_buried_tomb_courtyard",
-        title="Sandswept Crypt - Main Courtyard",
+        title="Sandswept Crypt - Solar Mirror Hall",
         region="scorchwaste",
-        description="Cobblestones show heavy cart wheel wear. Wind blows red sand across carved obsidian doors.",
+        description="Sunlight beams down an overhead shaft onto polished bronze mirrors. Stifling heat fills the stone chamber. A sealed stone vault blocks the way.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                text="You trace mirror reflection lines carved into the dust."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_buried_tomb_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "scorch_tomb_solar_mirror", "name": "Bronze Mirror", "tags": ["lockable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="scorchwaste_buried_tomb_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="scorchwaste_buried_tomb_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="scorch_tomb_align_mirrors", label="Align bronze mirrors", category="trait_exploit", condition={"min_skill": {"skill": "cunning", "value": 3}}, effects=[{"set_flag": {"flag": "solar_lock_solved", "value": True}}, {"log_event": "You aligned the solar mirrors and disengaged the stone lock."}], target_scene="scorchwaste_buried_tomb_quarters", result_text="The focused beam of sunlight trips the counterweight."),
+            Action(id="scorch_tomb_endure_heat", label="Endure baking heat", category="systemic", condition={"min_attribute": {"attribute": "endurance", "value": 13}}, target_scene="scorchwaste_buried_tomb_quarters", result_text="You push through the sweltering chamber without slowing down."),
             Action(id="scorchwaste_buried_tomb_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_buried_tomb_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 5 - Stage 3: Resolution / Consequences
     scenes["scorchwaste_buried_tomb_quarters"] = SceneNode(
         id="scorchwaste_buried_tomb_quarters",
-        title="Sandswept Crypt - Living Quarters",
+        title="Sandswept Crypt - Spring Vault",
         region="scorchwaste",
-        description="Rows of wooden bunks line the walls. Wind blows red sand across carved obsidian doors.",
+        description="Cool underground air chills your sweat. A pristine pool of desert water bubbles within a stone font. An ornate solar amulet rests on a carved dais.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "solar_amulet_taken", "value": True}},
+                text="The stone dais stands empty beside the bubbling spring."
             ),
         ],
+        entities=[
+            {"id": "scorch_tomb_spring_font", "name": "Stone Font", "tags": ["flammable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="scorchwaste_buried_tomb_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="scorchwaste_buried_tomb_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="scorchwaste_buried_tomb_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_buried_tomb_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="scorch_tomb_take_amulet", label="Take solar amulet", category="interaction", condition={"lacks_flag": "solar_amulet_taken"}, effects=[{"add_item": "solar_amulet"}, {"set_flag": {"flag": "solar_amulet_taken", "value": True}}, {"modify_health": 5}, {"log_event": "You retrieved the ancient solar amulet."}], result_text="The gold amulet gleams in your hand."),
+            Action(id="scorch_tomb_refill_skins", label="Fill water skins", category="interaction", effects=[{"modify_stamina": 5}, {"log_event": "You replenished your fresh water supply."}], result_text="You drink deeply from the cool underground spring."),
             Action(id="scorchwaste_buried_tomb_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_buried_tomb_courtyard", result_text="You retrace your steps."),
-            Action(id="scorchwaste_buried_tomb_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_armory", result_text="You press on to the next area."),
+            Action(id="scorchwaste_buried_tomb_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_buried_tomb_armory", result_text="You press on to the supply depot."),
         ]
     )
 
@@ -1068,81 +1065,73 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     # POI: White Salt Flats (10 nodes)
+    # Encounter 6 - Stage 1: Assessment / Approach
     scenes["scorchwaste_salt_pan_gate"] = SceneNode(
         id="scorchwaste_salt_pan_gate",
-        title="White Salt Flats - Outer Gate",
+        title="White Salt Flats - Shimmering Verge",
         region="scorchwaste",
-        description="Iron bars secure the heavy timber entrance. Blinding white crust stretches to the horizon.",
+        description="A blinding white plain of salt crust stretches toward the horizon. Searing heat creates trembling mirages. A stranded pack caravan calls for assistance.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "skeptical"},
+                text="You pierce through the mirage to pinpoint the true caravan."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_salt_pan_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "scorch_salt_pillar", "name": "Salt Pillar", "tags": ["climbable"], "climb_destination": "scorchwaste_salt_pan_courtyard"},
+            {"id": "scorch_salt_dried_brush", "name": "Dried Brush", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="scorchwaste_salt_pan_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="scorchwaste_salt_pan_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="scorch_salt_scan_flats", label="Scan the flats", category="interaction", result_text="You shield your eyes and study the salt formations."),
+            Action(id="scorch_salt_tread_carefully", label="Tread fragile salt", category="trait_exploit", condition={"has_trait": "nimble"}, target_scene="scorchwaste_salt_pan_courtyard", result_text="You step lightly across brittle crust without cracking it."),
             Action(id="scorchwaste_salt_pan_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 6 - Stage 2: Engagement / Climax
     scenes["scorchwaste_salt_pan_courtyard"] = SceneNode(
         id="scorchwaste_salt_pan_courtyard",
-        title="White Salt Flats - Main Courtyard",
+        title="White Salt Flats - Caustic Brine Pit",
         region="scorchwaste",
-        description="Cobblestones show heavy cart wheel wear. Blinding white crust stretches to the horizon.",
+        description="A fractured salt crust exposes a deep pit of caustic grey brine. A trapped desert merchant clings to a sinking pack saddle.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_attribute": {"attribute": "strength", "value": 14}},
+                text="Your powerful build can hoist the merchant out alone."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_salt_pan_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "scorch_salt_brine_pit_anchor", "name": "Salt Ridge", "tags": ["lockable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="scorchwaste_salt_pan_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="scorchwaste_salt_pan_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="scorch_salt_throw_rope", label="Throw climbing rope", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{"set_flag": {"flag": "merchant_rescued", "value": True}}, {"log_event": "You pulled the merchant from the caustic brine."}], target_scene="scorchwaste_salt_pan_quarters", result_text="The merchant grips the rope and scrambles to solid ground."),
+            Action(id="scorch_salt_haul_merchant", label="Haul by hand", category="systemic", condition={"min_attribute": {"attribute": "strength", "value": 14}}, stamina_cost=2, effects=[{"set_flag": {"flag": "merchant_rescued", "value": True}}, {"log_event": "You dragged the heavy merchant from the brine."}], target_scene="scorchwaste_salt_pan_quarters", result_text="You haul the shouting merchant onto the firm salt ledge."),
             Action(id="scorchwaste_salt_pan_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_salt_pan_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 6 - Stage 3: Resolution / Consequences
     scenes["scorchwaste_salt_pan_quarters"] = SceneNode(
         id="scorchwaste_salt_pan_quarters",
-        title="White Salt Flats - Living Quarters",
+        title="White Salt Flats - Solid Camp",
         region="scorchwaste",
-        description="Rows of wooden bunks line the walls. Blinding white crust stretches to the horizon.",
+        description="A dry sandstone hummock rises above the salt plain. The rescued merchant washes bitter brine from his face. Pack crates sit safe upon the stone.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "merchant_rescued", "value": True}},
+                text="The grateful merchant opens a cedar crate of trade crystals."
             ),
         ],
+        entities=[
+            {"id": "scorch_salt_merchant_crate", "name": "Trade Crate", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="scorchwaste_salt_pan_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="scorchwaste_salt_pan_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="scorchwaste_salt_pan_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_salt_pan_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="scorch_salt_reward", label="Accept salt crystals", category="social", condition={"flag_is": {"flag": "merchant_rescued", "value": True}, "lacks_flag": "salt_reward_taken"}, effects=[{"add_item": "refined_salt_crystals"}, {"set_flag": {"flag": "salt_reward_taken", "value": True}}, {"modify_reputation": {"faction": "caravaneers", "value": 20}}, {"log_event": "You received refined salt crystals from the merchant."}], result_text="The merchant gifts you rare crystalline salt."),
+            Action(id="scorch_salt_rest_camp", label="Rest under awning", category="interaction", effects=[{"modify_stamina": 3}], result_text="You rest beneath the canvas awning."),
             Action(id="scorchwaste_salt_pan_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_salt_pan_courtyard", result_text="You retrace your steps."),
-            Action(id="scorchwaste_salt_pan_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_armory", result_text="You press on to the next area."),
+            Action(id="scorchwaste_salt_pan_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_salt_pan_armory", result_text="You press on to the supply depot."),
         ]
     )
 

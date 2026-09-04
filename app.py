@@ -623,6 +623,18 @@ window.addEventListener("DOMContentLoaded", () => {
 </html>
 """
 
+_HEALTH_RESPONSE_BYTES = json.dumps(
+    {"service": "adventure-forge", "status": "ok", "version": __version__},
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_PLAYABLE_HTML_BYTES = _PLAYABLE_HTML.encode("utf-8")
+_PRESETS_RESPONSE_BYTES = json.dumps(
+    {"presets": {k: v.to_dict() for k, v in CHARACTER_PRESETS.items() if k != "pit_fighter"}},
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+
 
 async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
     """Serve the landing page, health check, REST game API, and MCP JSON-RPC endpoint."""
@@ -667,13 +679,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         await _send_response(
             send,
             status=200,
-            body=_json_response(
-                {
-                    "service": "adventure-forge",
-                    "status": "ok",
-                    "version": __version__,
-                }
-            ),
+            body=_HEALTH_RESPONSE_BYTES,
             content_type=b"application/json; charset=utf-8",
             include_body=include_body,
         )
@@ -693,7 +699,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         await _send_response(
             send,
             status=200,
-            body=_PLAYABLE_HTML.encode("utf-8"),
+            body=_PLAYABLE_HTML_BYTES,
             content_type=b"text/html; charset=utf-8",
             include_body=include_body,
         )
@@ -710,11 +716,10 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             )
             return
 
-        presets_meta = {k: v.to_dict() for k, v in CHARACTER_PRESETS.items() if k != "pit_fighter"}
         await _send_response(
             send,
             status=200,
-            body=_json_response({"presets": presets_meta}),
+            body=_PRESETS_RESPONSE_BYTES,
             content_type=b"application/json; charset=utf-8",
             include_body=include_body,
         )

@@ -25,6 +25,8 @@ class Action:
     def is_legal(self, character: CharacterSheet, world_flags: Dict[str, Any]) -> bool:
         if character.stamina < self.stamina_cost:
             return False
+        if self.condition is None:
+            return True
         return evaluate_condition(self.condition, character, world_flags)
 
     def to_dict(self) -> Dict[str, Any]:

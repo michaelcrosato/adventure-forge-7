@@ -10,6 +10,7 @@ Implements the multi-axis character state vector required by G1 / G3:
 7. Markers & Attire
 """
 from dataclasses import dataclass, field
+import dataclasses
 from typing import Dict, List, Any
 
 
@@ -32,16 +33,16 @@ class CharacterSheet:
     max_stamina: int = 10
 
     def has_trait(self, trait: str) -> bool:
-        return trait.lower() in [t.lower() for t in self.traits]
+        return trait.lower() in {t.lower() for t in self.traits}
 
     def has_flaw(self, flaw: str) -> bool:
-        return flaw.lower() in [f.lower() for f in self.flaws]
+        return flaw.lower() in {f.lower() for f in self.flaws}
 
     def has_marker(self, marker: str) -> bool:
-        return marker.lower() in [m.lower() for m in self.markers]
+        return marker.lower() in {m.lower() for m in self.markers}
 
     def has_item(self, item: str) -> bool:
-        return item.lower() in [i.lower() for i in self.inventory]
+        return item.lower() in {i.lower() for i in self.inventory}
 
     def get_attribute(self, attr: str, default: int = 0) -> int:
         return self.attributes.get(attr.lower(), default)
@@ -89,17 +90,17 @@ class CharacterSheet:
             max_stamina=int(data.get("max_stamina", 10)),
         )
 
-    def modify(self, **kwargs) -> "CharacterSheet":
+    def modify(self, **kwargs: Any) -> "CharacterSheet":
         """Return a new CharacterSheet with specified fields modified."""
-        d = self.to_dict()
+        updates: Dict[str, Any] = {}
         for k, v in kwargs.items():
             if k in ("attributes", "skills", "reputation"):
-                merged = dict(d[k])
+                merged = dict(getattr(self, k))
                 merged.update(v)
-                d[k] = merged
+                updates[k] = merged
             else:
-                d[k] = v
-        return CharacterSheet.from_dict(d)
+                updates[k] = v
+        return dataclasses.replace(self, **updates)
 
 
 @dataclass(frozen=True)

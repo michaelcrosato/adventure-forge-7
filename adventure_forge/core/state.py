@@ -3,6 +3,7 @@
 Guarantees bit-for-bit replay determinism (I1 / SYS-01 / SYS-04).
 """
 from dataclasses import dataclass, field
+import dataclasses
 import hashlib
 import json
 from typing import Dict, Any, List
@@ -26,6 +27,10 @@ class GameState:
 
     def fingerprint(self) -> str:
         """Compute canonical collision-resistant SHA-256 hash of this state."""
+        cached = getattr(self, "_cached_fp", None)
+        if isinstance(cached, str):
+            return cached
+
         canonical_dict = {
             "build_id": self.build_id,
             "character": self.character.to_dict(),
@@ -36,7 +41,9 @@ class GameState:
             "rng_state": self.rng.state,
         }
         serialized = json.dumps(canonical_dict, sort_keys=True, separators=(",", ":"))
-        return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+        fp = hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+        object.__setattr__(self, "_cached_fp", fp)
+        return fp
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -69,16 +76,9 @@ class GameState:
 
     def evolve(self, **kwargs) -> "GameState":
         """Return a new GameState with selected updated fields."""
-        d = self.to_dict()
-        for k, v in kwargs.items():
-            if k == "character" and isinstance(v, CharacterSheet):
-                d["character"] = v.to_dict()
-            elif k == "rng" and isinstance(v, DeterministicRNG):
-                d["rng"] = v.to_dict()
-            elif k == "world_flags":
-                merged = dict(d["world_flags"])
-                merged.update(v)
-                d["world_flags"] = merged
-            else:
-                d[k] = v
-        return GameState.from_dict(d)
+        flags = kwargs.get("world_flags")
+        if flags is not None and flags is not self.world_flags:
+            merged = dict(self.world_flags)
+            merged.update(flags)
+            kwargs["world_flags"] = merged
+        return dataclasses.replace(self, **kwargs)

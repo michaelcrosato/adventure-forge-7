@@ -9,7 +9,7 @@ from typing import List, TypeVar, Tuple
 T = TypeVar("T")
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class DeterministicRNG:
     """Immutable deterministic PRNG cursor using 64-bit SplitMix64 algorithm."""
     state: int

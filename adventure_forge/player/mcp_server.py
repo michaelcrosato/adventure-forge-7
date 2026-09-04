@@ -99,6 +99,8 @@ class MCPServer:
 
     def new_game(self, preset: str = "cutpurse", seed: Optional[int] = None) -> Dict[str, Any]:
         """Start a new game with the designated character preset."""
+        if not isinstance(preset, str):
+            preset = "cutpurse"
         try:
             char_preset = get_preset(preset)
         except KeyError:
@@ -196,6 +198,8 @@ class MCPServer:
 
     def call_tool(self, name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Dispatch a tool call by name with arguments."""
+        if not isinstance(arguments, dict):
+            arguments = {}
         if name == "new_game":
             preset = arguments.get("preset", "cutpurse")
             seed = arguments.get("seed")
@@ -215,6 +219,8 @@ _DEFAULT_SERVER = MCPServer()
 
 def new_game(preset: str = "cutpurse", seed: Optional[int] = None) -> Dict[str, Any]:
     """Module-level contract: new_game(preset: str) -> Dict."""
+    if not isinstance(preset, str):
+        preset = "cutpurse"
     return _DEFAULT_SERVER.new_game(preset, seed=seed)
 
 
@@ -240,10 +246,22 @@ def list_tools() -> List[Dict[str, Any]]:
 
 def handle_jsonrpc_request(request: Dict[str, Any], server: Optional[MCPServer] = None) -> Optional[Dict[str, Any]]:
     """Handle a single JSON-RPC 2.0 request conforming to the MCP specification."""
+    if not isinstance(request, dict):
+        return {
+            "jsonrpc": "2.0",
+            "id": None,
+            "error": {
+                "code": -32600,
+                "message": "Invalid Request: expected JSON object",
+            },
+        }
+
     srv = server or _DEFAULT_SERVER
     req_id = request.get("id")
     method = request.get("method")
-    params = request.get("params", {})
+    params = request.get("params")
+    if not isinstance(params, dict):
+        params = {}
 
     if req_id is None and method == "notifications/initialized":
         return None
@@ -278,7 +296,9 @@ def handle_jsonrpc_request(request: Dict[str, Any], server: Optional[MCPServer] 
 
     if method == "tools/call":
         tool_name = params.get("name", "")
-        arguments = params.get("arguments", {})
+        arguments = params.get("arguments")
+        if not isinstance(arguments, dict):
+            arguments = {}
         result = srv.call_tool(tool_name, arguments)
         return {
             "jsonrpc": "2.0",
@@ -323,15 +343,25 @@ def run_stdio_server(server: Optional[MCPServer] = None) -> None:
             err_resp = {
                 "jsonrpc": "2.0",
                 "id": None,
-                "error": {"code": -32700, "message": f"Parse error: {exc}"}
+                "error": {"code": -32700, "message": f"Parse error: {exc}"},
             }
             sys.stdout.write(json.dumps(err_resp) + "\n")
             sys.stdout.flush()
             continue
 
-        resp = handle_jsonrpc_request(req, srv)
-        if resp is not None:
-            sys.stdout.write(json.dumps(resp) + "\n")
+        try:
+            resp = handle_jsonrpc_request(req, srv)
+            if resp is not None:
+                sys.stdout.write(json.dumps(resp) + "\n")
+                sys.stdout.flush()
+        except Exception as exc:
+            req_id = req.get("id") if isinstance(req, dict) else None
+            err_resp = {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "error": {"code": -32603, "message": f"Internal error: {exc}"},
+            }
+            sys.stdout.write(json.dumps(err_resp) + "\n")
             sys.stdout.flush()
 
 

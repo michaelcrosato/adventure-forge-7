@@ -548,81 +548,74 @@ def build_sunken_hollows_province() -> RegionManifest:
     )
 
     # POI: Drowned Shrine (10 nodes)
+    # Encounter 10 - Stage 1: Assessment / Approach
     scenes["sunken_hollows_drowned_temple_gate"] = SceneNode(
         id="sunken_hollows_drowned_temple_gate",
-        title="Drowned Shrine - Outer Gate",
+        title="Drowned Shrine - Flooded Portico",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. Submerged stone pillars rise through clear water.",
+        description="Submerged black obsidian pillars rise through calm cavern water. Luminous blue cave fish glide past carved gargoyles. A submerged shrine nave opens below.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                text="Your vision pierces the deep water to spot the central altar."
             ),
         ],
         entities=[
-            {'id': 'sunken_hollows_drowned_temple_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "sunken_temple_bronze_crane", "name": "Bell Crane", "tags": ["lockable"], "initial_state": "locked"},
+            {"id": "sunken_temple_kelp_cluster", "name": "Water Kelp", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="sunken_hollows_drowned_temple_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="sunken_hollows_drowned_temple_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="hollows_shrine_inspect_pillars", label="Inspect shrine nave", category="interaction", result_text="You study the ancient stone reliefs submerged in water."),
+            Action(id="hollows_shrine_rig_rope", label="Rig descent rope", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{"set_flag": {"flag": "shrine_rope_rigged", "value": True}}, {"log_event": "You secured a descent guideline to the submerged altar."}], result_text="The braided rope guides the way to the altar floor."),
+            Action(id="hollows_shrine_dive_nave", label="Dive to altar", category="movement", target_scene="sunken_hollows_drowned_temple_courtyard", stamina_cost=1, result_text="You glide down between the dark obsidian colonnades."),
             Action(id="sunken_hollows_drowned_temple_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 10 - Stage 2: Engagement / Climax
     scenes["sunken_hollows_drowned_temple_courtyard"] = SceneNode(
         id="sunken_hollows_drowned_temple_courtyard",
-        title="Drowned Shrine - Main Courtyard",
+        title="Drowned Shrine - Submerged Altar",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. Submerged stone pillars rise through clear water.",
+        description="A carved obsidian altar rests on the flooded flagstone floor. A glowing pearl floats inside an iron cage. Predatory cave lampreys circle the ceiling arches.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "water_breather"},
+                text="You swim motionlessly in the deep water without disturbing the fish."
             ),
         ],
         entities=[
-            {'id': 'sunken_hollows_drowned_temple_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "sunken_temple_altar_cage", "name": "Iron Cage", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="sunken_hollows_drowned_temple_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="sunken_hollows_drowned_temple_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="hollows_shrine_pick_cage", label="Pick altar cage", category="item_affordance", condition={"has_item": "lockpick"}, effects=[{"set_flag": {"flag": "altar_cage_opened", "value": True}}, {"log_event": "You picked open the submerged altar lock."}], target_scene="sunken_hollows_drowned_temple_quarters", result_text="The lock tumblers yield cleanly beneath the water."),
+            Action(id="hollows_shrine_pry_cage", label="Pry iron cage", category="systemic", condition={"has_item": "crowbar"}, stamina_cost=2, effects=[{"set_flag": {"flag": "altar_cage_opened", "value": True}}, {"log_event": "You forced open the cage bars with raw leverage."}], target_scene="sunken_hollows_drowned_temple_quarters", result_text="The iron bars bend and release the glowing pearl."),
             Action(id="sunken_hollows_drowned_temple_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_drowned_temple_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 10 - Stage 3: Resolution / Consequences
     scenes["sunken_hollows_drowned_temple_quarters"] = SceneNode(
         id="sunken_hollows_drowned_temple_quarters",
-        title="Drowned Shrine - Living Quarters",
+        title="Drowned Shrine - High Air Belfry",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. Submerged stone pillars rise through clear water.",
+        description="You kick up into an ancient stone belfry trapped with breathable air. Water drips continuously from the bells. The retrieved abyssal pearl pulses with blue light.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "altar_cage_opened", "value": True}},
+                text="The radiant pearl illuminates the ancient bell chamber."
             ),
         ],
+        entities=[
+            {"id": "sunken_temple_belfry_bell", "name": "Temple Bell", "tags": ["flammable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_drowned_temple_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="sunken_hollows_drowned_temple_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="sunken_hollows_drowned_temple_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_drowned_temple_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="hollows_shrine_take_pearl", label="Take abyssal pearl", category="interaction", condition={"lacks_flag": "abyssal_pearl_taken"}, effects=[{"add_item": "abyssal_pearl"}, {"set_flag": {"flag": "abyssal_pearl_taken", "value": True}}, {"modify_reputation": {"faction": "hollow_dwellers", "value": 25}}, {"add_marker": "pearl_bearer"}, {"log_event": "You claimed the sacred abyssal pearl."}], result_text="The smooth pearl warms your hand with gentle power."),
+            Action(id="hollows_shrine_ring_bell", label="Strike temple bell", category="interaction", effects=[{"log_event": "The deep chime echoes across the underground sea."}], result_text="A deep resonant tone reverberates through the water."),
             Action(id="sunken_hollows_drowned_temple_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_drowned_temple_courtyard", result_text="You retrace your steps."),
-            Action(id="sunken_hollows_drowned_temple_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_armory", result_text="You press on to the next area."),
+            Action(id="sunken_hollows_drowned_temple_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_drowned_temple_armory", result_text="You press on to the supply depot."),
         ]
     )
 
@@ -1068,79 +1061,77 @@ def build_sunken_hollows_province() -> RegionManifest:
     )
 
     # POI: The Flooded Siphon (10 nodes)
+    # Encounter 9 - Stage 1: Assessment / Approach
     scenes["sunken_hollows_deep_siphon_gate"] = SceneNode(
         id="sunken_hollows_deep_siphon_gate",
-        title="The Flooded Siphon - Outer Gate",
+        title="The Flooded Siphon - Cave Shore",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. Air pockets linger beneath stone cavern domes.",
+        description="Dark subterranean water laps against slick limestone shelves. Glowing green moss illuminates a flooded tunnel entrance. Rising bubbles hint at caverns beyond.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "water_breather"},
+                text="Your gills pulse as they sample the oxygenated currents."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"ancestry_is": "deep_dweller"},
+                text="The scent of mineral water and cool stone is familiar."
             ),
         ],
         entities=[
-            {'id': 'sunken_hollows_deep_siphon_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "sunken_limestone_shelf", "name": "Limestone Shelf", "tags": ["climbable"], "climb_destination": "sunken_hollows_deep_siphon_courtyard"},
+            {"id": "sunken_driftwood_pile", "name": "Cave Driftwood", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="sunken_hollows_deep_siphon_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="sunken_hollows_deep_siphon_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="hollows_siphon_survey_depth", label="Survey water depth", category="interaction", result_text="You test the depth with a staff. The channel drops sharply."),
+            Action(id="hollows_siphon_seal_gear", label="Apply waterproof seal", category="item_affordance", condition={"has_item": "waterproof_seal"}, effects=[{"set_flag": {"flag": "gear_waterproofed", "value": True}}, {"log_event": "You treated your pack with waterproof sealant."}], result_text="Your equipment is secure against immersion."),
+            Action(id="hollows_siphon_dive_pool", label="Plunge into siphon", category="movement", target_scene="sunken_hollows_deep_siphon_courtyard", stamina_cost=2, result_text="You take a deep breath and dive into the freezing underground river."),
             Action(id="sunken_hollows_deep_siphon_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 9 - Stage 2: Engagement / Climax
     scenes["sunken_hollows_deep_siphon_courtyard"] = SceneNode(
         id="sunken_hollows_deep_siphon_courtyard",
-        title="The Flooded Siphon - Main Courtyard",
+        title="The Flooded Siphon - Choked Conduit",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. Air pockets linger beneath stone cavern domes.",
+        description="Frigid water exerts crushing pressure in the narrow stone siphon. A silt collapse partially chokes the tunnel. Lungs burn as air dwindles.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "water_breather"},
+                text="You breathe effortlessly in the submerged darkness."
             ),
         ],
         entities=[
-            {'id': 'sunken_hollows_deep_siphon_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "sunken_choked_boulder", "name": "Choked Boulder", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="sunken_hollows_deep_siphon_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="sunken_hollows_deep_siphon_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="hollows_siphon_push_boulder", label="Heave choked stone", category="systemic", condition={"min_attribute": {"attribute": "strength", "value": 13}}, effects=[{"set_flag": {"flag": "siphon_cleared", "value": True}}, {"log_event": "You dislodged the boulder and opened the airway."}], target_scene="sunken_hollows_deep_siphon_quarters", result_text="You roll the heavy rock free and surge upward through the gap."),
+            Action(id="hollows_siphon_endure_breath", label="Hold breath hard", category="trait_exploit", condition={"min_attribute": {"attribute": "endurance", "value": 14}}, effects=[{"set_flag": {"flag": "siphon_cleared", "value": True}}], target_scene="sunken_hollows_deep_siphon_quarters", result_text="You suppress the burning panic and kick through the silt."),
+            Action(id="hollows_siphon_pry_crowbar", label="Pry stone loose", category="item_affordance", condition={"has_item": "crowbar"}, effects=[{"set_flag": {"flag": "siphon_cleared", "value": True}}], target_scene="sunken_hollows_deep_siphon_quarters", result_text="The iron crowbar levers the blockage out of the channel."),
             Action(id="sunken_hollows_deep_siphon_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 9 - Stage 3: Resolution / Consequences
     scenes["sunken_hollows_deep_siphon_quarters"] = SceneNode(
         id="sunken_hollows_deep_siphon_quarters",
-        title="The Flooded Siphon - Living Quarters",
+        title="The Flooded Siphon - Trapped Air Dome",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. Air pockets linger beneath stone cavern domes.",
+        description="You break the surface and cough fresh air into an ancient dry cavern dome. Bioluminescent crystal stalactites glow along the vault. A chitin shell rests upon dry sand.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "siphon_cleared", "value": True}},
+                text="The air pocket remains stable and dry above the submerged current."
             ),
         ],
+        entities=[
+            {"id": "sunken_chitin_relic", "name": "Chitin Relic", "tags": ["lockable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_deep_siphon_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="sunken_hollows_deep_siphon_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="sunken_hollows_deep_siphon_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_deep_siphon_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="hollows_siphon_take_shield", label="Take chitin shield", category="interaction", condition={"lacks_flag": "chitin_shield_taken"}, effects=[{"add_item": "chitin_shield"}, {"set_flag": {"flag": "chitin_shield_taken", "value": True}}, {"modify_health": 4}, {"log_event": "You claimed the lightweight chitin shield."}], result_text="You strap the iridescent chitin shield to your arm."),
+            Action(id="hollows_siphon_rest_sand", label="Rest on sand", category="interaction", effects=[{"modify_stamina": 5}], result_text="You stretch out on the warm subterranean sand."),
             Action(id="sunken_hollows_deep_siphon_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_deep_siphon_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_deep_siphon_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_deep_siphon_armory", result_text="You press on to the next area."),
         ]

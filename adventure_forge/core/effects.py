@@ -16,6 +16,8 @@ def apply_effects(
     Returns:
         (new_character, new_world_flags, emitted_events, next_scene_override)
     """
+    if not effects:
+        return character, world_flags, [], ""
     new_char = character
     new_flags = dict(world_flags)
     events: List[str] = []

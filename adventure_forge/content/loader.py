@@ -2,25 +2,30 @@
 
 Assembles and validates the contiguous world graph across all regions, POIs, and scenes.
 """
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple, Optional
 from adventure_forge.content.schema import RegionManifest
+from adventure_forge.content.data.crags import build_iron_crags_region
+from adventure_forge.content.data.warrens import build_lower_warrens_region
+from adventure_forge.content.data.scorchwaste import build_scorchwaste_region
+from adventure_forge.content.data.court import build_high_court_region
+from adventure_forge.content.data.hollows import build_sunken_hollows_region
+from adventure_forge.content.data.stress_market import build_stress_market_region
+from adventure_forge.content.data.provinces.reach import build_reach_province
+from adventure_forge.content.data.provinces.lowlands import build_lowlands_province
+from adventure_forge.content.data.provinces.scorchwaste import build_scorchwaste_province
+from adventure_forge.content.data.provinces.high_court import build_high_court_province
+from adventure_forge.content.data.provinces.sunken_hollows import build_sunken_hollows_province
+
+_CACHED_REGISTRY: Optional[Dict[str, RegionManifest]] = None
 
 
-def build_world_registry() -> Dict[str, RegionManifest]:
+def build_world_registry(cached: bool = True) -> Dict[str, RegionManifest]:
     """Build and return the comprehensive shipped world registry."""
-    from adventure_forge.content.data.crags import build_iron_crags_region
-    from adventure_forge.content.data.warrens import build_lower_warrens_region
-    from adventure_forge.content.data.scorchwaste import build_scorchwaste_region
-    from adventure_forge.content.data.court import build_high_court_region
-    from adventure_forge.content.data.hollows import build_sunken_hollows_region
-    from adventure_forge.content.data.stress_market import build_stress_market_region
-    from adventure_forge.content.data.provinces.reach import build_reach_province
-    from adventure_forge.content.data.provinces.lowlands import build_lowlands_province
-    from adventure_forge.content.data.provinces.scorchwaste import build_scorchwaste_province
-    from adventure_forge.content.data.provinces.high_court import build_high_court_province
-    from adventure_forge.content.data.provinces.sunken_hollows import build_sunken_hollows_province
+    global _CACHED_REGISTRY
+    if cached and _CACHED_REGISTRY is not None:
+        return dict(_CACHED_REGISTRY)
 
-    return {
+    registry = {
         "iron_crags": build_iron_crags_region(),
         "lower_warrens": build_lower_warrens_region(),
         "scorchwaste_local": build_scorchwaste_region(),
@@ -33,6 +38,10 @@ def build_world_registry() -> Dict[str, RegionManifest]:
         "province_high_court": build_high_court_province(),
         "province_sunken_hollows": build_sunken_hollows_province(),
     }
+    if cached:
+        _CACHED_REGISTRY = registry
+        return dict(_CACHED_REGISTRY)
+    return registry
 
 
 def validate_world_links(registry: Dict[str, RegionManifest]) -> Tuple[bool, List[str]]:

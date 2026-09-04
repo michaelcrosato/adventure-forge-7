@@ -5,16 +5,17 @@ Validates declarative content for regions, POIs, scenes, entities, and actions.
 from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 from adventure_forge.core.actions import Action
+from adventure_forge.core.conditions import evaluate_condition
 
 
-@dataclass
+@dataclass(slots=True)
 class DynamicDescription:
     """Dynamic perception snippet based on character traits, skills, or history."""
     condition: Dict[str, Any]
     text: str  # 1 short sentence
 
 
-@dataclass
+@dataclass(slots=True)
 class SceneNode:
     """A single coherent scene or room in the world graph."""
     id: str
@@ -29,7 +30,6 @@ class SceneNode:
 
     def render_description(self, character: Any, world_flags: Dict[str, Any]) -> str:
         """Render final scene description combining base text with character-salient observations."""
-        from adventure_forge.core.conditions import evaluate_condition
         lines = [self.description.strip()]
         for dyn in self.dynamic_descriptions:
             if evaluate_condition(dyn.condition, character, world_flags):

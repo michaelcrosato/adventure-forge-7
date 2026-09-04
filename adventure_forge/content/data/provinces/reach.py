@@ -548,81 +548,79 @@ def build_reach_province() -> RegionManifest:
     )
 
     # POI: Eagle Wing Pass (10 nodes)
+    # Encounter 1 - Stage 1: Assessment / Approach
     scenes["reach_high_pass_gate"] = SceneNode(
         id="reach_high_pass_gate",
-        title="Eagle Wing Pass - Outer Gate",
+        title="Eagle Wing Pass - Fractured Bridge",
         region="reach",
-        description="Iron bars secure the heavy timber entrance. Narrow ledges wind past frozen mountain waterfalls.",
+        description="Cold wind roars across the fractured stone pass. Snapped iron cables swing over the drop. A stranded courier clings to frost-slicked granite.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "climber"},
+                text="You spot natural handholds along the granite crack."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_attribute": {"attribute": "strength", "value": 14}},
+                text="Heavy bridge timbers can serve as a makeshift lever."
             ),
         ],
         entities=[
-            {'id': 'reach_high_pass_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "reach_high_pass_bridge_timber", "name": "Bridge Timber", "tags": ["flammable", "lockable"], "initial_state": "intact"},
+            {"id": "reach_high_pass_granite_spur", "name": "Granite Spur", "tags": ["climbable"], "climb_destination": "reach_high_pass_courtyard"},
         ],
         base_actions=[
-            Action(id="reach_high_pass_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="reach_high_pass_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="reach_high_pass_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'reach_high_pass_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="reach_pass_scout_chasm", label="Inspect chasm", category="interaction", result_text="You gauge wind velocity and rock stability."),
+            Action(id="reach_pass_anchor_rope", label="Anchor rope", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{"set_flag": {"flag": "pass_rope_anchored", "value": True}}, {"log_event": "You secured climbing rope to the iron mooring ring."}], result_text="The rope snaps taut across the gap."),
+            Action(id="reach_pass_vault_cable", label="Vault cable", category="trait_exploit", condition={"has_trait": "nimble"}, target_scene="reach_high_pass_courtyard", result_text="You skip across the swaying iron cable with flawless balance."),
             Action(id="reach_high_pass_gate_to_prev", label="Return back", category="movement", target_scene="reach_hub", result_text="You retrace your steps."),
-            Action(id="reach_high_pass_gate_to_next", label="Press forward", category="movement", target_scene="reach_high_pass_courtyard", result_text="You press on to the next area."),
+            Action(id="reach_high_pass_gate_to_next", label="Press forward", category="movement", target_scene="reach_high_pass_courtyard", result_text="You pick your way along the narrow cliff trail."),
         ]
     )
 
+    # Encounter 1 - Stage 2: Engagement / Climax
     scenes["reach_high_pass_courtyard"] = SceneNode(
         id="reach_high_pass_courtyard",
-        title="Eagle Wing Pass - Main Courtyard",
+        title="Eagle Wing Pass - Wind Chasm",
         region="reach",
-        description="Cobblestones show heavy cart wheel wear. Narrow ledges wind past frozen mountain waterfalls.",
+        description="Gale winds hammer the narrow rock traverse. Freezing spray coats the sheer cliff face. The stranded courier slips on loose shale.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "nimble"},
+                text="You lean into the freezing gale without losing your footing."
             ),
         ],
         entities=[
-            {'id': 'reach_high_pass_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "reach_high_pass_chasm_anchor", "name": "Anchor Ring", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_high_pass_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="reach_high_pass_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="reach_high_pass_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'reach_high_pass_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="reach_pass_brace_gale", label="Brace against wind", category="interaction", stamina_cost=1, result_text="You drop low and drive your boots into stone."),
+            Action(id="reach_pass_haul_courier", label="Haul courier", category="systemic", condition={"min_attribute": {"attribute": "strength", "value": 14}}, effects=[{"set_flag": {"flag": "courier_rescued", "value": True}}, {"log_event": "You hauled the courier to safety."}], target_scene="reach_high_pass_quarters", result_text="Your muscles strain as you heave the man over the ledge."),
+            Action(id="reach_pass_secure_piton", label="Drive piton", category="item_affordance", condition={"has_item": "crowbar"}, effects=[{"set_flag": {"flag": "piton_secured", "value": True}}], target_scene="reach_high_pass_quarters", result_text="You hammer iron into the seam and haul the courier up."),
             Action(id="reach_high_pass_courtyard_to_prev", label="Return back", category="movement", target_scene="reach_high_pass_gate", result_text="You retrace your steps."),
-            Action(id="reach_high_pass_courtyard_to_next", label="Press forward", category="movement", target_scene="reach_high_pass_quarters", result_text="You press on to the next area."),
+            Action(id="reach_high_pass_courtyard_to_next", label="Press forward", category="movement", target_scene="reach_high_pass_quarters", result_text="You press on to the high shelter."),
         ]
     )
 
+    # Encounter 1 - Stage 3: Resolution / Consequences
     scenes["reach_high_pass_quarters"] = SceneNode(
         id="reach_high_pass_quarters",
-        title="Eagle Wing Pass - Living Quarters",
+        title="Eagle Wing Pass - High Shelter",
         region="reach",
-        description="Rows of wooden bunks line the walls. Narrow ledges wind past frozen mountain waterfalls.",
+        description="A stone windbreak shelters the mountain trail. Smoke rises from a rough rock hearth. The courier warms his frostbitten hands.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "courier_rescued", "value": True}},
+                text="The grateful courier offers you a sealed frontier satchel."
             ),
         ],
+        entities=[
+            {"id": "reach_high_pass_hearth_fire", "name": "Rock Hearth", "tags": ["flammable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="reach_high_pass_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="reach_high_pass_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="reach_high_pass_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'reach_high_pass_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="reach_pass_receive_satchel", label="Take frontier mail", category="interaction", condition={"flag_is": {"flag": "courier_rescued", "value": True}, "lacks_flag": "frontier_mail_taken"}, effects=[{"add_item": "frontier_mail"}, {"set_flag": {"flag": "frontier_mail_taken", "value": True}}, {"modify_reputation": {"faction": "iron_guard", "value": 15}}, {"log_event": "You received the frontier dispatch satchel."}], result_text="The courier hands over sealed official documents."),
+            Action(id="reach_pass_rest_hearth", label="Rest at hearth", category="interaction", effects=[{"modify_stamina": 4}, {"modify_health": 3}], result_text="The warmth restores your strength."),
             Action(id="reach_high_pass_quarters_to_prev", label="Return back", category="movement", target_scene="reach_high_pass_courtyard", result_text="You retrace your steps."),
-            Action(id="reach_high_pass_quarters_to_next", label="Press forward", category="movement", target_scene="reach_high_pass_armory", result_text="You press on to the next area."),
+            Action(id="reach_high_pass_quarters_to_next", label="Press forward", category="movement", target_scene="reach_high_pass_armory", result_text="You press on to the supply depot."),
         ]
     )
 
@@ -1068,81 +1066,75 @@ def build_reach_province() -> RegionManifest:
     )
 
     # POI: Ancient Iron Spire (10 nodes)
+    # Encounter 2 - Stage 1: Assessment / Approach
     scenes["reach_iron_spire_gate"] = SceneNode(
         id="reach_iron_spire_gate",
-        title="Ancient Iron Spire - Outer Gate",
+        title="Ancient Iron Spire - Tower Base",
         region="reach",
-        description="Iron bars secure the heavy timber entrance. Rusted metal towers rise into the mountain clouds.",
+        description="Rusted copper struts rise into storm clouds. Blue sparks crackle along the metal tower. Gale winds shake the iron gantry.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                text="Your eyes track glowing charge veins pulsing through the metal."
             ),
         ],
         entities=[
-            {'id': 'reach_iron_spire_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "reach_iron_spire_rung", "name": "Rusted Ladder", "tags": ["climbable"], "climb_destination": "reach_iron_spire_courtyard"},
+            {"id": "reach_iron_spire_conduit_box", "name": "Conduit Box", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_iron_spire_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="reach_iron_spire_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="reach_iron_spire_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'reach_iron_spire_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="reach_spire_survey_struts", label="Inspect tower struts", category="interaction", result_text="You map out the safest ascent up the conductor framework."),
+            Action(id="reach_spire_ground_cable", label="Ground cable", category="item_affordance", condition={"has_item": "crowbar"}, effects=[{"set_flag": {"flag": "spire_cable_grounded", "value": True}}, {"log_event": "You grounded the lower conductor cable."}], result_text="The heavy iron lever shunts the sparks harmlessly away."),
+            Action(id="reach_spire_begin_climb", label="Scale iron tower", category="movement", target_scene="reach_iron_spire_courtyard", stamina_cost=1, result_text="You grasp the cold metal rungs and haul yourself upward."),
             Action(id="reach_iron_spire_gate_to_prev", label="Return back", category="movement", target_scene="reach_hub", result_text="You retrace your steps."),
             Action(id="reach_iron_spire_gate_to_next", label="Press forward", category="movement", target_scene="reach_iron_spire_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 2 - Stage 2: Engagement / Climax
     scenes["reach_iron_spire_courtyard"] = SceneNode(
         id="reach_iron_spire_courtyard",
-        title="Ancient Iron Spire - Main Courtyard",
+        title="Ancient Iron Spire - Charged Gantry",
         region="reach",
-        description="Cobblestones show heavy cart wheel wear. Rusted metal towers rise into the mountain clouds.",
+        description="Blue sparks dance along the wet steel cables. Lightning flashes across the rusted catwalk. An automaton sentry hums with power.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "nimble"},
+                text="You keep balance on the narrow beam despite vibrating shockwaves."
             ),
         ],
         entities=[
-            {'id': 'reach_iron_spire_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "reach_iron_spire_sentry_chassis", "name": "Automaton Sentry", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_iron_spire_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="reach_iron_spire_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="reach_iron_spire_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'reach_iron_spire_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="reach_spire_dodge_arc", label="Duck under arc", category="interaction", stamina_cost=1, result_text="You duck low as a bolt of blue fire crackles overhead."),
+            Action(id="reach_spire_short_sentry", label="Short sentry core", category="trait_exploit", condition={"min_skill": {"skill": "cunning", "value": 3}}, effects=[{"set_flag": {"flag": "spire_sentry_disabled", "value": True}}, {"log_event": "You disabled the automaton sentry with clever wiring."}], target_scene="reach_iron_spire_quarters", result_text="A shower of sparks erupts as the sentry goes silent."),
+            Action(id="reach_spire_vault_gap", label="Vault broken gantry", category="trait_exploit", condition={"has_trait": "nimble"}, target_scene="reach_iron_spire_quarters", result_text="You leap over the missing metal plates to the apex ladder."),
             Action(id="reach_iron_spire_courtyard_to_prev", label="Return back", category="movement", target_scene="reach_iron_spire_gate", result_text="You retrace your steps."),
             Action(id="reach_iron_spire_courtyard_to_next", label="Press forward", category="movement", target_scene="reach_iron_spire_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 2 - Stage 3: Resolution / Consequences
     scenes["reach_iron_spire_quarters"] = SceneNode(
         id="reach_iron_spire_quarters",
-        title="Ancient Iron Spire - Living Quarters",
+        title="Ancient Iron Spire - Spire Apex",
         region="reach",
-        description="Rows of wooden bunks line the walls. Rusted metal towers rise into the mountain clouds.",
+        description="The apex lightning rod vents its electrical charge into the clouds. Calm air settles over the ridge. A glowing conductive core pulses in a brass mount.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "spire_core_harvested", "value": True}},
+                text="The empty brass mount cools in the crisp mountain wind."
             ),
         ],
+        entities=[
+            {"id": "reach_iron_spire_brass_mount", "name": "Brass Mount", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="reach_iron_spire_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="reach_iron_spire_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="reach_iron_spire_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'reach_iron_spire_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="reach_spire_take_core", label="Take conductive core", category="interaction", condition={"lacks_flag": "spire_core_harvested"}, effects=[{"add_item": "conductive_core"}, {"set_flag": {"flag": "spire_core_harvested", "value": True}}, {"add_marker": "storm_strider"}, {"log_event": "You extracted the humming conductive core."}], result_text="The warm glass core vibrates in your hand."),
+            Action(id="reach_spire_survey_valley", label="Survey the valley", category="interaction", result_text="You gaze across miles of alpine peaks and pine forests."),
             Action(id="reach_iron_spire_quarters_to_prev", label="Return back", category="movement", target_scene="reach_iron_spire_courtyard", result_text="You retrace your steps."),
-            Action(id="reach_iron_spire_quarters_to_next", label="Press forward", category="movement", target_scene="reach_iron_spire_armory", result_text="You press on to the next area."),
+            Action(id="reach_iron_spire_quarters_to_next", label="Press forward", category="movement", target_scene="reach_iron_spire_armory", result_text="You press on to the supply depot."),
         ]
     )
 
