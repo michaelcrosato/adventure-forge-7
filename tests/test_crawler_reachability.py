@@ -30,7 +30,7 @@ def test_all_scenes_and_actions_execution():
     """Exhaustively step every legal action across all 520 scenes in the world graph.
 
     Guarantees zero unhandled runtime exceptions (e.g. invalid effect operators,
-    broken scene transitions, or unhandled conditions) across all 2,220+ actions.
+    broken scene transitions, or unhandled conditions) across all 3,000+ actions.
     """
     registry = build_world_registry()
     engine = AdventureEngine(registry)
@@ -80,7 +80,7 @@ def test_all_scenes_and_actions_execution():
                     failed_actions.append((scene_id, act.id, f"{type(exc).__name__}: {exc}"))
 
     assert scenes_evaluated == 520, f"Expected 520 scenes evaluated, got {scenes_evaluated}"
-    assert actions_evaluated >= 2220, f"Expected >= 2220 actions evaluated, got {actions_evaluated}"
+    assert actions_evaluated >= 3000, f"Expected >= 3000 actions evaluated, got {actions_evaluated}"
     assert len(failed_actions) == 0, (
         f"Action execution failed on {len(failed_actions)} actions:\n"
         + "\n".join(f"  [{s_id}] action '{a_id}': {err}" for s_id, a_id, err in failed_actions)
@@ -121,7 +121,21 @@ def test_leaf_node_interactable_effects_regression():
     assert obs_1.success, f"reach_secret_shrine_act_1 failed: {obs_1.message}"
     assert "ice_lotus" in next_state_1.character.inventory, "Expected 'ice_lotus' in inventory after searching ice dais"
 
-    # 3. Test movement return: Return to sanctum
-    next_state_2, obs_2 = engine.step(state, "reach_secret_shrine_to_sanctum")
-    assert obs_2.success, f"reach_secret_shrine_to_sanctum failed: {obs_2.message}"
-    assert next_state_2.current_scene == "reach_frost_cavern_sanctum"
+    # 3. Test act_2: Study frost runes
+    next_state_2, obs_2 = engine.step(state, "reach_secret_shrine_act_2")
+    assert obs_2.success, f"reach_secret_shrine_act_2 failed: {obs_2.message}"
+
+    # 4. Test movement return: Return to sanctum
+    next_state_3, obs_3 = engine.step(state, "reach_secret_shrine_to_sanctum")
+    assert obs_3.success, f"reach_secret_shrine_to_sanctum failed: {obs_3.message}"
+    assert next_state_3.current_scene == "reach_frost_cavern_sanctum"
+
+
+def test_world_graph_interactable_density():
+    """Verify the Milestone 2 density invariant (>= 260 scenes with >= 3 interactables)."""
+    from adventure_forge.verification.density import verify_interactable_density
+    ok, msg, stats = verify_interactable_density()
+    assert ok, msg
+    assert stats["dense_scenes"] >= 260
+    assert stats["dense_percentage"] >= 50.0
+
