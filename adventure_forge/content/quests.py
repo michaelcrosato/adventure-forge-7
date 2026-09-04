@@ -6,9 +6,8 @@ Implements Baldur's Gate 3 systemic depth:
 - Faction standing shifts that dynamically reshape NPC greetings and shop prices.
 - Multiple mutually exclusive campaign endings.
 """
-from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
-from adventure_forge.core.conditions import evaluate_condition
+from dataclasses import dataclass
+from typing import Dict, Any, List
 from adventure_forge.core.character import CharacterSheet
 
 

@@ -99,7 +99,7 @@ def synthesize_affordances(
                             {"set_flag": {"flag": f"entity_{e_id}_state", "value": "unlocked"}},
                             {"log_event": f"You picked open the {e_name}."}
                         ],
-                        result_text=f"The lock tumblers click open.",
+                        result_text="The lock tumblers click open.",
                         risk="medium"
                     ))
                     seen_ids.add(act_id)
@@ -116,7 +116,7 @@ def synthesize_affordances(
                             {"set_flag": {"flag": f"entity_{e_id}_state", "value": "broken"}},
                             {"log_event": f"You forced open the {e_name} with raw leverage."}
                         ],
-                        result_text=f"The iron brackets buckle with a loud crack.",
+                        result_text="The iron brackets buckle with a loud crack.",
                         risk="high",
                         stamina_cost=2
                     ))
@@ -134,7 +134,7 @@ def synthesize_affordances(
                             {"set_flag": {"flag": f"entity_{e_id}_state", "value": "melted"}},
                             {"log_event": f"Chemical acid dissolves the latch of the {e_name}."}
                         ],
-                        result_text=f"Acid hisses and eats through the latch.",
+                        result_text="Acid hisses and eats through the latch.",
                         risk="low"
                     ))
                     seen_ids.add(act_id)
@@ -153,7 +153,7 @@ def synthesize_affordances(
                             {"set_flag": {"flag": f"hazard_{e_id}_smoke", "value": True}},
                             {"log_event": f"You ignited the {e_name}."}
                         ],
-                        result_text=f"Flames catch and spread quickly.",
+                        result_text="Flames catch and spread quickly.",
                         risk="high"
                     ))
                     seen_ids.add(act_id)

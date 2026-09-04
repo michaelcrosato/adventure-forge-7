@@ -11,7 +11,6 @@ Validates:
 - Replay determinism (identical SHA-256 fingerprints across runs)
 - Multi-axis character state divergence during triage
 """
-import pytest
 from adventure_forge.core.character import CharacterSheet, get_preset
 from adventure_forge.core.engine import StepResult
 from adventure_forge.flywheel.triage import (

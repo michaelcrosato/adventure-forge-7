@@ -47,11 +47,19 @@ python3 -m adventure_forge.flywheel.loop --cycles 10
 zu-loop run --cycles 10
 ```
 
-## Deployment
+## Deployment & Vercel Integration
 
-Vercel loads the dependency-free ASGI application in `app.py`. The root path
-provides a small landing page, and `/health` reports deployment health. The
-game, verification bar, flywheel, and MCP server remain command-line surfaces.
+AdventureForge deploys seamlessly to Vercel with zero configuration when imported directly from GitHub:
+- **Entrypoints**: `app.py` and `api/index.py` provide stateless ASGI handling.
+- **Root Landing Page (`/`)**: Displays live system status, architecture overview, and deployment links.
+- **Health Check (`/health`)**: High-velocity machine-readable deployment health monitor returning JSON status.
+- **MCP HTTP Surface (`/api/mcp`)**: Streamable Model Context Protocol JSON-RPC 2.0 endpoint over HTTP for AI coding agents.
+- **Vercel Plugin & MCP**: Pre-configured in `.agents/plugins/vercel/` and `.agents/mcp_config.json` for agent tool calling and remote Vercel API access (`https://mcp.vercel.com`).
+
+### Local Vercel Preview
+```bash
+npx vercel dev
+```
 
 ---
 

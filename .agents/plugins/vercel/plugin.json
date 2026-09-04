@@ -1,0 +1,4 @@
+{
+  "name": "vercel",
+  "description": "Vercel integration plugin for deployment automation, Python serverless runtime configuration, and Vercel MCP connectivity."
+}

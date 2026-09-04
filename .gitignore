@@ -26,10 +26,21 @@ wheels/
 .coverage
 htmlcov/
 .mypy_cache/
+.ruff_cache/
 flywheel_audit.jsonl
-.agents/
+
+# Agent run logs (keep plugins and configs tracked)
+.agents/*
+!.agents/plugins/
+!.agents/mcp_config.json
+
+# Deployments & Environments
+.vercel/
+.venv/
+venv/
 
 # System / OS
 *.Zone.Identifier
 .DS_Store
 Thumbs.db
+

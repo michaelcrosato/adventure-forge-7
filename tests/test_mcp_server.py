@@ -13,7 +13,6 @@ Validates:
 - JSON-RPC 2.0 protocol handling
 """
 import json
-import pytest
 from adventure_forge.player import mcp_server as mcp
 from adventure_forge.player.mcp_server import MCPServer, handle_jsonrpc_request
 

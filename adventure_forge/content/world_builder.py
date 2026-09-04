@@ -9,7 +9,7 @@ Implements G3, G4, G5:
 - Connected via continental highways into a single unbroken continuity.
 """
 from typing import Dict, List, Any
-from adventure_forge.content.schema import RegionManifest, SceneNode, DynamicDescription
+from adventure_forge.content.schema import SceneNode, DynamicDescription
 from adventure_forge.core.actions import Action
 
 

@@ -5,7 +5,6 @@ yielding 520+ nodes adhering strictly to the Hemingway baseline, multi-trait
 reactivity, and zero-softlock invariants.
 """
 import os
-import json
 
 PROVINCE_CONFIGS = [
     {
@@ -247,7 +246,7 @@ def generate_province_code(prov):
         f'def {func_name}() -> RegionManifest:',
         '    scenes = {}',
         '',
-        f'    # Province Hub',
+        '    # Province Hub',
         f'    scenes["{prov_id}_hub"] = SceneNode(',
         f'        id="{prov_id}_hub",',
         f'        title="{prov["name"]} - Central Hub",',
@@ -259,13 +258,13 @@ def generate_province_code(prov):
         '                text="Your military posture draws respectful nods from travelers."',
         '            ),',
         '        ],',
-        f'        base_actions=[',
+        '        base_actions=[',
         f'            Action(id="{prov_id}_hub_scout", label="Scout hub", category="interaction", result_text="You survey the bustling provincial crossroads."),',
         f'            Action(id="{prov_id}_hub_rest", label="Rest at inn", category="interaction", effects=[{{"modify_stamina": 5}}], result_text="You rest and regain stamina."),',
         f'            Action(id="{prov_id}_hub_board", label="Check notice board", category="interaction", effects=[{{"set_flag": {{"flag": "{prov_id}_notices_read", "value": True}}}}, {{"log_event": "You read the municipal notice board."}}], result_text="You read the pinned municipal notices."),',
         f'            Action(id="{prov_id}_to_bazaar", label="Go to Bazaar", category="movement", target_scene="bazaar_center", result_text="You travel along the highway to the Grand Bazaar."),',
-        f'        ]',
-        f'    )',
+        '        ]',
+        '    )',
         ''
     ]
 
@@ -273,7 +272,7 @@ def generate_province_code(prov):
         poi_key = poi[0]
         poi_name = poi[1]
         poi_desc = poi[2]
-        anchor_scene = poi[3]
+        _anchor_scene = poi[3]
         poi_label = poi[4] if len(poi) > 4 else format_action_label(poi_name)
 
         lines.append(f'    # POI: {poi_name} (10 nodes)')
@@ -391,11 +390,11 @@ def generate_province_code(prov):
         lines.append('    )')
         lines.append('')
 
-    lines.append(f'    return RegionManifest(')
+    lines.append('    return RegionManifest(')
     lines.append(f'        id="{prov_id}",')
     lines.append(f'        name="{prov["name"]}",')
     lines.append(f'        mechanic_name="{prov["mechanic"]}",')
-    lines.append(f'        mechanic_description="Comprehensive open-world region with 10 deep POIs.",')
+    lines.append('        mechanic_description="Comprehensive open-world region with 10 deep POIs.",')
     lines.append('        scenes=scenes')
     lines.append('    )')
 

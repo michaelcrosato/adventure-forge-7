@@ -15,6 +15,17 @@ af-verify = "adventure_forge.verification.verify:main"
 af-play = "adventure_forge.player.cli:main"
 af-flywheel = "adventure_forge.flywheel.loop:main"
 zu-loop = "adventure_forge.flywheel.loop:main"
+af-mcp = "adventure_forge.player.mcp_server:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "mypy>=1.0.0",
+    "ruff>=0.3.0",
+]
+
+[tool.vercel]
+entrypoint = "app:app"
 
 [tool.setuptools.packages.find]
 include = ["adventure_forge*"]
@@ -23,3 +34,11 @@ include = ["adventure_forge*"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 pythonpath = ["."]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+explicit_package_bases = true
+

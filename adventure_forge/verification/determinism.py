@@ -5,7 +5,7 @@ Verifies I1 / SYS-01 / SYS-04:
 - Bit-for-bit canonical fingerprint matching.
 - Tamper detection: modifying an action or seed invalidates the trace.
 """
-from typing import List, Dict, Any, Tuple
+from typing import List, Tuple
 from adventure_forge.core.state import GameState
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.engine import AdventureEngine

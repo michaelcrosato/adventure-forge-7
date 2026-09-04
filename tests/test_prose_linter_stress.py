@@ -7,7 +7,6 @@ Authored by Challenger M1.1 to empirically challenge and stress-test:
 4. Readability boundaries: Grade 6-8 bounds, scientific/legal jargon rejection, micro-phrase bypass.
 5. Syllable counter heuristics and resilience.
 """
-import pytest
 from adventure_forge.linter.prose_linter import (
     ProseLinter,
     flesch_kincaid_grade,

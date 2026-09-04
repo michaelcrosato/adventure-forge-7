@@ -8,7 +8,7 @@ Hard Invariants:
 - Stale or illegal actions strictly rejected without state mutation.
 - Canonical fingerprint hash updated deterministically.
 """
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, Any, List, Optional, Tuple
 from adventure_forge.core.state import GameState
 from adventure_forge.core.actions import Action, synthesize_affordances

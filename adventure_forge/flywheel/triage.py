@@ -6,10 +6,10 @@ Enforces SYS-07 / Minimal Proof #7:
 - Automatically ingests playtester telemetry and friction notes.
 """
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.state import GameState
-from adventure_forge.core.engine import AdventureEngine, StepResult
+from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.content.loader import build_world_registry
 

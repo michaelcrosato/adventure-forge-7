@@ -1,0 +1,2 @@
+# AdventureForge runtime dependencies
+# Core engine and ASGI entrypoints are dependency-free (Python standard library only).

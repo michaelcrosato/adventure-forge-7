@@ -10,8 +10,7 @@ Validates:
 - Preset integration in start_new_game()
 """
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
-import pytest
+from typing import List, Dict, Any
 from adventure_forge.content.loader import build_world_registry
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.engine import AdventureEngine

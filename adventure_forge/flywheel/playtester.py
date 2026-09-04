@@ -6,7 +6,7 @@ Enforces I6 Information Firewall:
 - Supports divergent play personas: Speedrunner, Brute, Infiltrator, Explorer, Saboteur.
 """
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional
 from adventure_forge.core.state import GameState
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.engine import AdventureEngine, StepResult
@@ -59,32 +59,32 @@ class BlindPlaytester:
             preferred = [a for a in actions if "force" in a["id"] or a["category"] in ("systemic", "combat")]
             if preferred:
                 val, self.rng = self.rng.next_int(0, len(preferred) - 1)
-                return preferred[val]["id"]
+                return str(preferred[val]["id"])
 
         elif self.persona == "infiltrator":
             # Prefers trait exploits, stealth, cunning, lockpicking
             preferred = [a for a in actions if a["category"] in ("trait_exploit", "item_affordance") or "slip" in a["id"] or "pick" in a["id"]]
             if preferred:
                 val, self.rng = self.rng.next_int(0, len(preferred) - 1)
-                return preferred[val]["id"]
+                return str(preferred[val]["id"])
 
         elif self.persona == "speedrunner":
             # Prefers movement actions that advance to new scenes quickly
             preferred = [a for a in actions if a["category"] == "movement"]
             if preferred:
                 val, self.rng = self.rng.next_int(0, len(preferred) - 1)
-                return preferred[val]["id"]
+                return str(preferred[val]["id"])
 
         elif self.persona == "saboteur":
             # Prefers high-risk, environmental burning/melting
             preferred = [a for a in actions if a["risk"] == "high" or "burn" in a["id"] or "melt" in a["id"]]
             if preferred:
                 val, self.rng = self.rng.next_int(0, len(preferred) - 1)
-                return preferred[val]["id"]
+                return str(preferred[val]["id"])
 
         # Default / Explorer: prefers variety and unvisited interaction verbs
         idx, self.rng = self.rng.next_int(0, len(actions) - 1)
-        return actions[idx]["id"]
+        return str(actions[idx]["id"])
 
     def run_session(self, initial_char: CharacterSheet, start_scene: str, max_turns: int = 20) -> SessionTelemetry:
         registry = build_world_registry()

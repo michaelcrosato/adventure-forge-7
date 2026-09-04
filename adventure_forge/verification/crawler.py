@@ -5,7 +5,7 @@ Performs BFS/DFS exploration of the world graph to prove:
 - No accidental dead-end traps without programmed exits.
 - No crashes during state exploration.
 """
-from typing import Set, List, Dict, Tuple, Any
+from typing import Set, Dict, Tuple, Any
 from collections import deque
 from adventure_forge.core.state import GameState
 from adventure_forge.core.character import CharacterSheet
@@ -42,7 +42,7 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
 
     visited_scenes: Set[str] = set()
     visited_state_hashes: Set[str] = set()
-    queue = deque()
+    queue: deque[GameState] = deque()
 
     initial_state = GameState(
         build_id="af-build-001",

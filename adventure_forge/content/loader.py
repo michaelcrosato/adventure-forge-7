@@ -2,9 +2,8 @@
 
 Assembles and validates the contiguous world graph across all regions, POIs, and scenes.
 """
-from typing import Dict, Any, List, Set, Tuple
-from adventure_forge.content.schema import RegionManifest, SceneNode
-from adventure_forge.core.actions import Action
+from typing import Dict, List, Set, Tuple
+from adventure_forge.content.schema import RegionManifest
 
 
 def build_world_registry() -> Dict[str, RegionManifest]:

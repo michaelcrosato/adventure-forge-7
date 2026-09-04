@@ -2,7 +2,6 @@
 from adventure_forge.linter.prose_linter import (
     ProseLinter,
     flesch_kincaid_grade,
-    word_count,
     split_sentences
 )
 from adventure_forge.content.loader import build_world_registry

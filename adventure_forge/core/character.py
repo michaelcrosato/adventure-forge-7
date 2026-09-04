@@ -10,8 +10,7 @@ Implements the multi-axis character state vector required by G1 / G3:
 7. Markers & Attire
 """
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Any
-import copy
+from typing import Dict, List, Any
 
 
 @dataclass(frozen=True)

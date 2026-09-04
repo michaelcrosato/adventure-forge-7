@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "vercel": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.vercel.com"]
+    },
+    "adventure-forge": {
+      "command": "python3",
+      "args": ["-m", "adventure_forge.player.mcp_server"]
+    }
+  }
+}

@@ -5,7 +5,7 @@ Guarantees bit-for-bit replay determinism (I1 / SYS-01 / SYS-04).
 from dataclasses import dataclass, field
 import hashlib
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.rng import DeterministicRNG
 

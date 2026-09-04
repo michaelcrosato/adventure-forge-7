@@ -3,7 +3,6 @@
 Enables canonical execution via:
     python3 -m adventure_forge.verify
 """
-import sys
 from adventure_forge.verification.verify import main, run_all_verification
 
 __all__ = ["main", "run_all_verification"]
