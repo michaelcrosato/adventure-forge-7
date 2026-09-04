@@ -183,13 +183,13 @@ def test_exact_dialogue_boundary_60_vs_61_words():
     sent_15 = "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen."
     dlg_60 = f"{sent_15} {sent_15} {sent_15} {sent_15}"
     assert word_count(dlg_60) == 60
-    assert linter.lint_dialogue(dlg_60, check_readability=False) == []
+    assert linter.lint_dialogue(dlg_60) == []
 
     # 61 words -> rejected
     sent_16 = "One two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen."
     dlg_61 = f"{sent_15} {sent_15} {sent_15} {sent_16}"
     assert word_count(dlg_61) == 61
-    errs_61 = linter.lint_dialogue(dlg_61, check_readability=False)
+    errs_61 = linter.lint_dialogue(dlg_61)
     assert any("Dialogue exceeds 60 words (61 words)" in e for e in errs_61)
 
 
@@ -296,3 +296,78 @@ def test_scene_description_sentence_limits():
         base_actions=[Action(id="a", label="Look", category="interaction")]
     )
     assert linter.lint_scene(scene_3_sent) == []
+
+
+# ==============================================================================
+# 7. Exact Mathematical FKGL Boundary Validation (5.99, 6.00, 7.00, 8.00, 8.01)
+# ==============================================================================
+
+def test_exact_grade_boundary_precision_599_600_700_800_801():
+    """Mathematically verify FKGL boundaries at 5.99 (reject), 6.00 (accept), 7.00 (accept), 8.00 (accept), 8.01 (reject)."""
+    linter = ProseLinter(min_readability_grade=6.0, max_readability_grade=8.0)
+
+    # 5.99 FKGL (1 sentence, 15 words, 20 syllables)
+    t599 = "cold dark stone gate deep night wind frost hall keep iron ancient silent cavern frozen."
+    assert flesch_kincaid_grade(t599) == 5.99
+    errs_599 = linter.lint_text(t599)
+    assert any("Readability grade 5.99 falls below minimum 6.0" in e for e in errs_599)
+
+    # 6.00 FKGL (2 sentences, 7 words, 12 syllables)
+    t600 = "iron ancient cold. silent cavern frozen dark."
+    assert flesch_kincaid_grade(t600) == 6.00
+    assert linter.lint_text(t600) == []
+
+    # 7.00 FKGL (1 sentence, 17 words, 23 syllables)
+    t700 = "cold dark stone gate deep night wind frost hall keep blade iron ancient silent cavern frozen shadow."
+    assert flesch_kincaid_grade(t700) == 7.00
+    assert linter.lint_text(t700) == []
+
+    # 8.00 FKGL (3 sentences, 19 words, 34 syllables)
+    s1 = "iron ancient silent cavern frozen shadow."
+    s2 = "pathway temple valley dungeon ancient cavern."
+    s3 = "cold dark cavern frozen shadow pathway temple."
+    t800 = f"{s1} {s2} {s3}"
+    assert flesch_kincaid_grade(t800) == 8.00
+    assert linter.lint_text(t800) == []
+
+    # 8.01 FKGL (1 sentence, 11 words, 18 syllables)
+    t801 = "cold dark stone gate iron ancient silent cavern frozen shadow pathway."
+    assert flesch_kincaid_grade(t801) == 8.01
+    errs_801 = linter.lint_text(t801)
+    assert any("Readability grade 8.01 exceeds maximum 8.0" in e for e in errs_801)
+
+
+# ==============================================================================
+# 8. Syllable Heuristics & Formatting Edge Cases
+# ==============================================================================
+
+def test_syllable_heuristic_edge_cases():
+    """Verify syllable counter handles edge cases without zero/negative return or crashes."""
+    tricky_words = [
+        ("a", 1),
+        ("i", 1),
+        ("don't", 1),
+        ("it's", 1),
+        ("watchman's", 2),
+        ("bottle", 1),
+        ("walked", 1),
+        ("waited", 1),
+        ("fissures", 2),
+        ("rhythm", 1),
+        ("abyss", 2),
+        ("dynamite", 3),
+    ]
+    for word, expected in tricky_words:
+        actual = estimate_syllables(word)
+        assert actual == expected, f"Word '{word}' expected {expected} syllables, got {actual}"
+
+
+def test_multiline_and_tab_formatted_prose():
+    """Verify that multi-line text with carriage returns, tabs, and multiple spaces behaves identically."""
+    linter = ProseLinter(max_sentence_words=18)
+    formatted_text = "Iron bars\tsecure\tthe heavy\r\ntimber entrance.\r\nCold wind   blows through the gap."
+    sentences = split_sentences(formatted_text)
+    assert len(sentences) == 2
+    assert word_count(sentences[0]) == 7
+    assert word_count(sentences[1]) == 6
+    assert linter.lint_text(formatted_text) == []
