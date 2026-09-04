@@ -12,6 +12,7 @@ Provides:
 from __future__ import annotations
 
 import json
+import urllib.parse
 from collections.abc import Awaitable, Callable
 from typing import Any
 
@@ -67,26 +68,42 @@ async def _send_response(
 
 def _extract_path(scope: dict[str, Any]) -> str:
     """Normalize path across local ASGI, direct Vercel functions, and Vercel rewrites."""
-    headers = dict(scope.get("headers", []))
-    raw_matched = headers.get(b"x-matched-path") or headers.get(b"x-forwarded-uri")
-    if raw_matched:
-        p = raw_matched.decode("utf-8", errors="replace").split("?")[0]
-        if p.startswith("/api/index.py"):
-            p = p[len("/api/index.py"):] or "/"
-        elif p.startswith("/api/index"):
-            p = p[len("/api/index"):] or "/"
-        elif p == "/api":
-            p = "/"
-        return p or "/"
+    # 1. Check query string parameter __path passed from vercel.json rewrite
+    qs = scope.get("query_string", b"")
+    if qs:
+        try:
+            params = urllib.parse.parse_qs(qs.decode("utf-8", errors="replace"))
+            if "__path" in params and params["__path"]:
+                candidate = str(params["__path"][0])
+                if candidate:
+                    return str("/" + candidate.lstrip("/"))
+        except Exception:
+            pass
 
-    p = scope.get("path", "/")
+    # 2. Check headers
+    headers = dict(scope.get("headers", []))
+    for header_name in [b"x-forwarded-uri", b"x-envoy-original-path", b"x-matched-path"]:
+        raw_val = headers.get(header_name)
+        if raw_val:
+            p = raw_val.decode("utf-8", errors="replace").split("?")[0]
+            if p.startswith("/api/index.py"):
+                p = p[len("/api/index.py"):] or "/"
+            elif p.startswith("/api/index"):
+                p = p[len("/api/index"):] or "/"
+            elif p == "/api":
+                p = "/"
+            if p != "/":
+                return str(p)
+
+    # 3. Fallback to scope path
+    p = str(scope.get("path", "/"))
     if p.startswith("/api/index.py"):
         p = p[len("/api/index.py"):] or "/"
     elif p.startswith("/api/index"):
         p = p[len("/api/index"):] or "/"
     elif p == "/api":
         p = "/"
-    return p or "/"
+    return str(p or "/")
 
 
 _PLAYABLE_HTML = """<!doctype html>
