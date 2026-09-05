@@ -91,11 +91,13 @@ def triage_defect_report(
     start_scene: str,
     action_trace: List[str],
     claimed_defect: str,
-    seed: int = 42
+    seed: int = 42,
+    engine: Optional[AdventureEngine] = None,
 ) -> TriageReport:
     """Attempt to deterministically reproduce a reported defect."""
-    registry = build_world_registry()
-    engine = AdventureEngine(registry)
+    if engine is None:
+        registry = build_world_registry()
+        engine = AdventureEngine(registry)
 
     state = GameState(
         build_id="af-build-001",
@@ -195,7 +197,8 @@ def triage_playtester_report(report: PlaytesterDefectReport) -> TriageReport:
 def triage_session_telemetry(
     telemetry: Any,
     initial_char: CharacterSheet,
-    start_scene: Optional[str] = None
+    start_scene: Optional[str] = None,
+    engine: Optional[AdventureEngine] = None,
 ) -> Optional[TriageReport]:
     """Triage friction notes or rejected actions from playtester session telemetry."""
     friction_notes = getattr(telemetry, "friction_notes", [])
@@ -209,5 +212,6 @@ def triage_session_telemetry(
         start_scene=resolved_start,
         action_trace=list(getattr(telemetry, "decisions_made", [])),
         claimed_defect=claimed,
-        seed=getattr(telemetry, "seed", 42)
+        seed=getattr(telemetry, "seed", 42),
+        engine=engine,
     )

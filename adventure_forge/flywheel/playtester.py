@@ -244,9 +244,16 @@ class BlindPlaytester:
         self.visited_actions.add(chosen_id)
         return chosen_id
 
-    def run_session(self, initial_char: CharacterSheet, start_scene: str, max_turns: int = 20) -> SessionTelemetry:
-        registry = build_world_registry()
-        engine = AdventureEngine(registry)
+    def run_session(
+        self,
+        initial_char: CharacterSheet,
+        start_scene: str,
+        max_turns: int = 20,
+        engine: Optional[AdventureEngine] = None,
+    ) -> SessionTelemetry:
+        if engine is None:
+            registry = build_world_registry()
+            engine = AdventureEngine(registry)
 
         self.visited_verbs = set()
         self.visited_actions = set()

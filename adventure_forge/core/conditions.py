@@ -97,12 +97,16 @@ def evaluate_condition(condition: Union[Dict[str, Any], List[Any], None], charac
                 or character.has_marker(f"status_{s_low}")
                 or character.has_marker(status_name)
             )
+            raw_statuses = world_flags.get("statuses")
+            status_list_match = False
+            if isinstance(raw_statuses, (list, tuple, set)):
+                status_list_match = any(s_low == str(s).lower() for s in raw_statuses)
             world_has = (
                 bool(world_flags.get(f"status_{s_low}"))
                 or bool(world_flags.get(s_low))
                 or bool(world_flags.get(f"status_{status_name}"))
                 or bool(world_flags.get(status_name))
-                or (s_low in [str(s).lower() for s in world_flags.get("statuses", [])])
+                or status_list_match
             )
             if status_target == "character":
                 has_it = char_has

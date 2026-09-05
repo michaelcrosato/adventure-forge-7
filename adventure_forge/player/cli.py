@@ -7,6 +7,7 @@ Enforces:
 """
 import sys
 from typing import Tuple, Optional, Dict, Any
+from adventure_forge.core.character import get_preset
 from adventure_forge.core.state import GameState
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.rng import DeterministicRNG
@@ -75,7 +76,6 @@ def render_ui(
 
 
 def start_new_game(char_preset: str = "cutpurse") -> Tuple[AdventureEngine, GameState]:
-    from adventure_forge.core.character import get_preset
     registry = build_world_registry()
     engine = AdventureEngine(registry)
 

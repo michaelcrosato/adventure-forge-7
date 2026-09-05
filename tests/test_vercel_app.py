@@ -202,3 +202,55 @@ def test_game_api_validation_errors() -> None:
     missing_resp = request("/api/game/step", "POST", body=missing_fields)
     assert missing_resp[0]["status"] == 400
 
+
+def test_game_quests_endpoint() -> None:
+    """Test /api/game/quests returns campaign and subquest metadata."""
+    msgs = request("/api/game/quests")
+    assert msgs[0]["status"] == 200
+    data = json.loads(msgs[1]["body"])
+    assert "campaign" in data
+    assert "subquests" in data
+    assert data["campaign"]["id"] == "five_seals_campaign"
+    assert len(data["subquests"]) == 5
+
+    # HEAD method
+    head_msgs = request("/api/game/quests", "HEAD")
+    assert head_msgs[0]["status"] == 200
+    assert head_msgs[1]["body"] == b""
+
+    # POST method not allowed
+    post_msgs = request("/api/game/quests", "POST")
+    assert post_msgs[0]["status"] == 405
+
+
+def test_game_hazards_endpoint() -> None:
+    """Test /api/game/hazards returns hazard combos."""
+    msgs = request("/api/game/hazards")
+    assert msgs[0]["status"] == 200
+    data = json.loads(msgs[1]["body"])
+    assert "hazards" in data
+    assert "conflagration" in data["hazards"]
+    assert "stun" in data["hazards"]
+
+    # HEAD method
+    head_msgs = request("/api/game/hazards", "HEAD")
+    assert head_msgs[0]["status"] == 200
+    assert head_msgs[1]["body"] == b""
+
+    # POST method not allowed
+    post_msgs = request("/api/game/hazards", "POST")
+    assert post_msgs[0]["status"] == 405
+
+
+def test_method_not_allowed_endpoints() -> None:
+    """Ensure disallowed HTTP verbs return 405 across endpoints."""
+    # POST to presets
+    assert request("/api/game/presets", "POST")[0]["status"] == 405
+    # GET to game/new
+    assert request("/api/game/new", "GET")[0]["status"] == 405
+    # GET to game/step
+    assert request("/api/game/step", "GET")[0]["status"] == 405
+    # DELETE to api/mcp
+    assert request("/api/mcp", "DELETE")[0]["status"] == 405
+
+

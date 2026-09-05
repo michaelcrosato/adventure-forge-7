@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, List, Tuple
 import json
 from adventure_forge.core.character import CharacterSheet, get_preset
+from adventure_forge.core.engine import AdventureEngine
+from adventure_forge.content.loader import build_world_registry
 from adventure_forge.flywheel.playtester import BlindPlaytester, SessionTelemetry
 from adventure_forge.flywheel.triage import triage_session_telemetry
 from adventure_forge.verification.verify import run_all_verification
@@ -70,6 +72,7 @@ class OrchestratorManager:
     def __init__(self, log_path: str = "flywheel_audit.jsonl"):
         self.log_path = log_path
         self.history: List[FlywheelCycleSummary] = []
+        self._engine = AdventureEngine(build_world_registry())
         self.personas = [
             "explorer",
             "brute",
@@ -97,14 +100,14 @@ class OrchestratorManager:
         for p_idx, persona in enumerate(self.personas):
             char, start_scene = get_canonical_persona_setup(persona)
             tester = BlindPlaytester(persona=persona, seed=cycle_num * 100 + p_idx)
-            tel = tester.run_session(char, start_scene=start_scene, max_turns=15)
+            tel = tester.run_session(char, start_scene=start_scene, max_turns=15, engine=self._engine)
             telemetries.append(tel)
             total_decisions += tel.turn_count
             total_retention += tel.retention_score
 
             if tel.friction_notes:
                 hotspots.extend(tel.friction_notes)
-                triage_rep = triage_session_telemetry(tel, char, start_scene=start_scene)
+                triage_rep = triage_session_telemetry(tel, char, start_scene=start_scene, engine=self._engine)
                 if triage_rep:
                     triage_results.append(triage_rep.to_dict())
 

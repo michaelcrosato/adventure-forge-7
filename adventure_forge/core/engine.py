@@ -14,6 +14,7 @@ from adventure_forge.core.state import GameState
 from adventure_forge.core.actions import Action, synthesize_affordances
 from adventure_forge.core.effects import apply_effects
 from adventure_forge.content.schema import RegionManifest, SceneNode
+from adventure_forge.content.quests import get_continental_main_quest, evaluate_all_subquests
 
 
 @dataclass
@@ -88,7 +89,6 @@ class AdventureEngine:
 
     def get_quest_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current continental main quest progress and subquests for active state."""
-        from adventure_forge.content.quests import get_continental_main_quest, evaluate_all_subquests
         quest = get_continental_main_quest()
         progress = quest.evaluate_progress(state.character, state.world_flags)
         progress["subquests"] = evaluate_all_subquests(state.character, state.world_flags)

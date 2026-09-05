@@ -58,6 +58,9 @@ def validate_world_links(registry: Dict[str, RegionManifest]) -> Tuple[bool, Lis
             for act in scene.base_actions:
                 if act.target_scene and act.target_scene not in all_scenes:
                     errors.append(f"[{sc_id}] Action '{act.id}' targets unknown scene: '{act.target_scene}'")
+                for eff in act.effects:
+                    if "change_scene" in eff and eff["change_scene"] not in all_scenes:
+                        errors.append(f"[{sc_id}] Action '{act.id}' effect change_scene targets unknown scene: '{eff['change_scene']}'")
             # Check entities
             for ent in scene.entities:
                 dest = ent.get("climb_destination")
