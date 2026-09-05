@@ -93,9 +93,24 @@ def build_iron_crags_region() -> RegionManifest:
                 "name": "Cable Car",
                 "tags": ["transport"],
                 "initial_state": "intact"
+            },
+            {
+                "id": "signal_bell",
+                "name": "Signal Bell",
+                "tags": ["metallic", "interactable"]
             }
         ],
         base_actions=[
+            Action(
+                id="ring_warning_bell",
+                label="Ring signal bell",
+                category="interaction",
+                effects=[
+                    {"log_event": "You struck the iron bell to alert the watch."}
+                ],
+                result_text="A deep chime echoes down the mountain canyons.",
+                risk="low"
+            ),
             Action(
                 id="climb_down_base",
                 label="Climb down",
@@ -140,7 +155,18 @@ def build_iron_crags_region() -> RegionManifest:
                 text="You feel right at home among the heavy stone ramparts."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "beacon_brazier",
+                "name": "Beacon Brazier",
+                "tags": ["flammable", "interactable"]
+            },
+            {
+                "id": "lookout_perch",
+                "name": "Lookout Perch",
+                "tags": ["climbable"]
+            }
+        ],
         base_actions=[
             Action(
                 id="claim_crags_beacon",
@@ -152,6 +178,17 @@ def build_iron_crags_region() -> RegionManifest:
                     {"log_event": "The mountain beacon blazes into the night."}
                 ],
                 result_text="You thrust a torch into pitch. Flames roar into the sky.",
+                risk="low"
+            ),
+            Action(
+                id="survey_valley",
+                label="Survey valley below",
+                category="interaction",
+                effects=[
+                    {"set_flag": {"flag": "crags_valley_mapped", "value": True}},
+                    {"log_event": "You surveyed the sprawling lowlands from the peak."}
+                ],
+                result_text="Clear skies reveal the entire continent stretched below.",
                 risk="low"
             ),
             Action(

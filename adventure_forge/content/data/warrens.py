@@ -133,8 +133,32 @@ def build_lower_warrens_region() -> RegionManifest:
                 text="You read the chalk marks left by local fence lookouts."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "drain_pipe",
+                "name": "Drain Pipe",
+                "tags": ["scavengeable"]
+            },
+            {
+                "id": "rubble_pile",
+                "name": "Rubble Pile",
+                "tags": ["climbable"]
+            }
+        ],
         base_actions=[
+            Action(
+                id="search_gutters",
+                label="Search alley gutters",
+                category="interaction",
+                effects=[
+                    {"add_item": "silver_coin"},
+                    {"set_flag": {"flag": "found_gutter_coin", "value": True}},
+                    {"log_event": "You found a dropped silver coin in the muddy drain."}
+                ],
+                condition={"lacks_flag": "found_gutter_coin"},
+                result_text="Your fingers pluck a silver coin from the muck.",
+                risk="low"
+            ),
             Action(
                 id="enter_black_market",
                 label="Enter cellar",
@@ -174,7 +198,14 @@ def build_lower_warrens_region() -> RegionManifest:
                 text="The fence grins and offers you a seat at the high table."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "smuggler_crate",
+                "name": "Contraband Crate",
+                "tags": ["lockable", "scavengeable"],
+                "initial_state": "locked"
+            }
+        ],
         base_actions=[
             Action(
                 id="buy_lockpicks",
@@ -225,7 +256,19 @@ def build_lower_warrens_region() -> RegionManifest:
                 text="The sergeant hands you the keys to the district armory."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "armory_rack",
+                "name": "Weapons Rack",
+                "tags": ["scavengeable"]
+            },
+            {
+                "id": "iron_safe",
+                "name": "Duty Safe",
+                "tags": ["lockable"],
+                "initial_state": "locked"
+            }
+        ],
         base_actions=[
             Action(
                 id="take_patrol_badge",
@@ -238,6 +281,17 @@ def build_lower_warrens_region() -> RegionManifest:
                 ],
                 condition={"lacks_flag": "has_watch_badge"},
                 result_text="The heavy bronze badge confirms your official standing.",
+                risk="low"
+            ),
+            Action(
+                id="inspect_duty_ledger",
+                label="Inspect duty ledger",
+                category="interaction",
+                effects=[
+                    {"set_flag": {"flag": "read_patrol_roster", "value": True}},
+                    {"log_event": "You memorized the city watch night patrol schedule."}
+                ],
+                result_text="The duty log details shift changes and gate passwords.",
                 risk="low"
             ),
             Action(

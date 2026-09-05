@@ -96,7 +96,18 @@ def build_sunken_hollows_region() -> RegionManifest:
                 text="Your gills effortlessly draw oxygen from the subterranean currents."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "obsidian_altar",
+                "name": "Obsidian Altar",
+                "tags": ["interactable"]
+            },
+            {
+                "id": "temple_urn",
+                "name": "Submerged Urn",
+                "tags": ["scavengeable"]
+            }
+        ],
         base_actions=[
             Action(
                 id="take_sunken_relic",
@@ -110,6 +121,17 @@ def build_sunken_hollows_region() -> RegionManifest:
                 condition={"lacks_flag": "sunken_relic_secured"},
                 result_text="Your hand closes around the smooth, luminous pearl.",
                 risk="medium"
+            ),
+            Action(
+                id="read_glyph_frieze",
+                label="Read temple runes",
+                category="interaction",
+                effects=[
+                    {"set_flag": {"flag": "decoded_abyssal_script", "value": True}},
+                    {"log_event": "You deciphered ancient tidal glyphs on the temple walls."}
+                ],
+                result_text="Chiseled script records the sinking of the elder empire.",
+                risk="low"
             ),
             Action(
                 id="swim_to_surface",

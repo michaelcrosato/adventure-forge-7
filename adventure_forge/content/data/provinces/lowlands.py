@@ -350,6 +350,7 @@ def build_lowlands_province() -> RegionManifest:
         ],
         entities=[
             {"id": "lowlands_thief_sluice_trapdoor", "name": "Sluice Trapdoor", "tags": ["lockable"], "initial_state": "intact"},
+            {"id": "lowlands_thief_cache", "name": "Smuggler Cache", "tags": ["scavengeable"]},
         ],
         base_actions=[
             Action(id="lowlands_thief_take_ledger", label="Take watch ledger", category="interaction", condition={"flag_is": {"flag": "strongbox_opened", "value": True}, "lacks_flag": "patrol_ledger_taken"}, effects=[{"add_item": "watch_patrol_ledger"}, {"set_flag": {"flag": "patrol_ledger_taken", "value": True}}, {"modify_reputation": {"faction": "smugglers", "value": 25}}, {"log_event": "You secured the confidential watch patrol ledger."}], result_text="You slide the leather ledger into your tunic."),

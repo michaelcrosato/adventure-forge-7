@@ -25,7 +25,14 @@ def build_high_court_region() -> RegionManifest:
                 text="You catch a clerk hiding a forged document in his sleeve."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "archive_cabinet",
+                "name": "Archive Cabinet",
+                "tags": ["lockable", "scavengeable"],
+                "initial_state": "locked"
+            }
+        ],
         base_actions=[
             Action(
                 id="present_writ",
@@ -91,7 +98,19 @@ def build_high_court_region() -> RegionManifest:
                 text="The presiding judge leans forward with intense focus."
             )
         ],
-        entities=[],
+        entities=[
+            {
+                "id": "bench_cedar",
+                "name": "Magistrate Bench",
+                "tags": ["interactable"]
+            },
+            {
+                "id": "evidence_dossier",
+                "name": "Exhibit Chest",
+                "tags": ["lockable"],
+                "initial_state": "locked"
+            }
+        ],
         base_actions=[
             Action(
                 id="deliver_argument",
@@ -103,6 +122,17 @@ def build_high_court_region() -> RegionManifest:
                     {"log_event": "The high tribunal ruled in your favor with full exoneration."}
                 ],
                 result_text="The lead judge brings the iron gavel down with a resounding strike.",
+                risk="low"
+            ),
+            Action(
+                id="examine_statutes",
+                label="Review legal statutes",
+                category="interaction",
+                effects=[
+                    {"set_flag": {"flag": "memorized_court_precedents", "value": True}},
+                    {"log_event": "You studied past judicial rulings on tribunal records."}
+                ],
+                result_text="Parchment records cite ancient laws and decrees.",
                 risk="low"
             ),
             Action(
