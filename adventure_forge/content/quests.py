@@ -421,20 +421,335 @@ def subquest_hollows_abyssal_keystones() -> QuestLine:
     )
 
 
-def get_provincial_subquests() -> Dict[str, QuestLine]:
-    """Returns a dictionary of all 5 provincial subquests keyed by quest id."""
+def quest_reach_faction_intrigue() -> QuestLine:
+    """The Reach: Sky-Pact of the Crags faction intrigue arc."""
+    return QuestLine(
+        id="quest_reach_faction_intrigue",
+        name="The Sky-Pact of the Crags",
+        synopsis="Mediate the clash between Cliff Clans and Storm Wardens over the Spire Grid.",
+        stages=[
+            QuestStage(
+                id="reach_intrigue_stage_discovery",
+                title="Severed Mountain Circuit",
+                province="reach",
+                description="Inspect severed cables or ground the surge wire to trace the sabotage.",
+                required_flags={},
+                completion_flags={"reach_discovery_completed": True},
+                reputation_rewards={"cliff_clans": 5, "storm_wardens": 5},
+                approaches=["perception", "social", "item_affordance"],
+            ),
+            QuestStage(
+                id="reach_intrigue_stage_escalation",
+                title="The Quarry Blockade",
+                province="reach",
+                description="Break the quarry blockade by force, stealth, or negotiated truce.",
+                required_flags={"reach_discovery_completed": True},
+                completion_flags={"reach_escalation_completed": True},
+                reputation_rewards={"cliff_clans": 10, "storm_wardens": 10},
+                approaches=["athletics", "stealth", "rhetoric"],
+            ),
+            QuestStage(
+                id="reach_intrigue_stage_dilemma",
+                title="The Apex Overload",
+                province="reach",
+                description="Stop the battery overload before blue lightning strikes the peaks.",
+                required_flags={"reach_escalation_completed": True},
+                completion_flags={"reach_dilemma_resolved": True},
+                reputation_rewards={"storm_wardens": 15, "cliff_clans": 15},
+                approaches=["discharge", "short_circuit", "harmonize"],
+            ),
+            QuestStage(
+                id="reach_intrigue_stage_resolution",
+                title="Pact of the Peaks",
+                province="reach",
+                description="Proclaim the final summit pact at the central mountain hub.",
+                required_flags={"reach_dilemma_resolved": True},
+                completion_flags={"reach_intrigue_resolved": True},
+                reputation_rewards={"storm_wardens": 25, "cliff_clans": 25},
+                approaches=["dominance", "liberation", "harmony"],
+            ),
+        ],
+        endings={
+            "storm_warden_dominance": "You gave full power to the Storm Wardens to shield the high pass.",
+            "cliff_clan_liberation": "You cut the power grid and freed the Cliff Clans from monastic rule.",
+            "ascetic_harmony": "You vented the storm charge into alpine steam vents to unite both factions.",
+        },
+        ending_conditions={
+            "storm_warden_dominance": {"reach_ending_warden": True},
+            "cliff_clan_liberation": {"reach_ending_clan": True},
+            "ascetic_harmony": {"reach_ending_harmony": True},
+        },
+    )
+
+
+def quest_high_court_faction_intrigue() -> QuestLine:
+    """The High Court: Tripartite Throne faction intrigue arc."""
+    return QuestLine(
+        id="quest_high_court_faction_intrigue",
+        name="The Tripartite Throne",
+        synopsis="Navigate the deadly throne crisis among Crown, Duke, and Guild factions.",
+        stages=[
+            QuestStage(
+                id="court_intrigue_stage_discovery",
+                title="Shadows in the Archives",
+                province="high_court",
+                description="Uncover scraped records in the archives or stop trade couriers.",
+                required_flags={},
+                completion_flags={"court_discovery_completed": True},
+                reputation_rewards={"crown_royalists": 5, "dukes_conclave": 5, "guild_emissaries": 5},
+                approaches=["lockpicking", "cunning", "stealth", "rhetoric"],
+            ),
+            QuestStage(
+                id="court_intrigue_stage_escalation",
+                title="The Silver Embargo",
+                province="high_court",
+                description="Infiltrate the ducal silver vault, sway palatine knights, or buy grain.",
+                required_flags={"court_discovery_completed": True},
+                completion_flags={"court_escalation_completed": True},
+                reputation_rewards={"crown_royalists": 10, "dukes_conclave": 10, "guild_emissaries": 10},
+                approaches=["infiltration", "rhetoric", "commerce"],
+            ),
+            QuestStage(
+                id="court_intrigue_stage_dilemma",
+                title="The Tribunal Convocation",
+                province="high_court",
+                description="Present key evidence before the high court bench.",
+                required_flags={"court_escalation_completed": True},
+                completion_flags={"court_dilemma_resolved": True},
+                reputation_rewards={"crown_royalists": 15, "dukes_conclave": 15, "guild_emissaries": 15},
+                approaches=["crown", "duke", "guild", "regency"],
+            ),
+            QuestStage(
+                id="court_intrigue_stage_resolution",
+                title="Proclamation of Veras",
+                province="high_court",
+                description="Read the royal decree from the high palace balcony.",
+                required_flags={"court_dilemma_resolved": True},
+                completion_flags={"court_intrigue_resolved": True},
+                reputation_rewards={"crown_royalists": 25, "dukes_conclave": 25, "guild_emissaries": 25},
+                approaches=["martial", "autonomy", "commerce", "regency"],
+            ),
+        ],
+        endings={
+            "court_royalist_ascendancy": "You restored imperial law under the firm rule of the High Justiciar.",
+            "court_ducal_confederacy": "You gave noble autonomy to Duke Cassian and ended central taxes.",
+            "court_guild_plutocracy": "You approved the trade pact to let merchant syndicates govern.",
+            "court_unbounded_protector": "You cast out all three factions to govern the capital as Lord Regent.",
+        },
+        ending_conditions={
+            "court_royalist_ascendancy": {"court_ending_royalist": True},
+            "court_ducal_confederacy": {"court_ending_ducal": True},
+            "court_guild_plutocracy": {"court_ending_guild": True},
+            "court_unbounded_protector": {"court_ending_regent": True},
+        },
+    )
+
+
+def subquest_scorchwaste_water_wars() -> QuestLine:
+    """The Scorchwaste: Water Wars faction intrigue arc."""
+    return QuestLine(
+        id="subquest_scorchwaste_water_wars",
+        name="The Scorchwaste Water Wars",
+        synopsis="Intervene in the clash between Dune Nomads and the Salt Raider Cartel.",
+        stages=[
+            QuestStage(
+                id="scorch_war_stage_exploration",
+                title="Survey the Dune Ridge",
+                province="scorchwaste",
+                description="Brave hot desert winds to find the contested water pipe.",
+                required_flags={},
+                completion_flags={"scorch_pipeline_surveyed": True},
+                reputation_rewards={"desert_nomads": 5},
+                approaches=["survival", "scouting", "heat_endurance"],
+            ),
+            QuestStage(
+                id="scorch_war_stage_alignment",
+                title="The Oasis Parley",
+                province="scorchwaste",
+                description="Pledge to the water wardens or take a contract from the salt cartel.",
+                required_flags={"scorch_pipeline_surveyed": True},
+                completion_flags={"scorch_faction_chosen": True},
+                reputation_rewards={"desert_nomads": 15, "salt_raiders": 15},
+                approaches=["diplomacy", "extortion", "infiltration"],
+            ),
+            QuestStage(
+                id="scorch_war_stage_crisis",
+                title="Purge the Aquifer",
+                province="scorchwaste",
+                description="Clear caustic salt scale from the deep well pump.",
+                required_flags={"scorch_faction_chosen": True},
+                completion_flags={"scorch_crisis_resolved": True},
+                reputation_rewards={"desert_nomads": 20, "caravaneers": 15},
+                approaches=["force", "chemistry", "sabotage"],
+            ),
+            QuestStage(
+                id="scorch_war_stage_resolution",
+                title="Dominion of the Dunes",
+                province="scorchwaste",
+                description="Settle the rule of the desert aquifer at the central hub.",
+                required_flags={"scorch_crisis_resolved": True},
+                completion_flags={"scorch_war_resolved": True},
+                reputation_rewards={"desert_nomads": 25, "salt_raiders": 25},
+                approaches=["treaty", "monopoly", "sovereignty"],
+            ),
+        ],
+        endings={
+            "free_waters": "You broke the cartel blockade and returned pure water to all nomad tribes.",
+            "cartel_monopoly": "You enforced the Salt Cartel monopoly over the desert wells for gold.",
+            "desalination_concordat": "You made a fair treaty between caravans and nomad tribes.",
+            "desert_autocrat": "You seized sole control of the deep aquifer keys to rule the dunes.",
+        },
+        ending_conditions={
+            "free_waters": {"scorch_ending_free_water": True},
+            "cartel_monopoly": {"scorch_ending_cartel_monopoly": True},
+            "desalination_concordat": {"scorch_ending_concordat": True},
+            "desert_autocrat": {"scorch_ending_autocrat": True},
+        },
+    )
+
+
+def subquest_hollows_abyssal_schism() -> QuestLine:
+    """The Sunken Hollows: Abyssal Schism faction intrigue arc."""
+    return QuestLine(
+        id="subquest_hollows_abyssal_schism",
+        name="The Sunken Hollows Abyssal Schism",
+        synopsis="Guide the struggle between deep scholars and salvage divers.",
+        stages=[
+            QuestStage(
+                id="hollows_schism_stage_exploration",
+                title="The Dark Plunge",
+                province="sunken_hollows",
+                description="Dive subterranean rapids to reach the lower sunken halls.",
+                required_flags={},
+                completion_flags={"hollows_rapids_navigated": True},
+                reputation_rewards={"deep_clans": 5},
+                approaches=["diving", "athletics", "buoyancy"],
+            ),
+            QuestStage(
+                id="hollows_schism_stage_alignment",
+                title="The Wharf Concordat",
+                province="sunken_hollows",
+                description="Align with Scholar Vance or hire Master Orlov salvage crew.",
+                required_flags={"hollows_rapids_navigated": True},
+                completion_flags={"hollows_faction_chosen": True},
+                reputation_rewards={"deep_clans": 15, "trench_divers": 15},
+                approaches=["scholarship", "bribery", "labor_union"],
+            ),
+            QuestStage(
+                id="hollows_schism_stage_crisis",
+                title="The Siphon Rupture",
+                province="sunken_hollows",
+                description="Stop rising water and severed air hoses inside the deep siphon.",
+                required_flags={"hollows_faction_chosen": True},
+                completion_flags={"hollows_crisis_resolved": True},
+                reputation_rewards={"deep_clans": 20, "trench_divers": 20},
+                approaches=["engineering", "diving_gear", "acoustic_tuning"],
+            ),
+            QuestStage(
+                id="hollows_schism_stage_resolution",
+                title="Fate of Abyssal Vault",
+                province="sunken_hollows",
+                description="Decide the fate of the primordial vault gates at the central hub.",
+                required_flags={"hollows_crisis_resolved": True},
+                completion_flags={"hollows_schism_resolved": True},
+                reputation_rewards={"deep_clans": 25, "trench_divers": 25},
+                approaches=["warding", "dredging", "awakening"],
+            ),
+        ],
+        endings={
+            "archive_sanctuary": "You warded the sunken temples to safeguard ancient history.",
+            "cartel_dredge": "You helped the Brine Cartel claim the deep vaults for salvage.",
+            "diver_commune": "You led working divers to form a free union commune.",
+            "deluge_unsealed": "You broke the ancient seals and let primeval tides flood the caves.",
+        },
+        ending_conditions={
+            "archive_sanctuary": {"hollows_ending_archive_sanctuary": True},
+            "cartel_dredge": {"hollows_ending_cartel_dredge": True},
+            "diver_commune": {"hollows_ending_diver_commune": True},
+            "deluge_unsealed": {"hollows_ending_deluge_unsealed": True},
+        },
+    )
+
+
+def subquest_lowlands_river_intrigue() -> QuestLine:
+    """The Lowlands: River Sluice War faction intrigue arc."""
+    return QuestLine(
+        id="subquest_lowlands_river_intrigue",
+        name="The Lowlands Sluice War",
+        synopsis="Take a side in the canal war between shadow smugglers and river guild bailiffs.",
+        stages=[
+            QuestStage(
+                id="lowlands_intrigue_stage_manifest",
+                title="Intercept Customs Book",
+                province="lowlands",
+                description="Steal the customs book from the river gate before bailiffs lock the vault.",
+                required_flags={},
+                completion_flags={"lowlands_manifest_decided": True},
+                reputation_rewards={"shadow_syndicate": 10, "river_guild": 10},
+                approaches=["stealth", "rhetoric", "forgery"],
+            ),
+            QuestStage(
+                id="lowlands_intrigue_stage_sluice",
+                title="Control Canal Sluice",
+                province="lowlands",
+                description="Control the great canal sluice to dictate river barge traffic through the city.",
+                required_flags={"lowlands_manifest_decided": True},
+                completion_flags={"lowlands_sluice_decided": True},
+                reputation_rewards={"shadow_syndicate": 15, "river_guild": 15},
+                approaches=["mechanics", "force", "bribery"],
+            ),
+            QuestStage(
+                id="lowlands_intrigue_stage_showdown",
+                title="Harbor Bell Showdown",
+                province="lowlands",
+                description="Decide the fate of the harbor at the bell tower showdown.",
+                required_flags={"lowlands_sluice_decided": True},
+                completion_flags={"lowlands_river_intrigue_resolved": True},
+                reputation_rewards={"shadow_syndicate": 25, "river_guild": 25},
+                approaches=["signaling", "alarm", "diplomacy"],
+            ),
+        ],
+        endings={
+            "syndicate_ascendant": "You helped the smugglers seize the canal. Black market trade rules the harbor.",
+            "river_guild_monopoly": "You helped the bailiffs lock the river. The guild enforces strict river tolls.",
+            "clandestine_compact": "You brokered peace between both factions. Profit flows to you from both sides.",
+        },
+        ending_conditions={
+            "syndicate_ascendant": {"lowlands_intrigue_syndicate_win": True},
+            "river_guild_monopoly": {"lowlands_intrigue_guild_win": True},
+            "clandestine_compact": {"lowlands_intrigue_compact_win": True},
+        },
+    )
+
+
+def get_faction_intrigue_quests() -> Dict[str, QuestLine]:
+    """Returns the Milestone 13 5-province faction intrigue questlines."""
     return {
+        "quest_reach_faction_intrigue": quest_reach_faction_intrigue(),
+        "quest_high_court_faction_intrigue": quest_high_court_faction_intrigue(),
+        "subquest_scorchwaste_water_wars": subquest_scorchwaste_water_wars(),
+        "subquest_hollows_abyssal_schism": subquest_hollows_abyssal_schism(),
+        "subquest_lowlands_river_intrigue": subquest_lowlands_river_intrigue(),
+    }
+
+
+def get_provincial_subquests(include_intrigue: bool = False) -> Dict[str, QuestLine]:
+    """Returns provincial subquests. Defaults to baseline subquests for backward compatibility."""
+    quests = {
         "subquest_reach_smuggler_caches": subquest_reach_smuggler_caches(),
         "subquest_lowlands_shadow_broker": subquest_lowlands_shadow_broker(),
         "subquest_scorchwaste_water_baron": subquest_scorchwaste_water_baron(),
         "subquest_court_decrees": subquest_court_decrees(),
         "subquest_hollows_abyssal_keystones": subquest_hollows_abyssal_keystones(),
     }
+    if include_intrigue:
+        quests.update(get_faction_intrigue_quests())
+    return quests
 
 
 def get_provincial_subquest(quest_id: str) -> Optional[QuestLine]:
     """Retrieve a specific provincial subquest by its id or province keyword."""
-    subquests = get_provincial_subquests()
+    subquests = get_provincial_subquests(include_intrigue=True)
     if quest_id in subquests:
         return subquests[quest_id]
     for q in subquests.values():
@@ -445,23 +760,27 @@ def get_provincial_subquest(quest_id: str) -> Optional[QuestLine]:
     return None
 
 
-def get_all_quests() -> List[QuestLine]:
-    """Return all shipped quests: continental main quest plus all provincial subquests."""
-    return [get_continental_main_quest()] + list(get_provincial_subquests().values())
+def get_all_quests(include_intrigue: bool = False) -> List[QuestLine]:
+    """Return all shipped quests."""
+    return [get_continental_main_quest()] + list(get_provincial_subquests(include_intrigue=include_intrigue).values())
 
 
-def evaluate_all_subquests(character: CharacterSheet, world_flags: Dict[str, Any]) -> Dict[str, Any]:
-    """Evaluate progress across all provincial subquest lines."""
+def evaluate_all_subquests(
+    character: CharacterSheet, world_flags: Dict[str, Any], include_intrigue: bool = False
+) -> Dict[str, Any]:
+    """Evaluate progress across provincial subquest lines."""
     return {
         qid: quest.evaluate_progress(character, world_flags)
-        for qid, quest in get_provincial_subquests().items()
+        for qid, quest in get_provincial_subquests(include_intrigue=include_intrigue).items()
     }
 
 
-def evaluate_all_quests(character: CharacterSheet, world_flags: Dict[str, Any]) -> Dict[str, Any]:
+def evaluate_all_quests(
+    character: CharacterSheet, world_flags: Dict[str, Any], include_intrigue: bool = False
+) -> Dict[str, Any]:
     """Evaluate continental main quest and all provincial subquests."""
     main_prog = get_continental_main_quest().evaluate_progress(character, world_flags)
-    sub_progs = evaluate_all_subquests(character, world_flags)
+    sub_progs = evaluate_all_subquests(character, world_flags, include_intrigue=include_intrigue)
     res: Dict[str, Any] = {
         "main_quest": main_prog,
         "subquests": sub_progs,
@@ -470,4 +789,5 @@ def evaluate_all_quests(character: CharacterSheet, world_flags: Dict[str, Any]) 
     for qid, sprog in sub_progs.items():
         res[qid] = sprog
     return res
+
 
