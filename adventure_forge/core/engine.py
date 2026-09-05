@@ -70,16 +70,21 @@ class AdventureEngine:
         return found[0] if found else None
 
     def get_legal_actions(self, state: GameState) -> List[Action]:
+        cached = getattr(state, "_cached_legal_actions", None)
+        if isinstance(cached, list):
+            return cached
         scene = self.get_scene(state.current_scene)
         if not scene:
             return []
-        return synthesize_affordances(
+        actions = synthesize_affordances(
             base_actions=scene.base_actions,
             scene_entities=scene.entities,
             character=state.character,
             world_flags=state.world_flags,
             region_id=scene.region or state.current_region,
         )
+        object.__setattr__(state, "_cached_legal_actions", actions)
+        return actions
 
     def get_quest_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current continental main quest progress and subquests for active state."""

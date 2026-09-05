@@ -73,7 +73,7 @@ Every feature from the Survey phase appears here with its assigned milestone.
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`
 - `ProseLinter.lint_text(text: str) -> List[str]`: Enforces sentence count (1–3), word count (<=18), Grade 6–8 FKGL, zero purple words.
 - `ProseLinter.lint_scene(scene: Scene) -> List[str]`: Enforces scene descriptions, entity descriptions, and action labels (<=3 words).
-- `ProseLinter.lint_registry(registry: Dict[str, Region]) -> Dict[str, List[str]]`: Scans entire world graph.
+- `ProseLinter.lint_registry(registry: Dict[str, Region]) -> Tuple[bool, List[str]]`: Scans entire world graph.
 
 ### `adventure_forge.content.loader` ↔ `adventure_forge.core.engine`
 - `build_world_registry() -> Dict[str, Region]`: Returns 520 immutable scenes across 11 regions.
@@ -81,7 +81,7 @@ Every feature from the Survey phase appears here with its assigned milestone.
 
 ### `adventure_forge.verification.verify` ↔ Canonical Entry Points
 - `./verify` (shell executable) and `python3 -m adventure_forge.verify`:
-  - Runs all 6 mechanical verification gates.
+  - Runs all 7 mechanical verification gates.
   - Returns exit code 0 if and only if all gates pass.
 
 ### `adventure_forge.player.mcp_server` ↔ Playtester / Agent Fleet

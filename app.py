@@ -1008,7 +1008,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
 
     # Route: /api/mcp or /mcp (Model Context Protocol JSON-RPC)
     if path in {"/api/mcp", "/mcp"}:
-        server = MCPServer(registry=_REGISTRY)
+        server = MCPServer(engine=_ENGINE)
         if method in {"GET", "HEAD"}:
             payload = {
                 "service": "adventure-forge-mcp",

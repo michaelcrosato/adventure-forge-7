@@ -22,10 +22,11 @@ Starts a fresh adventure with a chosen character preset and optional seed.
   * `preset` (string, optional, default: `"cutpurse"`):
     - `"cutpurse"` (Silas: stealth, agility, lockpicking)
     - `"noble"` (Vivienne: court intrigue, high charisma, wealth)
-    - `"warrior"` (Kael: physical strength, heavy weapons, intimidation)
-    - `"pit_fighter"` (Torin: unarmed combat, endurance, streetwise)
-    - `"scholar"` (Mara: history, arcana, languages)
-    - `"ranger"` (Eamon: survival, tracking, archery)
+    - `"warrior"` (Garron: physical strength, endurance, brawling)
+    - `"nomad"` (Kael: desert survival, endurance, keen eyes)
+    - `"diver"` (Mara: abyssal diving, water breathing, nimble agility)
+    - `"scout"` (Torin: highland scouting, cliff climbing, stealth)
+    - `"pit_fighter"` (Garron: pit fighter brawler alias)
   * `seed` (integer, optional): Deterministic PRNG seed.
 - **Returns**: Sanitized initial `StepResult` dictionary.
 

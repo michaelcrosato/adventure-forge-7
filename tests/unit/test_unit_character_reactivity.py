@@ -258,3 +258,71 @@ def test_scavenge_and_submersible_affordance_synthesis():
     assert dive_acts[0].label == "Board Deep Sub"
     assert len(dive_acts[0].label.split()) <= 3
 
+
+def test_character_fast_lookup_sets_and_modification():
+    """Verify precomputed sets for items/traits/flaws/markers remain accurate after modify()."""
+    char = _make_char(
+        traits=["Nimble", "Keen_Eyed"],
+        flaws=["Marked_Outlaw"],
+        markers=["Guild_Brand"],
+        inventory=["Lockpick", "Silver_Coin"]
+    )
+    # Case-insensitive queries
+    assert char.has_trait("nimble") is True
+    assert char.has_trait("NIMBLE") is True
+    assert char.has_trait("absent") is False
+
+    assert char.has_flaw("marked_outlaw") is True
+    assert char.has_flaw("absent") is False
+
+    assert char.has_marker("guild_brand") is True
+    assert char.has_marker("absent") is False
+
+    assert char.has_item("lockpick") is True
+    assert char.has_item("LOCKPICK") is True
+    assert char.has_item("gold_bar") is False
+
+    # After modify(), new sets are automatically computed
+    updated = char.modify(
+        inventory=["Gold_Bar"],
+        traits=["Brave"]
+    )
+    assert updated.has_item("gold_bar") is True
+    assert updated.has_item("lockpick") is False
+    assert updated.has_trait("brave") is True
+    assert updated.has_trait("nimble") is False
+
+
+def test_game_state_action_caching_and_invalidation():
+    """Verify get_legal_actions caches results on GameState and invalidates on state.evolve()."""
+    from adventure_forge.content.loader import build_world_registry
+    from adventure_forge.core.engine import AdventureEngine
+    from adventure_forge.core.state import GameState
+
+    registry = build_world_registry()
+    engine = AdventureEngine(registry)
+    char = _make_char()
+
+    state1 = GameState(
+        build_id="test",
+        session_id="s1",
+        character=char,
+        current_region="lower_warrens",
+        current_scene="warrens_gate",
+    )
+
+    assert getattr(state1, "_cached_legal_actions", None) is None
+    actions1 = engine.get_legal_actions(state1)
+    assert getattr(state1, "_cached_legal_actions", None) is actions1
+
+    # Subsequent call returns identical cached reference
+    actions2 = engine.get_legal_actions(state1)
+    assert actions2 is actions1
+
+    # State evolution creates new GameState without stale cache
+    state2 = state1.evolve(current_scene="warrens_black_market")
+    assert getattr(state2, "_cached_legal_actions", None) is None
+    actions3 = engine.get_legal_actions(state2)
+    assert getattr(state2, "_cached_legal_actions", None) is actions3
+
+

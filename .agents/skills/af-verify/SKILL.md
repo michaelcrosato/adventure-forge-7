@@ -47,11 +47,12 @@ from adventure_forge.content.loader import build_world_registry
 
 linter = ProseLinter()
 registry = build_world_registry()
-violations = linter.lint_registry(registry)
-for scene_id, errs in violations.items():
-    print(f'=== Scene {scene_id} ===')
-    for e in errs:
+passed, violations = linter.lint_registry(registry)
+if not passed:
+    for e in violations:
         print(f'  - {e}')
+else:
+    print('Prose strictly conforms to Hemingway baseline.')
 "
 ```
 
@@ -59,15 +60,12 @@ for scene_id, errs in violations.items():
 Run the BFS crawler standalone:
 ```bash
 python3 -c "
-from adventure_forge.verification.crawler import BFSReachabilityCrawler
-from adventure_forge.content.loader import build_world_registry
+from adventure_forge.verification.crawler import crawl_world_graph
 
-registry = build_world_registry()
-crawler = BFSReachabilityCrawler(registry)
-reachable, total, unreachable = crawler.crawl_all()
-print(f'Reachable: {reachable}/{total}')
-if unreachable:
-    print('Unreachable scenes:', unreachable[:10])
+passed, msg, stats = crawl_world_graph()
+print(msg)
+if stats.get('unvisited_scenes'):
+    print('Unvisited scenes:', stats['unvisited_scenes'][:10])
 "
 ```
 

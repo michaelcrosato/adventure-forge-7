@@ -162,7 +162,8 @@ def main():
         page = 0  # Reset page on state transition
 
         if obs.is_terminal:
-            render_ui(obs, page, page_size)
+            final_quest = engine.get_quest_progress(state)
+            render_ui(obs, page=page, page_size=page_size, state=state, quest_info=final_quest)
             print(f"\n*** OUTCOME REACHED: {obs.outcome or 'JOURNEY CONCLUDED'} ***\n")
             break
 

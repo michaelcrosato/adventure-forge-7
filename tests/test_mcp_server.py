@@ -201,3 +201,29 @@ def test_jsonrpc_protocol_handling():
     assert call_res["result"]["isError"] is False
     payload = json.loads(call_res["result"]["content"][0]["text"])
     assert payload["scene_id"] == "court_antechamber"
+
+
+def test_mcp_server_engine_injection():
+    """MCPServer reuses pre-built AdventureEngine when injected."""
+    from adventure_forge.content.loader import build_world_registry
+    from adventure_forge.core.engine import AdventureEngine
+
+    reg = build_world_registry()
+    eng = AdventureEngine(reg)
+    srv = MCPServer(engine=eng)
+    assert srv.engine is eng
+    assert srv._registry is reg
+    obs = srv.new_game("cutpurse")
+    assert obs["success"] is True
+    assert obs["scene_id"] == "warrens_gate"
+
+
+def test_mcp_server_presets_schema():
+    """new_game tool schema describes all playable presets."""
+    srv = MCPServer()
+    tools = srv.get_tools_schema()
+    new_game_tool = next(t for t in tools if t["name"] == "new_game")
+    desc = new_game_tool["inputSchema"]["properties"]["preset"]["description"]
+    for expected in ("cutpurse", "noble", "warrior", "nomad", "diver", "scout", "pit_fighter"):
+        assert expected in desc, f"Expected preset '{expected}' in schema description: {desc}"
+

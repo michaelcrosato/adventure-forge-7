@@ -85,10 +85,19 @@ def error_observation(message: str, status: str = "error") -> Dict[str, Any]:
 class MCPServer:
     """Model Context Protocol server and state container for AdventureForge."""
 
-    def __init__(self, seed: int = 999, registry: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        seed: int = 999,
+        registry: Optional[Dict[str, Any]] = None,
+        engine: Optional[AdventureEngine] = None,
+    ):
         self.default_seed = seed
-        self._registry = registry or build_world_registry()
-        self.engine: AdventureEngine = AdventureEngine(self._registry)
+        if engine is not None:
+            self.engine = engine
+            self._registry = registry or engine.world_registry
+        else:
+            self._registry = registry or build_world_registry()
+            self.engine = AdventureEngine(self._registry)
         self.state: Optional[GameState] = None
         self.last_obs: Optional[StepResult] = None
 
@@ -151,13 +160,13 @@ class MCPServer:
         return [
             {
                 "name": "new_game",
-                "description": "Start a new adventure game with a character preset (e.g. 'cutpurse', 'noble', 'warrior', 'pit_fighter').",
+                "description": "Start a new adventure game with a character preset ('cutpurse', 'noble', 'warrior', 'nomad', 'diver', 'scout', 'pit_fighter').",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
                         "preset": {
                             "type": "string",
-                            "description": "Character preset identifier ('cutpurse', 'noble', 'warrior', 'pit_fighter').",
+                            "description": "Character preset identifier ('cutpurse', 'noble', 'warrior', 'nomad', 'diver', 'scout', 'pit_fighter').",
                             "default": "cutpurse",
                         },
                         "seed": {

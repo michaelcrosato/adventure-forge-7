@@ -36,7 +36,7 @@ class GameState:
             "character": self.character.to_dict(),
             "current_region": self.current_region,
             "current_scene": self.current_scene,
-            "world_flags": {k: self.world_flags[k] for k in sorted(self.world_flags.keys())},
+            "world_flags": self.world_flags,
             "turn_count": self.turn_count,
             "rng_state": self.rng.state,
         }

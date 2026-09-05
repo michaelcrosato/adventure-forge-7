@@ -32,16 +32,34 @@ class CharacterSheet:
     stamina: int = 10
     max_stamina: int = 10
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "_trait_set", {t.lower() for t in self.traits})
+        object.__setattr__(self, "_flaw_set", {f.lower() for f in self.flaws})
+        object.__setattr__(self, "_marker_set", {m.lower() for m in self.markers})
+        object.__setattr__(self, "_item_set", {i.lower() for i in self.inventory})
+
     def has_trait(self, trait: str) -> bool:
+        t_set = getattr(self, "_trait_set", None)
+        if t_set is not None:
+            return trait.lower() in t_set
         return trait.lower() in {t.lower() for t in self.traits}
 
     def has_flaw(self, flaw: str) -> bool:
+        f_set = getattr(self, "_flaw_set", None)
+        if f_set is not None:
+            return flaw.lower() in f_set
         return flaw.lower() in {f.lower() for f in self.flaws}
 
     def has_marker(self, marker: str) -> bool:
+        m_set = getattr(self, "_marker_set", None)
+        if m_set is not None:
+            return marker.lower() in m_set
         return marker.lower() in {m.lower() for m in self.markers}
 
     def has_item(self, item: str) -> bool:
+        i_set = getattr(self, "_item_set", None)
+        if i_set is not None:
+            return item.lower() in i_set
         return item.lower() in {i.lower() for i in self.inventory}
 
     def get_attribute(self, attr: str, default: int = 0) -> int:

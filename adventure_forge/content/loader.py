@@ -63,5 +63,8 @@ def validate_world_links(registry: Dict[str, RegionManifest]) -> Tuple[bool, Lis
                 dest = ent.get("climb_destination")
                 if dest and dest not in all_scenes:
                     errors.append(f"[{sc_id}] Entity '{ent.get('id')}' destination unknown: '{dest}'")
+                sub_dest = ent.get("submerge_destination")
+                if sub_dest and sub_dest not in all_scenes:
+                    errors.append(f"[{sc_id}] Entity '{ent.get('id')}' submerge destination unknown: '{sub_dest}'")
 
     return len(errors) == 0, errors
