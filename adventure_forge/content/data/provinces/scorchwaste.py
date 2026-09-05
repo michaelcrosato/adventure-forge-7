@@ -1581,79 +1581,78 @@ def build_scorchwaste_province() -> RegionManifest:
     )
 
     # POI: Hidden Spring Oasis (10 nodes)
+    # Encounter 15 - Stage 1: Assessment / Approach
     scenes["scorchwaste_canyon_oasis_gate"] = SceneNode(
         id="scorchwaste_canyon_oasis_gate",
-        title="Hidden Spring Oasis - Outer Gate",
+        title="Hidden Spring Oasis - Canyon Mouth",
         region="scorchwaste",
-        description="Iron bars secure the heavy timber entrance. Date palms shelter a deep pool of fresh water.",
+        description="Sunlight scorches the red sandstone canyon. Palm fronds cast cool shadows over a green spring basin. Two desert sentries eye each other across the pool.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "heat_hardened"},
+                text="Your heat hardened skin shrugs off the blistering midday glare."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_canyon_oasis_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "scorch_oasis_spring_basin", "name": "Spring Basin", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="scorchwaste_canyon_oasis_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="scorchwaste_canyon_oasis_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="scorch_oasis_scout_spring", label="Inspect canyon oasis", category="interaction", result_text="You scan the green oasis water and watch the tense guards."),
+            Action(id="scorch_oasis_rest_shade", label="Rest in shade", category="interaction", effects=[{"modify_stamina": 4}], result_text="You rest beneath the cool date palms and shake off the heat."),
+            Action(id="scorch_oasis_drink_canteen", label="Drink from canteen", category="item_affordance", condition={"has_item": "water_skin"}, effects=[{"modify_stamina": 2}, {"modify_health": 2}], result_text="You take a deep drink from your waterskin, feeling refreshed."),
             Action(id="scorchwaste_canyon_oasis_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 15 - Stage 2: Engagement / Climax
     scenes["scorchwaste_canyon_oasis_courtyard"] = SceneNode(
         id="scorchwaste_canyon_oasis_courtyard",
-        title="Hidden Spring Oasis - Main Courtyard",
+        title="Hidden Spring Oasis - Contested Pool",
         region="scorchwaste",
-        description="Cobblestones show heavy cart wheel wear. Date palms shelter a deep pool of fresh water.",
+        description="Red algae clouds the shallow stone pool. Armed nomad elders argue over contested water rights. A fallen palm trunk blocks the upper feeder sluice.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "nimble"},
+                text="You step lightly across the hot gravel near the spring."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_canyon_oasis_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "scorch_oasis_sluice", "name": "Feeder Sluice", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="scorchwaste_canyon_oasis_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="scorchwaste_canyon_oasis_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="scorch_oasis_inspect_pool", label="Inspect spring basin", category="interaction", result_text="You examine the stagnant red pool and the jammed intake sluice."),
+            Action(id="scorch_oasis_purify_spring", label="Purify spring water", category="trait_exploit", condition={"min_skill": {"skill": "cunning", "value": 3}}, effects=[{"set_flag": {"flag": "oasis_water_purified", "value": True}}, {"log_event": "You neutralized the red algae with mineral salts."}], target_scene="scorchwaste_canyon_oasis_quarters", result_text="You dissolve mineral salts into the pool, clearing the toxic algae."),
+            Action(id="scorch_oasis_parley_clans", label="Parley with elders", category="social", condition={"min_skill": {"skill": "rhetoric", "value": 4}}, effects=[{"set_flag": {"flag": "oasis_clans_allied", "value": True}}, {"log_event": "You brokered a water treaty between the clans."}], target_scene="scorchwaste_canyon_oasis_quarters", result_text="Your reasoned words convince both sides to share the spring."),
+            Action(id="scorch_oasis_drag_trunk", label="Drag palm trunk", category="systemic", condition={"min_attribute": {"attribute": "strength", "value": 15}}, effects=[{"set_flag": {"flag": "oasis_sluice_cleared", "value": True}}, {"log_event": "You dragged the fallen palm trunk from the sluice."}], target_scene="scorchwaste_canyon_oasis_quarters", result_text="You heave the heavy palm trunk free, letting fresh water rush in."),
             Action(id="scorchwaste_canyon_oasis_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 15 - Stage 3: Resolution / Consequences
     scenes["scorchwaste_canyon_oasis_quarters"] = SceneNode(
         id="scorchwaste_canyon_oasis_quarters",
-        title="Hidden Spring Oasis - Living Quarters",
+        title="Hidden Spring Oasis - Elders Shelter",
         region="scorchwaste",
-        description="Rows of wooden bunks line the walls. Date palms shelter a deep pool of fresh water.",
+        description="Cool spring water trickles into a clean rock basin. Palm woven mats offer rest from the desert heat. Clay water jugs stand along the sandstone wall.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "oasis_water_purified", "value": True}},
+                text="Nomad elders nod in gratitude as clean water fills the pool."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "oasis_clans_allied", "value": True}},
+                text="A fragile desert peace holds after your successful parley."
             ),
         ],
+        entities=[
+            {"id": "scorch_oasis_jugs", "name": "Water Jugs", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="scorchwaste_canyon_oasis_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="scorchwaste_canyon_oasis_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="scorchwaste_canyon_oasis_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_canyon_oasis_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="scorch_oasis_receive_offering", label="Receive elder gift", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "oasis_water_purified", "value": True}}, {"flag_is": {"flag": "oasis_clans_allied", "value": True}}, {"flag_is": {"flag": "oasis_sluice_cleared", "value": True}}]}, {"lacks_flag": "oasis_offering_taken"}]}, effects=[{"add_item": "purified_oasis_vial"}, {"set_flag": {"flag": "oasis_offering_taken", "value": True}}, {"modify_reputation": {"faction": "caravaneers", "value": 25}}, {"add_marker": "desert_healer"}, {"log_event": "You received the purified oasis vial from the elders."}], result_text="The elders present you with a glass vial of sacred spring water."),
+            Action(id="scorch_oasis_rest_cistern", label="Rest near cistern", category="interaction", effects=[{"modify_stamina": 3}], result_text="You rest on palm mats beside the cool spring water."),
+            Action(id="scorchwaste_canyon_oasis_quarters_act_2", label="Inspect water jugs", category="interaction", effects=[{"set_flag": {"flag": "scorchwaste_canyon_oasis_quarters_footlocker_searched", "value": True}}, {"log_event": "You inspected the clay jugs."}], result_text="You check the sealed clay water amphorae."),
             Action(id="scorchwaste_canyon_oasis_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_canyon_oasis_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_canyon_oasis_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_canyon_oasis_armory", result_text="You press on to the next area."),
         ]
@@ -2364,77 +2363,74 @@ def build_scorchwaste_province() -> RegionManifest:
     # POI: Nomad Deep Well (10 nodes)
     scenes["scorchwaste_nomad_well_gate"] = SceneNode(
         id="scorchwaste_nomad_well_gate",
-        title="Nomad Deep Well - Outer Gate",
+        title="Nomad Deep Well - Outer Wellhead",
         region="scorchwaste",
-        description="Iron bars secure the heavy timber entrance. A bronze bucket hangs on a hemp rope.",
+        description="Windblown dunes encircle a stone wellhead. Heavy iron chains hang slack down the dark shaft. Sand skiff ruts scar the outer dune ridge.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                text="Your sharp vision picks out fresh raider tracks in the sand."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                text="You spot tactical high ground atop the nearby dune crest."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_nomad_well_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "scorch_well_head", "name": "Stone Wellhead", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="scorchwaste_nomad_well_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="scorchwaste_nomad_well_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="scorch_well_scout_dunes", label="Inspect desert well", category="interaction", result_text="You scan the desert wellhead and examine the slack hoist chains."),
+            Action(id="scorch_well_survey_tracks", label="Survey sand tracks", category="trait_exploit", condition={"any_of": [{"has_trait": "night_eyed"}, {"min_skill": {"skill": "cunning", "value": 2}}]}, effects=[{"set_flag": {"flag": "nomad_tracks_surveyed", "value": True}}, {"log_event": "You discovered fresh desert raider tracks."}], target_scene="scorchwaste_nomad_well_courtyard", result_text="You trace skiff runner ruts leading toward the courtyard."),
+            Action(id="scorch_well_rig_harness", label="Rig descent harness", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{"set_flag": {"flag": "well_rope_rigged", "value": True}}, {"log_event": "You rigged a rope harness to the wellhead."}], target_scene="scorchwaste_nomad_well_courtyard", result_text="You secure a climbing rope harness around the stone rim."),
             Action(id="scorchwaste_nomad_well_gate_to_prev", label="Return back", category="movement", target_scene="scorchwaste_hub", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_gate_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 16 - Stage 2: Engagement / Climax
     scenes["scorchwaste_nomad_well_courtyard"] = SceneNode(
         id="scorchwaste_nomad_well_courtyard",
-        title="Nomad Deep Well - Main Courtyard",
+        title="Nomad Deep Well - Hoist Platform",
         region="scorchwaste",
-        description="Cobblestones show heavy cart wheel wear. A bronze bucket hangs on a hemp rope.",
+        description="A seized brass windlass drum sits jammed with gravel. Desert raiders watch the well from behind high sandbanks. Heat shimmers across the parched stone.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_attribute": {"attribute": "endurance", "value": 14}},
+                text="You brace against the dry wind without losing footing."
             ),
         ],
         entities=[
-            {'id': 'scorchwaste_nomad_well_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "scorch_well_windlass", "name": "Brass Windlass", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="scorchwaste_nomad_well_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="scorchwaste_nomad_well_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="scorch_well_inspect_drum", label="Examine cable drum", category="interaction", result_text="You inspect the gravel-choked gears of the bronze windlass drum."),
+            Action(id="scorch_well_repair_windlass", label="Repair well windlass", category="systemic", condition={"any_of": [{"min_attribute": {"attribute": "strength", "value": 14}}, {"has_item": "crowbar"}]}, effects=[{"set_flag": {"flag": "nomad_well_repaired", "value": True}}, {"log_event": "You cleared the jammed gears and repaired the windlass."}], target_scene="scorchwaste_nomad_well_quarters", result_text="You free the seized drum, cranking groundwater to the surface."),
+            Action(id="scorch_well_repel_raiders", label="Repel sand raiders", category="trait_exploit", condition={"any_of": [{"min_skill": {"skill": "stealth", "value": 3}}, {"min_attribute": {"attribute": "strength", "value": 15}}]}, effects=[{"set_flag": {"flag": "well_raiders_repelled", "value": True}}, {"log_event": "You repelled the desert raider scouts."}], target_scene="scorchwaste_nomad_well_quarters", result_text="You drive off the raider scouts before they can rush the well."),
             Action(id="scorchwaste_nomad_well_courtyard_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_gate", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_courtyard_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 16 - Stage 3: Resolution / Consequences
     scenes["scorchwaste_nomad_well_quarters"] = SceneNode(
         id="scorchwaste_nomad_well_quarters",
-        title="Nomad Deep Well - Living Quarters",
+        title="Nomad Deep Well - Cistern Vault",
         region="scorchwaste",
-        description="Rows of wooden bunks line the walls. A bronze bucket hangs on a hemp rope.",
+        description="Damp sand cools the cistern floor beneath the well. Droplets collect on ancient carved sandstone blocks. A leather tool roll lies half buried in the silt.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "nomad_well_repaired", "value": True}},
+                text="Clear water sloshes inside the hoisted leather well bucket."
             ),
         ],
+        entities=[
+            {"id": "scorch_well_cistern", "name": "Deep Cistern", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="scorchwaste_nomad_well_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="scorchwaste_nomad_well_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="scorchwaste_nomad_well_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'scorchwaste_nomad_well_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="scorch_well_claim_relic", label="Claim nomad relic", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "nomad_well_repaired", "value": True}}, {"flag_is": {"flag": "well_raiders_repelled", "value": True}}]}, {"lacks_flag": "well_relic_claimed"}]}, effects=[{"add_item": "desert_star_compass"}, {"add_item": "nomad_water_flask"}, {"set_flag": {"flag": "well_relic_claimed", "value": True}}, {"modify_reputation": {"faction": "caravaneers", "value": 20}}, {"log_event": "You unearthed the ancient nomad star compass."}], result_text="You dig out a bronze star compass and an oiled nomad flask from the silt."),
+            Action(id="scorch_well_rest_cistern", label="Rest near basin", category="interaction", effects=[{"modify_stamina": 3}], result_text="The cool cistern air restores your energy."),
+            Action(id="scorchwaste_nomad_well_quarters_act_2", label="Inspect salt jars", category="interaction", effects=[{"set_flag": {"flag": "scorchwaste_nomad_well_quarters_footlocker_searched", "value": True}}, {"log_event": "You searched the cistern niche."}], result_text="You check the sealed clay salt jars."),
             Action(id="scorchwaste_nomad_well_quarters_to_prev", label="Return back", category="movement", target_scene="scorchwaste_nomad_well_courtyard", result_text="You retrace your steps."),
             Action(id="scorchwaste_nomad_well_quarters_to_next", label="Press forward", category="movement", target_scene="scorchwaste_nomad_well_armory", result_text="You press on to the next area."),
         ]

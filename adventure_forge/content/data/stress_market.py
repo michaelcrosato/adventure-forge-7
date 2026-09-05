@@ -27,7 +27,7 @@ def build_stress_market_region() -> RegionManifest:
         label="Climb to Crags",
         category="movement",
         target_scene="crags_base",
-        result_text="You head toward the looming mountain trail.",
+        result_text="You head toward the high mountain trail.",
         risk="low"
     ))
     stress_actions.append(Action(

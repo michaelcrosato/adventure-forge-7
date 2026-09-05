@@ -2368,7 +2368,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_gate",
         title="The Echoing Dome - Outer Gate",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. The huge dark caves carry quiet whispers for miles.",
+        description="Iron bars secure the heavy timber entrance. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2395,7 +2395,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_courtyard",
         title="The Echoing Dome - Main Courtyard",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. The huge dark caves carry quiet whispers for miles.",
+        description="Cobblestones show heavy cart wheel wear. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2422,7 +2422,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_quarters",
         title="The Echoing Dome - Living Quarters",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. The huge dark caves carry quiet whispers for miles.",
+        description="Rows of wooden bunks line the walls. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2446,7 +2446,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_armory",
         title="The Echoing Dome - Supply Depot",
         region="sunken_hollows",
-        description="Crates of rations and tools stand stacked. The huge dark caves carry quiet whispers for miles.",
+        description="Crates of rations and tools stand stacked. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2473,7 +2473,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_cellar",
         title="The Echoing Dome - Lower Cellar",
         region="sunken_hollows",
-        description="Damp air smells of cool earth and storage. The huge dark caves carry quiet whispers for miles.",
+        description="Damp air smells of cool earth and storage. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2497,7 +2497,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_passage",
         title="The Echoing Dome - Stone Corridor",
         region="sunken_hollows",
-        description="Wall sconces hold flickering tallow candles. The huge dark caves carry quiet whispers for miles.",
+        description="Wall sconces hold flickering tallow candles. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2524,7 +2524,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_chamber",
         title="The Echoing Dome - Inner Chamber",
         region="sunken_hollows",
-        description="A sturdy oak desk holds ledgers and maps. The huge dark caves carry quiet whispers for miles.",
+        description="A sturdy oak desk holds ledgers and maps. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2548,7 +2548,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_overlook",
         title="The Echoing Dome - High Overlook",
         region="sunken_hollows",
-        description="A stone ledge provides a clear view. The huge dark caves carry quiet whispers for miles.",
+        description="A stone ledge provides a clear view. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2572,7 +2572,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_sanctum",
         title="The Echoing Dome - Inner Sanctum",
         region="sunken_hollows",
-        description="A stone altar stands in quiet reverence. The huge dark caves carry quiet whispers for miles.",
+        description="A stone altar stands in quiet reverence. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},
@@ -2596,7 +2596,7 @@ def build_sunken_hollows_province() -> RegionManifest:
         id="sunken_hollows_echoing_dome_vault",
         title="The Echoing Dome - Deep Vault",
         region="sunken_hollows",
-        description="Iron-banded chests sit in deep shadows. The huge dark caves carry quiet whispers for miles.",
+        description="Iron-banded chests sit in deep shadows. The huge dark caves carry quiet echoes for miles.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "night_eyed"},

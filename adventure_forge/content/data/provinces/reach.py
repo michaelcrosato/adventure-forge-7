@@ -12,7 +12,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_hub",
         title="The Reach - Central Hub",
         region="reach",
-        description="Granite peaks loom over the stone waystation. Mountain patrolmen inspect incoming pack mules.",
+        description="Granite peaks rise over the stone waystation. Mountain patrolmen inspect incoming pack mules.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"min_attribute": {"attribute": "strength", "value": 12}},
@@ -31,79 +31,85 @@ def build_reach_province() -> RegionManifest:
     )
 
     # POI: Dunwall Fortress (10 nodes)
+    # Encounter 11 - Stage 1: Assessment / Approach
     scenes["reach_dunwall_fort_gate"] = SceneNode(
         id="reach_dunwall_fort_gate",
-        title="Dunwall Fortress - Outer Gate",
+        title="Dunwall Fortress - Cliffside Approach",
         region="reach",
-        description="Iron bars secure the heavy timber entrance. Iron battlements crown the sheer cliff face.",
+        description="Granite walls cling to the sheer cliff. Iron grates seal the fortress gate. A deep dry moat guards the approach.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "climber"},
+                text="You spot sheer rock handholds along the fortress drainage crevice."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"background_is": "drifter"},
+                text="You recognize the standard garrison guard rotation times."
+            ),
+            DynamicDescription(
+                condition={"has_flaw": "marked_outlaw"},
+                text="Fortress sentries scan the road with suspicious scowls."
             ),
         ],
         entities=[
-            {'id': 'reach_dunwall_fort_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "reach_dunwall_fort_gate_grate", "name": "Iron Grate", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_dunwall_fort_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="reach_dunwall_fort_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="reach_dunwall_fort_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'reach_dunwall_fort_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="reach_dunwall_scout_gate", label="Scout gate", category="interaction", result_text="You study the sheer cliffs and gate defenses."),
+            Action(id="reach_dunwall_grapple_rope", label="Anchor rope", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{"set_flag": {"flag": "dunwall_grapple_anchored", "value": True}}, {"log_event": "You anchored a grappling rope to the wall."}], target_scene="reach_dunwall_fort_courtyard", result_text="You throw a grappling line and scale the lower wall."),
+            Action(id="reach_dunwall_scout_crevice", label="Scale drainage fissure", category="trait_exploit", condition={"has_trait": "climber"}, target_scene="reach_dunwall_fort_courtyard", result_text="You climb the sheer drainage fissure into the fortress."),
             Action(id="reach_dunwall_fort_gate_to_prev", label="Return back", category="movement", target_scene="reach_hub", result_text="You retrace your steps."),
-            Action(id="reach_dunwall_fort_gate_to_next", label="Press forward", category="movement", target_scene="reach_dunwall_fort_courtyard", result_text="You press on to the next area."),
+            Action(id="reach_dunwall_fort_gate_to_next", label="Press forward", category="movement", stamina_cost=1, target_scene="reach_dunwall_fort_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 11 - Stage 2: Engagement / Climax
     scenes["reach_dunwall_fort_courtyard"] = SceneNode(
         id="reach_dunwall_fort_courtyard",
-        title="Dunwall Fortress - Main Courtyard",
+        title="Dunwall Fortress - Inner Gatehouse",
         region="reach",
-        description="Cobblestones show heavy cart wheel wear. Iron battlements crown the sheer cliff face.",
+        description="Iron winch gears groan inside the tower. Heavy bronze levers hold the portcullis chains. Patrol guards muster across the yard.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "nimble"},
+                text="You leap over the spiked ditch without breaking stride."
             ),
         ],
         entities=[
-            {'id': 'reach_dunwall_fort_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "reach_dunwall_fort_winch", "name": "Portcullis Winch", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_dunwall_fort_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="reach_dunwall_fort_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="reach_dunwall_fort_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'reach_dunwall_fort_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="reach_dunwall_scout_courtyard", label="Inspect winch gears", category="interaction", result_text="You survey the muster yard and defense towers."),
+            Action(id="reach_dunwall_jam_winch", label="Jam winch gears", category="trait_exploit", condition={"any_of": [{"min_skill": {"skill": "cunning", "value": 3}}, {"has_item": "crowbar"}]}, effects=[{"set_flag": {"flag": "dunwall_winch_jammed", "value": True}}, {"log_event": "You jammed the iron winch gears."}], target_scene="reach_dunwall_fort_quarters", result_text="You wedge iron into the gears, locking the gate shut."),
+            Action(id="reach_dunwall_heave_portcullis", label="Heave portcullis lever", category="systemic", condition={"min_attribute": {"attribute": "strength", "value": 15}}, effects=[{"set_flag": {"flag": "dunwall_portcullis_lifted", "value": True}}, {"log_event": "You forced open the heavy portcullis."}], target_scene="reach_dunwall_fort_quarters", result_text="You strain and force the bronze lever to lift the iron gate."),
             Action(id="reach_dunwall_fort_courtyard_to_prev", label="Return back", category="movement", target_scene="reach_dunwall_fort_gate", result_text="You retrace your steps."),
             Action(id="reach_dunwall_fort_courtyard_to_next", label="Press forward", category="movement", target_scene="reach_dunwall_fort_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 11 - Stage 3: Resolution / Consequences
     scenes["reach_dunwall_fort_quarters"] = SceneNode(
         id="reach_dunwall_fort_quarters",
-        title="Dunwall Fortress - Living Quarters",
+        title="Dunwall Fortress - Garrison Quarters",
         region="reach",
-        description="Rows of wooden bunks line the walls. Iron battlements crown the sheer cliff face.",
+        description="Bunk frames line the stone barracks. An iron commander lockbox sits under a bench. Lanterns burn along the wall.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "dunwall_winch_jammed", "value": True}},
+                text="Shouts echo outside as guards hammer on the jammed iron gates."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "dunwall_portcullis_lifted", "value": True}},
+                text="Garrison soldiers scatter in disarray through the lifted gate."
             ),
         ],
+        entities=[
+            {"id": "reach_dunwall_fort_lockbox", "name": "Commander Lockbox", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="reach_dunwall_fort_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="reach_dunwall_fort_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="reach_dunwall_fort_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'reach_dunwall_fort_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="reach_dunwall_claim_armory", label="Open iron lockbox", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "dunwall_winch_jammed", "value": True}}, {"flag_is": {"flag": "dunwall_portcullis_lifted", "value": True}}]}, {"lacks_flag": "dunwall_plans_taken"}]}, effects=[{"add_item": "dunwall_siege_plans"}, {"set_flag": {"flag": "dunwall_plans_taken", "value": True}}, {"modify_reputation": {"faction": "smugglers", "value": 20}}, {"modify_reputation": {"faction": "iron_guard", "value": 10}}, {"log_event": "You took the fortress siege plans."}], result_text="You crack the commander's lockbox and seize the siege plans."),
+            Action(id="reach_dunwall_rest_barracks", label="Rest on bunk", category="interaction", effects=[{"modify_stamina": 3}], result_text="You rest on an empty cot and recover stamina."),
+            Action(id="reach_dunwall_fort_quarters_act_2", label="Search footlocker", category="interaction", effects=[{"set_flag": {"flag": "reach_dunwall_fort_quarters_footlocker_searched", "value": True}}, {"log_event": "You searched the barracks footlocker."}], result_text="You search through an iron footlocker."),
             Action(id="reach_dunwall_fort_quarters_to_prev", label="Return back", category="movement", target_scene="reach_dunwall_fort_courtyard", result_text="You retrace your steps."),
             Action(id="reach_dunwall_fort_quarters_to_next", label="Press forward", category="movement", target_scene="reach_dunwall_fort_armory", result_text="You press on to the next area."),
         ]
@@ -1100,7 +1106,7 @@ def build_reach_province() -> RegionManifest:
         id="reach_iron_spire_courtyard",
         title="Ancient Iron Spire - Charged Gantry",
         region="reach",
-        description="Blue sparks dance along the wet steel cables. Lightning flashes across the rusted catwalk. An automaton sentry hums with power.",
+        description="Blue sparks crackle along the wet steel cables. Lightning flashes across the rusted catwalk. An automaton sentry hums with power.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "nimble"},
@@ -1844,79 +1850,77 @@ def build_reach_province() -> RegionManifest:
     )
 
     # POI: Glacial Cavern (10 nodes)
+    # Encounter 12 - Stage 1: Assessment / Approach
     scenes["reach_frost_cavern_gate"] = SceneNode(
         id="reach_frost_cavern_gate",
-        title="Glacial Cavern - Outer Gate",
+        title="Glacial Cavern - Blue Crevasse",
         region="reach",
-        description="Iron bars secure the heavy timber entrance. Blue ice walls echo with dripping water.",
+        description="Frost coats the limestone cavern entrance. A yawning blue chasm splits the cavern floor. Freezing wind howls through the dark gap.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "nimble"},
+                text="You balance on the slick blue ice ridge."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "night_eyed"},
+                text="Your eyes pierce the dark icy abyss."
             ),
         ],
         entities=[
-            {'id': 'reach_frost_cavern_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "reach_frost_cavern_ice_chasm", "name": "Ice Chasm", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_frost_cavern_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="reach_frost_cavern_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="reach_frost_cavern_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'reach_frost_cavern_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="reach_cavern_scout_chasm", label="Inspect ice chasm", category="interaction", result_text="You study the jagged blue crevasse and unstable ice shelves."),
+            Action(id="reach_cavern_rig_bridge", label="Rig rope bridge", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{"set_flag": {"flag": "frost_crevasse_bridged", "value": True}}, {"log_event": "You rigged a safety rope across the ice crevasse."}], target_scene="reach_frost_cavern_courtyard", result_text="You anchor climbing rope across the deep chasm."),
+            Action(id="reach_cavern_vault_ice", label="Vault ice ridge", category="trait_exploit", condition={"has_trait": "nimble"}, target_scene="reach_frost_cavern_courtyard", result_text="You skip across the narrow ice spine with easy grace."),
             Action(id="reach_frost_cavern_gate_to_prev", label="Return back", category="movement", target_scene="reach_hub", result_text="You retrace your steps."),
             Action(id="reach_frost_cavern_gate_to_next", label="Press forward", category="movement", target_scene="reach_frost_cavern_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 12 - Stage 2: Engagement / Climax
     scenes["reach_frost_cavern_courtyard"] = SceneNode(
         id="reach_frost_cavern_courtyard",
-        title="Glacial Cavern - Main Courtyard",
+        title="Glacial Cavern - Hanging Ice Gallery",
         region="reach",
-        description="Cobblestones show heavy cart wheel wear. Blue ice walls echo with dripping water.",
+        description="Sharp ice stalactites hang from the vaulted roof. Sub-zero gusts blast through the gallery. Clear frost blankets the slick floor.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_attribute": {"attribute": "endurance", "value": 14}},
+                text="Your hardy lungs resist the biting frost."
             ),
         ],
         entities=[
-            {'id': 'reach_frost_cavern_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "reach_frost_cavern_stalactites", "name": "Hanging Stalactites", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="reach_frost_cavern_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="reach_frost_cavern_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="reach_frost_cavern_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'reach_frost_cavern_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="reach_cavern_scout_gallery", label="Inspect ice gallery", category="interaction", result_text="You watch for falling ice shards along the ceiling."),
+            Action(id="reach_cavern_brace_chill", label="Brace against chill", category="systemic", condition={"min_attribute": {"attribute": "endurance", "value": 14}}, effects=[{"modify_stamina": 3}, {"log_event": "Your endurance endured the biting glacial gale."}], result_text="You steady your breathing and push through the sub-zero blast."),
+            Action(id="reach_cavern_clear_stalactites", label="Dislodge stalactites", category="trait_exploit", condition={"any_of": [{"has_item": "crowbar"}, {"min_attribute": {"attribute": "strength", "value": 14}}]}, effects=[{"set_flag": {"flag": "stalactites_cleared", "value": True}}, {"log_event": "You cleared the hazardous ice stalactites."}], target_scene="reach_frost_cavern_quarters", result_text="You knock down the precarious hanging spikes safely."),
             Action(id="reach_frost_cavern_courtyard_to_prev", label="Return back", category="movement", target_scene="reach_frost_cavern_gate", result_text="You retrace your steps."),
             Action(id="reach_frost_cavern_courtyard_to_next", label="Press forward", category="movement", target_scene="reach_frost_cavern_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 12 - Stage 3: Resolution / Consequences
     scenes["reach_frost_cavern_quarters"] = SceneNode(
         id="reach_frost_cavern_quarters",
-        title="Glacial Cavern - Living Quarters",
+        title="Glacial Cavern - Frost Shelves",
         region="reach",
-        description="Rows of wooden bunks line the walls. Blue ice walls echo with dripping water.",
+        description="Frozen storage shelves line the cavern walls. Ancient glacial rime glitters in the dim light. A small camp stove radiates heat.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "stalactites_cleared", "value": True}},
+                text="The ceiling is clear of falling ice hazards."
             ),
         ],
+        entities=[
+            {"id": "reach_frost_cavern_stove", "name": "Camp Stove", "tags": ["flammable"], "initial_state": "intact"},
+        ],
         base_actions=[
-            Action(id="reach_frost_cavern_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="reach_frost_cavern_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="reach_frost_cavern_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'reach_frost_cavern_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="reach_cavern_harvest_rime", label="Harvest glacial rime", category="interaction", condition={"all_of": [{"flag_is": {"flag": "stalactites_cleared", "value": True}}, {"lacks_flag": "glacial_rime_harvested"}]}, effects=[{"add_item": "glacial_rime_core"}, {"set_flag": {"flag": "glacial_rime_harvested", "value": True}}, {"modify_reputation": {"faction": "frost_wardens", "value": 25}}, {"add_marker": "frost_strider"}, {"log_event": "You harvested crystallized glacial rime."}], result_text="You carefully pry a luminescent cluster of glacial rime free."),
+            Action(id="reach_cavern_rest_hearth", label="Rest near stove", category="interaction", effects=[{"modify_stamina": 2}, {"modify_health": 2}], result_text="The warmth of the stove eases your chills."),
+            Action(id="reach_cavern_search_cache", label="Search ice cache", category="interaction", effects=[{"set_flag": {"flag": "reach_frost_cavern_cache_checked", "value": True}}, {"log_event": "You checked the frozen cache."}], result_text="You search through the frozen crates."),
             Action(id="reach_frost_cavern_quarters_to_prev", label="Return back", category="movement", target_scene="reach_frost_cavern_courtyard", result_text="You retrace your steps."),
             Action(id="reach_frost_cavern_quarters_to_next", label="Press forward", category="movement", target_scene="reach_frost_cavern_armory", result_text="You press on to the next area."),
         ]

@@ -6,12 +6,42 @@ Enforces I6 Information Firewall:
 - Supports divergent play personas: Explorer, Brute, Infiltrator, Speedrunner, Saboteur, Nomad, Diver, Scout.
 """
 from dataclasses import dataclass
-from typing import Dict, Any, List, Optional, Set
+from enum import Enum
+from typing import Dict, Any, List, Optional, Set, Union
 from adventure_forge.core.state import GameState
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.engine import AdventureEngine, StepResult
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.content.loader import build_world_registry
+
+
+class PlaytesterPersona(str, Enum):
+    """Authoritative enumeration of blind playtester behavioral personas."""
+    EXPLORER = "explorer"
+    BRUTE = "brute"
+    INFILTRATOR = "infiltrator"
+    SPEEDRUNNER = "speedrunner"
+    SABOTEUR = "saboteur"
+    NOMAD = "nomad"
+    DIVER = "diver"
+    SCOUT = "scout"
+
+    @classmethod
+    def from_str(cls, val: Union[str, "PlaytesterPersona"]) -> "PlaytesterPersona":
+        """Convert a string or enum member to a PlaytesterPersona (case-insensitive)."""
+        if isinstance(val, cls):
+            return val
+        cleaned = str(val).lower().strip()
+        try:
+            return cls(cleaned)
+        except ValueError:
+            try:
+                return cls[cleaned.upper()]
+            except KeyError:
+                raise ValueError(
+                    f"Unknown playtester persona '{val}'. "
+                    f"Available personas: {[p.value for p in cls]}"
+                )
 
 
 @dataclass
@@ -26,36 +56,49 @@ class SessionTelemetry:
     retention_score: float
     friction_notes: List[str]
 
+    @property
+    def decisions(self) -> List[str]:
+        """Convenience property for decisions list."""
+        return self.decisions_made
+
+    @property
+    def final_scene(self) -> str:
+        """The final scene reached during this playtest session."""
+        return self.scenes_visited[-1] if self.scenes_visited else ""
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             "persona": self.persona,
             "seed": self.seed,
             "turn_count": self.turn_count,
             "decisions_made": list(self.decisions_made),
+            "decisions": list(self.decisions_made),
             "scenes_visited": list(self.scenes_visited),
             "fingerprints": list(self.fingerprints),
             "terminal_outcome": self.terminal_outcome,
             "retention_score": self.retention_score,
             "friction_notes": list(self.friction_notes),
+            "final_scene": self.final_scene,
         }
 
 
 class BlindPlaytester:
     """Autonomous playtester driven solely by observable affordances and a behavioral persona."""
 
-    PERSONAS = [
-        "explorer",
-        "brute",
-        "infiltrator",
-        "speedrunner",
-        "saboteur",
-        "nomad",
-        "diver",
-        "scout",
-    ]
+    PERSONAS: List[str] = [p.value for p in PlaytesterPersona]
 
-    def __init__(self, persona: str = "explorer", seed: int = 42):
-        self.persona = persona.lower().strip()
+    def __init__(
+        self,
+        persona: Union[PlaytesterPersona, str] = PlaytesterPersona.EXPLORER,
+        seed: int = 42,
+    ):
+        if isinstance(persona, PlaytesterPersona):
+            self.persona = persona.value
+        else:
+            try:
+                self.persona = PlaytesterPersona.from_str(persona).value
+            except ValueError:
+                self.persona = str(persona).lower().strip()
         self.seed = seed
         self.rng = DeterministicRNG.from_seed(seed)
         self.visited_verbs: Set[str] = set()
@@ -185,12 +228,21 @@ class BlindPlaytester:
                 ]
 
         elif p == "nomad":
-            # Prefers survival, endurance, desert navigation, trade, oasis interaction
+            # Prioritizes hydration, shade recovery, sandstorm endurance, waterskin refill, oasis interaction, caravan barter
             nomad_kws = (
-                "surviv", "endur", "desert", "dune", "trade", "oasis",
-                "shade", "water", "drink", "sand", "well", "canteen",
-                "salvage", "compass", "trek", "march", "bazaar", "rest",
-                "nomad", "barter", "caravan", "brave", "scorch"
+                # Hydration & waterskin refill
+                "hydrat", "water", "drink", "refill", "waterskin", "canteen",
+                "flask", "quench", "thirst", "sip", "well", "spring", "cistern",
+                # Shade recovery
+                "shade", "rest_in_shade", "shelter", "cool_off", "recover",
+                # Sandstorm endurance & desert survival
+                "sandstorm", "endur", "surviv", "storm", "dune", "brave", "desert", "scorch",
+                # Oasis interaction
+                "oasis", "palm", "mirage",
+                # Caravan barter & trade
+                "barter", "caravan", "trade", "merchant", "trader", "bazaar", "wares",
+                # General survival/exploration
+                "salvage", "compass", "trek", "march", "rest", "nomad"
             )
             direct_nomad = [
                 a for a in actions
@@ -201,35 +253,65 @@ class BlindPlaytester:
             else:
                 preferred = [
                     a for a in actions
-                    if a.get("category") in ("social", "interaction")
+                    if a.get("category") in ("social", "interaction", "systemic")
                 ]
 
         elif p == "diver":
-            # Prefers diving, submerging, water manipulation, deep trenches
+            # Prioritizes submersion, diving bell operation, water buoyancy, pressure equalization, salvage prying, deep cavern diving
             diver_kws = (
-                "dive", "submerg", "water", "trench", "swim", "pool",
-                "lake", "river", "grotto", "abyss", "depth", "deep",
-                "wade", "conductive", "drown", "tide", "flood", "bell",
-                "plunge", "sea", "ocean", "current", "channel", "aquatic",
-                "salvage_diving", "coral", "reef", "sunken"
+                # Submersion & swimming
+                "dive", "submerg", "water", "swim", "plunge", "immerse", "pool", "lake",
+                "river", "wade", "current", "channel",
+                # Diving bell operation
+                "bell", "diving_bell", "winch", "rig_bell", "operate_diving_bell",
+                # Water buoyancy
+                "buoyancy", "buoyant", "float", "surface", "tread_water", "ballast",
+                # Pressure equalization
+                "pressure", "equaliz", "equalize_pressure", "decompression", "air_pocket", "breathe", "lung", "air",
+                # Salvage prying
+                "salvage", "pry", "pry_open", "salvage_chest", "salvage_diving", "salvage_sunken", "chest", "wreck",
+                # Deep cavern diving & trenches
+                "trench", "grotto", "abyss", "depth", "deep", "cavern", "sunken",
+                "aquatic", "coral", "reef", "conductive", "drown", "tide", "flood", "sea", "ocean"
             )
-            preferred = [
+            direct_diver = [
                 a for a in actions
                 if any(kw in a.get("id", "").lower() or kw in a.get("label", "").lower() for kw in diver_kws)
             ]
+            if direct_diver:
+                preferred = direct_diver
+            else:
+                preferred = [
+                    a for a in actions
+                    if a.get("category") in ("systemic", "item_affordance", "movement")
+                ]
 
         elif p == "scout":
-            # Prefers verticality, climbing, vantage points, scaling cliffs, scouting
+            # Prioritizes vertical cliff climbing, rope rigging, altitude stamina conservation, ridge overlook surveying, mountain vantage reconnaissance
             scout_kws = (
-                "scout", "climb", "vantage", "scale", "cliff", "vertical",
-                "ridge", "peak", "height", "lookout", "survey", "spire",
-                "watch", "rope", "crag", "mountain", "ascent", "ascend",
-                "tower", "overlook", "bluff", "high", "pass"
+                # Vertical cliff climbing
+                "climb", "scale", "cliff", "vertical", "crag", "scale_cliff", "climb_crag",
+                "rock_face", "ascent", "ascend", "peak", "spire", "bluff",
+                # Rope rigging
+                "rope", "rig_rope", "secure_rope", "grapple", "anchor", "piton", "belay", "tether", "rigging",
+                # Altitude stamina conservation
+                "conserve", "rest_ledge", "steady_breath", "pace_ascent", "acclimat", "stamina", "brace", "ledge",
+                # Ridge overlook surveying
+                "survey", "overlook", "ridge", "ridge_overlook", "survey_ridge", "panoramic", "vista", "horizon",
+                # Mountain vantage reconnaissance
+                "vantage", "reconnaissance", "scout", "lookout", "watch", "mountain", "pass", "height", "tower", "spot_trail"
             )
-            preferred = [
+            direct_scout = [
                 a for a in actions
                 if any(kw in a.get("id", "").lower() or kw in a.get("label", "").lower() for kw in scout_kws)
             ]
+            if direct_scout:
+                preferred = direct_scout
+            else:
+                preferred = [
+                    a for a in actions
+                    if a.get("category") in ("movement", "systemic", "interaction")
+                ]
 
         if preferred:
             unvisited_pref = [a for a in preferred if a.get("id") not in self.visited_actions]

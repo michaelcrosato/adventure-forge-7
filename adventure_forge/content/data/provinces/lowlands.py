@@ -104,7 +104,7 @@ def build_lowlands_province() -> RegionManifest:
             Action(id="lowlands_oakhaven_port_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
             Action(id="lowlands_oakhaven_port_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
             Action(id="lowlands_oakhaven_port_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_oakhaven_port_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
-            Action(id="lowlands_bribe_informant", label="Bribe dock runner", category="interaction", condition={"lacks_flag": "lowlands_informant_contacted"}, effects=[{"set_flag": {"flag": "lowlands_informant_contacted", "value": True}}, {"log_event": "You paid the runner for whispers on the Shadow Broker."}], result_text="The runner whispers coordinates to the customs archive."),
+            Action(id="lowlands_bribe_informant", label="Bribe dock runner", category="interaction", condition={"lacks_flag": "lowlands_informant_contacted"}, effects=[{"set_flag": {"flag": "lowlands_informant_contacted", "value": True}}, {"log_event": "You paid the runner for tips on the Shadow Broker."}], result_text="The runner shares coordinates to the customs archive."),
             Action(id="lowlands_oakhaven_port_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_oakhaven_port_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_oakhaven_port_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_oakhaven_port_armory", result_text="You press on to the next area."),
         ]
@@ -309,7 +309,7 @@ def build_lowlands_province() -> RegionManifest:
             {"id": "lowlands_thief_ale_barrel", "name": "Ale Barrel", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_thief_whisper_code", label="Whisper password", category="social", condition={"has_marker": "guild_brand"}, target_scene="lowlands_thieves_hall_courtyard", result_text="The lookout nods and unbolts the heavy cellar door."),
+            Action(id="lowlands_thief_whisper_code", label="Give password", category="social", condition={"has_marker": "guild_brand"}, target_scene="lowlands_thieves_hall_courtyard", result_text="The lookout nods and unbolts the heavy cellar door."),
             Action(id="lowlands_thief_slip_past", label="Sneak past lookout", category="trait_exploit", condition={"min_skill": {"skill": "stealth", "value": 3}}, target_scene="lowlands_thieves_hall_courtyard", result_text="You slip behind the wine casks unseen."),
             Action(id="lowlands_thief_listen_rumors", label="Listen to rumors", category="interaction", effects=[{"log_event": "You learned that the syndicate strongbox holds watch rosters."}], result_text="You overhear guards discussing patrol schedules."),
             Action(id="lowlands_thieves_hall_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
@@ -322,7 +322,7 @@ def build_lowlands_province() -> RegionManifest:
         id="lowlands_thieves_hall_courtyard",
         title="Shadow Cellar - Vault Alcove",
         region="lowlands",
-        description="Torch shadows dance across damp limestone arches. An iron-banded strongbox sits upon a stone pedestal. A sleeping guard dog rests on a sack.",
+        description="Torchlight flickers across damp limestone arches. An iron-banded strongbox sits upon a stone pedestal. A sleeping guard dog rests on a sack.",
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"has_trait": "light_fingers"},
@@ -805,79 +805,81 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     # POI: Anchor & Chain Inn (10 nodes)
+    # Encounter 13 - Stage 1: Assessment / Approach
     scenes["lowlands_dock_tavern_gate"] = SceneNode(
         id="lowlands_dock_tavern_gate",
-        title="Anchor & Chain Inn - Outer Gate",
+        title="Anchor & Chain Inn - Tavern Porch",
         region="lowlands",
-        description="Iron bars secure the heavy timber entrance. Drunken sailors sing around wooden bench tables.",
+        description="Salty river fog drifts past the tavern porch. Laughter and clinking tankards filter through greasy glass windows. Two scarred dockers guard the heavy oak door.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "streetwise"},
+                text="You read the gamblers body language through the open window."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"background_is": "cutpurse"},
+                text="You spot loaded bone dice tucked inside the dealer belt."
             ),
         ],
         entities=[
-            {'id': 'lowlands_dock_tavern_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "lowlands_tavern_door", "name": "Oak Door", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="lowlands_dock_tavern_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="lowlands_dock_tavern_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="lowlands_tavern_scout_entrance", label="Inspect tavern porch", category="interaction", result_text="You observe the bouncers and listen to the raucous crowd inside."),
+            Action(id="lowlands_tavern_bribe_bouncer", label="Bribe tavern docker", category="social", condition={"any_of": [{"has_item": "silver_coin"}, {"min_skill": {"skill": "cunning", "value": 2}}]}, target_scene="lowlands_dock_tavern_courtyard", result_text="You slip coin and a quick nod to pass through the door unmolested."),
+            Action(id="lowlands_tavern_eavesdrop", label="Eavesdrop on crew", category="trait_exploit", condition={"has_trait": "streetwise"}, target_scene="lowlands_dock_tavern_courtyard", result_text="You overhear smuggler barge timetables before stepping inside."),
             Action(id="lowlands_dock_tavern_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 13 - Stage 2: Engagement / Climax
     scenes["lowlands_dock_tavern_courtyard"] = SceneNode(
         id="lowlands_dock_tavern_courtyard",
-        title="Anchor & Chain Inn - Main Courtyard",
+        title="Anchor & Chain Inn - Taproom Floor",
         region="lowlands",
-        description="Cobblestones show heavy cart wheel wear. Drunken sailors sing around wooden bench tables.",
+        description="Thick pipe smoke hangs over crowded wooden benches. River pilots roll bone dice across an ironbound oak table. Angry sailors shout over unpaid bets.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_flaw": "marked_outlaw"},
+                text="You spot an undercover watch officer nursing dark ale."
             ),
         ],
         entities=[
-            {'id': 'lowlands_dock_tavern_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "lowlands_tavern_dice_table", "name": "Gaming Table", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="lowlands_dock_tavern_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="lowlands_dock_tavern_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="lowlands_tavern_survey_gamblers", label="Watch dice game", category="interaction", result_text="You watch the river pilot palm loaded dice between throws."),
+            Action(id="lowlands_tavern_cheat_dice", label="Cheat dice ring", category="trait_exploit", condition={"any_of": [{"has_trait": "light_fingers"}, {"min_skill": {"skill": "cunning", "value": 4}}]}, effects=[{"set_flag": {"flag": "tavern_dice_won", "value": True}}, {"log_event": "You swapped the loaded dice and swept the pot."}], target_scene="lowlands_dock_tavern_quarters", result_text="Your deft swap wins the pot before the dealer notices."),
+            Action(id="lowlands_tavern_flip_table", label="Flip tavern table", category="systemic", condition={"min_attribute": {"attribute": "strength", "value": 14}}, effects=[{"set_flag": {"flag": "tavern_brawl_escaped", "value": True}}, {"log_event": "You flipped the heavy gaming table and broke into the backroom."}], target_scene="lowlands_dock_tavern_quarters", result_text="You heave the heavy oak table into the bouncers and slip past."),
             Action(id="lowlands_dock_tavern_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_gate", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 13 - Stage 3: Resolution / Consequences
     scenes["lowlands_dock_tavern_quarters"] = SceneNode(
         id="lowlands_dock_tavern_quarters",
-        title="Anchor & Chain Inn - Living Quarters",
+        title="Anchor & Chain Inn - Cellar Storeroom",
         region="lowlands",
-        description="Rows of wooden bunks line the walls. Drunken sailors sing around wooden bench tables.",
+        description="Empty tankards clutter the quiet rear storeroom. Loose floorboards conceal a smuggler cache beneath grain sacks. Cold river drafts seep between wall timbers.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "tavern_dice_won", "value": True}},
+                text="Rival gamblers search the front hall while you loot the safe."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "tavern_brawl_escaped", "value": True}},
+                text="Bouncers nurse bruises after the tavern table collapsed."
             ),
         ],
+        entities=[
+            {"id": "lowlands_tavern_cache", "name": "Floorboard Cache", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="lowlands_dock_tavern_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="lowlands_dock_tavern_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="lowlands_dock_tavern_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_dock_tavern_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="lowlands_tavern_loot_safe", label="Loot floor cache", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "tavern_dice_won", "value": True}}, {"flag_is": {"flag": "tavern_brawl_escaped", "value": True}}]}, {"lacks_flag": "tavern_cache_looted"}]}, effects=[{"add_item": "smuggler_bounty_purse"}, {"add_item": "canal_route_ledger"}, {"set_flag": {"flag": "tavern_cache_looted", "value": True}}, {"modify_reputation": {"faction": "smugglers", "value": 20}}, {"log_event": "You looted the innkeeper floorboard cache."}], result_text="You pry up the loose pine board and seize the hidden loot."),
+            Action(id="lowlands_tavern_rest_taproom", label="Rest in booth", category="interaction", effects=[{"modify_stamina": 2}], result_text="You catch your breath behind the stacked ale barrels."),
+            Action(id="lowlands_dock_tavern_quarters_act_2", label="Inspect ale cask", category="interaction", effects=[{"set_flag": {"flag": "lowlands_dock_tavern_quarters_footlocker_searched", "value": True}}, {"log_event": "You inspected the cellar cask."}], result_text="You tap the side of an aged cedar cider cask."),
             Action(id="lowlands_dock_tavern_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_dock_tavern_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_dock_tavern_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_dock_tavern_armory", result_text="You press on to the next area."),
         ]
@@ -1065,79 +1067,77 @@ def build_lowlands_province() -> RegionManifest:
     )
 
     # POI: Weavers District (10 nodes)
+    # Encounter 14 - Stage 1: Assessment / Approach
     scenes["lowlands_cloth_market_gate"] = SceneNode(
         id="lowlands_cloth_market_gate",
-        title="Weavers District - Outer Gate",
+        title="Weavers District - Cloth Stalls",
         region="lowlands",
-        description="Iron bars secure the heavy timber entrance. Dyed linens hang drying across the alleyways.",
+        description="Vibrant bolts of linen hang from wooden awnings. Merchants hawk river wool and dyed flax to passing crowds. Undercover watchmen patrol the market lane in disguise.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"has_trait": "skeptical"},
+                text="Your sharp eyes catch city watch rings under merchant coats."
             ),
         ],
         entities=[
-            {'id': 'lowlands_cloth_market_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "lowlands_market_awning", "name": "Linen Awning", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="lowlands_cloth_market_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="lowlands_cloth_market_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="lowlands_market_scout_stalls", label="Survey cloth stalls", category="interaction", result_text="You study the bustling crowd and note guard positions."),
+            Action(id="lowlands_market_blend_crowd", label="Blend into crowd", category="trait_exploit", condition={"min_skill": {"skill": "stealth", "value": 3}}, target_scene="lowlands_cloth_market_courtyard", result_text="You slip through the thick crowd of cloth buyers unnoticed."),
+            Action(id="lowlands_market_pose_merchant", label="Pose as importer", category="social", condition={"min_skill": {"skill": "rhetoric", "value": 3}}, effects=[{"set_flag": {"flag": "silk_merchant_disguise", "value": True}}, {"log_event": "You posed as a foreign silk merchant."}], target_scene="lowlands_cloth_market_courtyard", result_text="You speak with haughty authority, parting the crowd before you."),
             Action(id="lowlands_cloth_market_gate_to_prev", label="Return back", category="movement", target_scene="lowlands_hub", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_gate_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 14 - Stage 2: Engagement / Climax
     scenes["lowlands_cloth_market_courtyard"] = SceneNode(
         id="lowlands_cloth_market_courtyard",
-        title="Weavers District - Main Courtyard",
+        title="Weavers District - Dyeing Square",
         region="lowlands",
-        description="Cobblestones show heavy cart wheel wear. Dyed linens hang drying across the alleyways.",
+        description="Great dye vats steam in the open weaving square. A portly tax assessor tallies municipal tolls inside an iron cage. Armed watchmen stand guard near the scale.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "silk_merchant_disguise", "value": True}},
+                text="The tax assessor nods politely at your fine attire."
             ),
         ],
         entities=[
-            {'id': 'lowlands_cloth_market_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "lowlands_market_dye_vat", "name": "Dye Vat", "tags": ["flammable"], "initial_state": "intact"},
         ],
         base_actions=[
-            Action(id="lowlands_cloth_market_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="lowlands_cloth_market_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="lowlands_cloth_market_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="lowlands_market_inspect_looms", label="Examine dye vats", category="interaction", result_text="You observe the pungent indigo vats and watchmen patrol paths."),
+            Action(id="lowlands_market_cut_purse", label="Cut assessor purse", category="trait_exploit", condition={"any_of": [{"has_trait": "light_fingers"}, {"min_skill": {"skill": "cunning", "value": 3}}]}, effects=[{"set_flag": {"flag": "tax_key_stolen", "value": True}}, {"log_event": "You lifted the municipal tax chest key."}], target_scene="lowlands_cloth_market_quarters", result_text="Your deft fingers slice the tax assessor velvet key ring unnoticed."),
+            Action(id="lowlands_market_distract_watch", label="Distract city watch", category="social", condition={"has_item": "silver_coin"}, effects=[{"remove_item": "silver_coin"}, {"set_flag": {"flag": "watch_distracted", "value": True}}, {"log_event": "You sparked a brawl by tossing silver into the crowd."}], target_scene="lowlands_cloth_market_quarters", result_text="You toss coins into the street, causing a merchant brawl."),
             Action(id="lowlands_cloth_market_courtyard_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_gate", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_courtyard_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 14 - Stage 3: Resolution / Consequences
     scenes["lowlands_cloth_market_quarters"] = SceneNode(
         id="lowlands_cloth_market_quarters",
-        title="Weavers District - Living Quarters",
+        title="Weavers District - Wool Warehouse",
         region="lowlands",
-        description="Rows of wooden bunks line the walls. Dyed linens hang drying across the alleyways.",
+        description="Bales of raw wool fill the quiet back warehouse. An iron revenue chest sits upon a stone workbench. Muffled street cries echo from outside.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "tax_key_stolen", "value": True}},
+                text="The stolen tax key fits smoothly into the brass chest lock."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "watch_distracted", "value": True}},
+                text="The street brawl occupies the entire district watch squad."
             ),
         ],
+        entities=[
+            {"id": "lowlands_market_tax_chest", "name": "Revenue Chest", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="lowlands_cloth_market_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="lowlands_cloth_market_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="lowlands_cloth_market_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'lowlands_cloth_market_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="lowlands_market_claim_revenue", label="Loot tax chest", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "tax_key_stolen", "value": True}}, {"flag_is": {"flag": "watch_distracted", "value": True}}]}, {"lacks_flag": "market_tax_looted"}]}, effects=[{"add_item": "tax_collector_ledger"}, {"add_item": "velvet_disguise_cloak"}, {"set_flag": {"flag": "market_tax_looted", "value": True}}, {"modify_reputation": {"faction": "smugglers", "value": 25}}, {"modify_reputation": {"faction": "city_watch", "value": -10}}, {"log_event": "You seized the municipal revenue chest."}], result_text="You unlock the iron chest and pack the revenue ledger and velvet cloak."),
+            Action(id="lowlands_market_rest_alcove", label="Rest near bolts", category="interaction", effects=[{"modify_stamina": 2}], result_text="You rest against stacked bolts of wool and catch your breath."),
+            Action(id="lowlands_cloth_market_quarters_act_2", label="Search fabric crates", category="interaction", effects=[{"set_flag": {"flag": "lowlands_cloth_market_quarters_footlocker_searched", "value": True}}, {"log_event": "You searched the storage crate."}], result_text="You search through a wooden shipping crate."),
             Action(id="lowlands_cloth_market_quarters_to_prev", label="Return back", category="movement", target_scene="lowlands_cloth_market_courtyard", result_text="You retrace your steps."),
             Action(id="lowlands_cloth_market_quarters_to_next", label="Press forward", category="movement", target_scene="lowlands_cloth_market_armory", result_text="You press on to the next area."),
         ]

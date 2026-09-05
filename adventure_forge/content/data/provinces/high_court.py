@@ -548,79 +548,81 @@ def build_high_court_province() -> RegionManifest:
     )
 
     # POI: The Royal Archives (10 nodes)
+    # Encounter 17 - Stage 1: Assessment / Approach
     scenes["high_court_royal_archive_gate"] = SceneNode(
         id="high_court_royal_archive_gate",
-        title="The Royal Archives - Outer Gate",
+        title="The Royal Archives - Scriptorium Entry",
         region="high_court",
-        description="Iron bars secure the heavy timber entrance. Cedar book stacks reach the vaulted ceiling.",
+        description="Scented beeswax and old parchment fill the scriptorium entrance. Scribes copy legal decrees beneath arched stained glass windows. An intake clerk inspects petitioner passes.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"background_is": "noble_exile"},
+                text="You recognize the suppressed royal crest on sealed folios."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                text="You note guard patrols changing outside the archive door."
             ),
         ],
         entities=[
-            {'id': 'high_court_royal_archive_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {"id": "high_archive_intake_desk", "name": "Clerk Desk", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="high_court_royal_archive_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="high_court_royal_archive_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="high_court_royal_archive_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'high_court_royal_archive_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="high_archive_scout_scriptorium", label="Inspect scriptorium desk", category="interaction", result_text="You study the busy clerks and identify the head archivist desk."),
+            Action(id="high_archive_bluff_clerk", label="Present reading writ", category="social", condition={"any_of": [{"min_skill": {"skill": "rhetoric", "value": 3}}, {"has_item": "legal_dossier"}]}, effects=[{"set_flag": {"flag": "archive_pass_granted", "value": True}}, {"log_event": "You bluffed the scriptorium intake clerk."}], target_scene="high_court_royal_archive_courtyard", result_text="The clerk stamps your petitioner pass and waves you into the stacks."),
+            Action(id="high_archive_slip_stacks", label="Slip behind curtains", category="trait_exploit", condition={"min_skill": {"skill": "stealth", "value": 3}}, target_scene="high_court_royal_archive_courtyard", result_text="You slip past the intake desk behind a heavy velvet drapery."),
             Action(id="high_court_royal_archive_gate_to_prev", label="Return back", category="movement", target_scene="high_court_hub", result_text="You retrace your steps."),
             Action(id="high_court_royal_archive_gate_to_next", label="Press forward", category="movement", target_scene="high_court_royal_archive_courtyard", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 17 - Stage 2: Engagement / Climax
     scenes["high_court_royal_archive_courtyard"] = SceneNode(
         id="high_court_royal_archive_courtyard",
-        title="The Royal Archives - Main Courtyard",
+        title="The Royal Archives - Restricted Stacks",
         region="high_court",
-        description="Cobblestones show heavy cart wheel wear. Cedar book stacks reach the vaulted ceiling.",
+        description="Towering bookshelves stretch toward high painted ceiling vaults. A locked bronze grille seals the restricted imperial genealogy codices. Scribes hurry past carrying heavy folios.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
-            ),
-            DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"min_skill": {"skill": "cunning", "value": 4}},
+                text="You read the faded handwriting on the restricted parchment."
             ),
         ],
         entities=[
-            {'id': 'high_court_royal_archive_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {"id": "high_archive_bronze_grille", "name": "Bronze Grille", "tags": ["lockable"], "initial_state": "locked"},
         ],
         base_actions=[
-            Action(id="high_court_royal_archive_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="high_court_royal_archive_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="high_court_royal_archive_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'high_court_royal_archive_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="high_archive_browse_folios", label="Examine locked stacks", category="interaction", result_text="You examine the ornate bronze cage protecting genealogical codices."),
+            Action(id="high_archive_pick_grille", label="Pick bronze grille", category="item_affordance", condition={"has_item": "lockpick"}, effects=[{"set_flag": {"flag": "archive_grille_unlocked", "value": True}}, {"log_event": "You picked the restricted archive grille."}], target_scene="high_court_royal_archive_quarters", result_text="Your lockpick clicks smoothly, swinging the heavy bronze gate open."),
+            Action(id="high_archive_decipher_scroll", label="Decipher dynastic scroll", category="trait_exploit", condition={"min_skill": {"skill": "cunning", "value": 4}}, effects=[{"set_flag": {"flag": "royal_lineage_deciphered", "value": True}}, {"log_event": "You deciphered the secret imperial lineage scroll."}], target_scene="high_court_royal_archive_quarters", result_text="You read the scraped vellum revealing the secret royal lineage."),
             Action(id="high_court_royal_archive_courtyard_to_prev", label="Return back", category="movement", target_scene="high_court_royal_archive_gate", result_text="You retrace your steps."),
             Action(id="high_court_royal_archive_courtyard_to_next", label="Press forward", category="movement", target_scene="high_court_royal_archive_quarters", result_text="You press on to the next area."),
         ]
     )
 
+    # Encounter 17 - Stage 3: Resolution / Consequences
     scenes["high_court_royal_archive_quarters"] = SceneNode(
         id="high_court_royal_archive_quarters",
-        title="The Royal Archives - Living Quarters",
+        title="The Royal Archives - Reading Alcove",
         region="high_court",
-        description="Rows of wooden bunks line the walls. Cedar book stacks reach the vaulted ceiling.",
+        description="A quiet reading alcove overlooks the archive courtyard. Rare dynastic scrolls rest inside an iron book press. Soft candle light warms the desk.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "archive_grille_unlocked", "value": True}},
+                text="The unlocked bronze grille stands ajar behind the heavy curtain."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "royal_lineage_deciphered", "value": True}},
+                text="The deciphered lineage scroll confirms the suppressed royal bloodline."
             ),
         ],
+        entities=[
+            {"id": "high_archive_book_press", "name": "Book Press", "tags": ["lockable"], "initial_state": "locked"},
+        ],
         base_actions=[
-            Action(id="high_court_royal_archive_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="high_court_royal_archive_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="high_court_royal_archive_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'high_court_royal_archive_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="high_archive_extract_scroll", label="Take lineage scroll", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "archive_grille_unlocked", "value": True}}, {"flag_is": {"flag": "royal_lineage_deciphered", "value": True}}]}, {"lacks_flag": "lineage_scroll_extracted"}]}, effects=[{"add_item": "sovereign_lineage_scroll"}, {"set_flag": {"flag": "lineage_scroll_extracted", "value": True}}, {"modify_reputation": {"faction": "justiciars", "value": 25}}, {"add_marker": "court_historian"}, {"log_event": "You secured the sovereign lineage scroll."}], result_text="You roll the ancient imperial patent and seal it inside your cloak."),
+            Action(id="high_archive_rest_desk", label="Rest at lectern", category="interaction", effects=[{"modify_stamina": 2}], result_text="You rest against the polished walnut desk and catch your breath."),
+            Action(id="high_court_royal_archive_quarters_act_2", label="Inspect document drawers", category="interaction", effects=[{"set_flag": {"flag": "high_court_royal_archive_quarters_footlocker_searched", "value": True}}, {"log_event": "You searched the archive drawer."}], result_text="You search through a drawer of catalog cards."),
             Action(id="high_court_royal_archive_quarters_to_prev", label="Return back", category="movement", target_scene="high_court_royal_archive_courtyard", result_text="You retrace your steps."),
             Action(id="high_court_royal_archive_quarters_to_next", label="Press forward", category="movement", target_scene="high_court_royal_archive_armory", result_text="You press on to the next area."),
         ]
@@ -811,13 +813,13 @@ def build_high_court_province() -> RegionManifest:
     # POI: Chancellor Garden (10 nodes)
     scenes["high_court_chancellor_court_gate"] = SceneNode(
         id="high_court_chancellor_court_gate",
-        title="Chancellor Garden - Outer Gate",
+        title="Chancellor Garden - Rose Colonnade",
         region="high_court",
-        description="Iron bars secure the heavy timber entrance. Stone fountains bubble among trimmed rose hedges.",
+        description="White marble fountains splash along the manicured rose colonnade. Moonlit gravel corridors wind between sculpted boxwood hedges. Aristocratic guests stroll past discreet guards.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"ancestry_is": "highborn"},
+                text="Your refined lineage opens conversation among the gathered aristocracy."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -825,12 +827,12 @@ def build_high_court_province() -> RegionManifest:
             ),
         ],
         entities=[
-            {'id': 'high_court_chancellor_court_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {'id': 'high_garden_fountain', 'name': 'Marble Fountain', 'tags': ['lockable'], 'initial_state': 'locked'},
         ],
         base_actions=[
-            Action(id="high_court_chancellor_court_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="high_court_chancellor_court_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="high_court_chancellor_court_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'high_court_chancellor_court_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="high_garden_scout_colonnade", label="Inspect garden portico", category="interaction", result_text="You observe the noble guests and identify the Chancellor private pavilion."),
+            Action(id="high_garden_present_favor", label="Present noble favor", category="social", condition={"any_of": [{"ancestry_is": "highborn"}, {"min_skill": {"skill": "rhetoric", "value": 3}}]}, target_scene="high_court_chancellor_court_courtyard", result_text="You exchange aristocratic greetings and gain entry to the rose pavilion."),
+            Action(id="high_garden_skirt_hedges", label="Skirt yew hedges", category="trait_exploit", condition={"min_skill": {"skill": "stealth", "value": 3}}, target_scene="high_court_chancellor_court_courtyard", result_text="You slip past the perimeter guards along shadowed boxwood paths."),
             Action(id="high_court_chancellor_court_gate_to_prev", label="Return back", category="movement", target_scene="high_court_hub", result_text="You retrace your steps."),
             Action(id="high_court_chancellor_court_gate_to_next", label="Press forward", category="movement", target_scene="high_court_chancellor_court_courtyard", result_text="You press on to the next area."),
         ]
@@ -838,13 +840,13 @@ def build_high_court_province() -> RegionManifest:
 
     scenes["high_court_chancellor_court_courtyard"] = SceneNode(
         id="high_court_chancellor_court_courtyard",
-        title="Chancellor Garden - Main Courtyard",
+        title="Chancellor Garden - Rose Pergola",
         region="high_court",
-        description="Cobblestones show heavy cart wheel wear. Stone fountains bubble among trimmed rose hedges.",
+        description="Climbing white roses canopy the private garden pavilion. The Chancellor laughs with foreign envoys over crystal wine goblets. A masked servant hovers near the silver tray.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "skeptical"},
+                text="You catch the bitter scent of crushed nightshade in the wine."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -852,12 +854,12 @@ def build_high_court_province() -> RegionManifest:
             ),
         ],
         entities=[
-            {'id': 'high_court_chancellor_court_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {'id': 'high_garden_wine_tray', 'name': 'Silver Tray', 'tags': ['lockable'], 'initial_state': 'locked'},
         ],
         base_actions=[
-            Action(id="high_court_chancellor_court_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="high_court_chancellor_court_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="high_court_chancellor_court_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'high_court_chancellor_court_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="high_garden_observe_banquet", label="Observe rose pergola", category="interaction", result_text="You observe the Chancellor toasts and note the servant subtle movements."),
+            Action(id="high_garden_detect_poison", label="Detect wine poison", category="trait_exploit", condition={"any_of": [{"has_trait": "skeptical"}, {"min_skill": {"skill": "cunning", "value": 4}}]}, effects=[{'set_flag': {'flag': 'garden_poison_detected', 'value': True}}, {'log_event': 'You detected nightshade poison in the Chancellor goblet.'}], target_scene="high_court_chancellor_court_quarters", result_text="You spot crystalline nightshade sediment clinging to the Chancellor glass."),
+            Action(id="high_garden_swap_chalice", label="Swap poisoned chalice", category="trait_exploit", condition={"has_trait": "light_fingers"}, effects=[{'set_flag': {'flag': 'duke_chalice_swapped', 'value': True}}, {'log_event': 'You palmed and replaced the poisoned goblet.'}], target_scene="high_court_chancellor_court_quarters", result_text="Your sleight of hand replaces the tainted wine chalice with fresh spring water."),
             Action(id="high_court_chancellor_court_courtyard_to_prev", label="Return back", category="movement", target_scene="high_court_chancellor_court_gate", result_text="You retrace your steps."),
             Action(id="high_court_chancellor_court_courtyard_to_next", label="Press forward", category="movement", target_scene="high_court_chancellor_court_quarters", result_text="You press on to the next area."),
         ]
@@ -865,23 +867,26 @@ def build_high_court_province() -> RegionManifest:
 
     scenes["high_court_chancellor_court_quarters"] = SceneNode(
         id="high_court_chancellor_court_quarters",
-        title="Chancellor Garden - Living Quarters",
+        title="Chancellor Garden - Marble Salon",
         region="high_court",
-        description="Rows of wooden bunks line the walls. Stone fountains bubble among trimmed rose hedges.",
+        description="Silken cushions line the private marble garden salon. Moonlight bathes the stone balustrade overlooking the court below. The Chancellor breathes easily in the cool night air.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "garden_poison_detected", "value": True}},
+                text="The tainted goblet sits secured on the side table as evidence."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "duke_chalice_swapped", "value": True}},
+                text="The Chancellor offers profound thanks for averting the assassination."
             ),
         ],
+        entities=[
+            {'id': 'high_garden_salon_couch', 'name': 'Silk Couch', 'tags': ['flammable'], 'initial_state': 'intact'},
+        ],
         base_actions=[
-            Action(id="high_court_chancellor_court_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="high_court_chancellor_court_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="high_court_chancellor_court_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'high_court_chancellor_court_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="high_garden_expose_plot", label="Expose garden treason", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "garden_poison_detected", "value": True}}, {"flag_is": {"flag": "duke_chalice_swapped", "value": True}}]}, {"lacks_flag": "chancellor_signet_claimed"}]}, effects=[{'add_item': 'chancellor_signet_ring'}, {'set_flag': {'flag': 'chancellor_signet_claimed', 'value': True}}, {'modify_reputation': {'faction': 'high_nobility', 'value': 25}}, {'add_marker': 'savior_of_veras'}, {'log_event': 'You exposed the poison plot and received the Chancellor signet ring.'}], result_text="The Chancellor hands you his golden signet ring in deepest gratitude."),
+            Action(id="high_garden_rest_gazebo", label="Rest in pergola", category="interaction", effects=[{'modify_stamina': 3}], result_text="You rest on silk cushions in the cool nocturnal garden."),
+            Action(id="high_court_chancellor_court_quarters_act_2", label="Inspect wine carafe", category="interaction", effects=[{'set_flag': {'flag': 'high_court_chancellor_court_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You inspected the crystal carafe.'}], result_text="You examine the ornate decanter of vintage plum wine."),
             Action(id="high_court_chancellor_court_quarters_to_prev", label="Return back", category="movement", target_scene="high_court_chancellor_court_courtyard", result_text="You retrace your steps."),
             Action(id="high_court_chancellor_court_quarters_to_next", label="Press forward", category="movement", target_scene="high_court_chancellor_court_armory", result_text="You press on to the next area."),
         ]
@@ -2118,7 +2123,7 @@ def build_high_court_province() -> RegionManifest:
         dynamic_descriptions=[
             DynamicDescription(
                 condition={"background_is": "noble_exile"},
-                text="Courtiers whisper your ancestral name with hushed curiosity."
+                text="Courtiers murmur your ancestral name with hushed curiosity."
             ),
         ],
         entities=[

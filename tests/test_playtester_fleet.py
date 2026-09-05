@@ -21,7 +21,11 @@ from typing import List, Dict, Any
 import os
 from adventure_forge.core.character import get_preset
 from adventure_forge.core.engine import StepResult
-from adventure_forge.flywheel.playtester import BlindPlaytester
+from adventure_forge.flywheel.playtester import (
+    BlindPlaytester,
+    PlaytesterPersona,
+    SessionTelemetry,
+)
 from adventure_forge.flywheel.orchestrator import (
     OrchestratorManager,
     get_canonical_persona_setup,
@@ -322,3 +326,122 @@ def test_orchestrator_manager_run_cycle(tmp_path):
         content = f.read()
         assert "ALL_GREEN" in content
         assert '"sessions_run": 8' in content
+
+
+# ── 8. Milestone 10 Persona Enum & Enriched Heuristics Tests ───────────────────
+
+def test_playtester_persona_enum_and_init():
+    """PlaytesterPersona enum members, string conversion, and BlindPlaytester initialization."""
+    assert len(PlaytesterPersona) == 8
+    expected = ["explorer", "brute", "infiltrator", "speedrunner", "saboteur", "nomad", "diver", "scout"]
+    for member_name in expected:
+        enum_val = PlaytesterPersona(member_name)
+        assert enum_val.value == member_name
+        assert PlaytesterPersona.from_str(member_name) == enum_val
+        assert PlaytesterPersona.from_str(member_name.upper()) == enum_val
+
+    assert BlindPlaytester.PERSONAS == expected
+
+    # Accept Enum
+    t1 = BlindPlaytester(persona=PlaytesterPersona.NOMAD)
+    assert t1.persona == "nomad"
+
+    # Accept string (uppercase and whitespace)
+    t2 = BlindPlaytester(persona="  DIVER  ")
+    assert t2.persona == "diver"
+
+    # Accept canonical setup with Enum
+    char, start = get_canonical_persona_setup(PlaytesterPersona.SCOUT)
+    assert char.name == "Torin"
+    assert start == "reach_hub"
+
+
+def test_nomad_enriched_heuristics():
+    """Nomad prioritizes hydration, shade recovery, sandstorm endurance, waterskin refill, oasis interaction, caravan barter."""
+    actions = [
+        {"id": "examine_dune", "label": "Look at sand", "category": "interaction", "risk": "low", "stamina_cost": 0},
+        {"id": "refill_waterskin", "label": "Refill waterskin", "category": "systemic", "risk": "low", "stamina_cost": 0},
+        {"id": "climb_tower", "label": "Climb tower", "category": "movement", "risk": "medium", "stamina_cost": 1},
+    ]
+    obs = _make_dummy_step_result(actions)
+    tester = BlindPlaytester(persona=PlaytesterPersona.NOMAD, seed=42)
+    chosen = tester.select_action(obs)
+    assert chosen == "refill_waterskin"
+
+    # Sandstorm endurance and caravan barter
+    actions2 = [
+        {"id": "hide_in_cellar", "label": "Hide in cellar", "category": "interaction", "risk": "low", "stamina_cost": 0},
+        {"id": "endure_sandstorm", "label": "Endure sandstorm", "category": "systemic", "risk": "high", "stamina_cost": 1},
+        {"id": "barter_caravan", "label": "Barter caravan", "category": "social", "risk": "low", "stamina_cost": 0},
+    ]
+    obs2 = _make_dummy_step_result(actions2)
+    chosen2 = tester.select_action(obs2)
+    assert chosen2 in ("endure_sandstorm", "barter_caravan")
+
+
+def test_diver_enriched_heuristics():
+    """Diver prioritizes submersion, diving bell operation, water buoyancy, pressure equalization, salvage prying, deep cavern diving."""
+    actions = [
+        {"id": "light_campfire", "label": "Light campfire", "category": "interaction", "risk": "low", "stamina_cost": 0},
+        {"id": "operate_diving_bell", "label": "Operate diving bell", "category": "systemic", "risk": "medium", "stamina_cost": 1},
+        {"id": "read_tombstone", "label": "Read stone", "category": "interaction", "risk": "low", "stamina_cost": 0},
+    ]
+    obs = _make_dummy_step_result(actions)
+    tester = BlindPlaytester(persona=PlaytesterPersona.DIVER, seed=42)
+    chosen = tester.select_action(obs)
+    assert chosen == "operate_diving_bell"
+
+    # Buoyancy, pressure equalization, salvage
+    actions2 = [
+        {"id": "examine_wall", "label": "Examine wall", "category": "interaction", "risk": "low", "stamina_cost": 0},
+        {"id": "equalize_pressure", "label": "Equalize pressure", "category": "systemic", "risk": "low", "stamina_cost": 0},
+        {"id": "salvage_sunken_chest", "label": "Salvage chest", "category": "interaction", "risk": "medium", "stamina_cost": 1},
+    ]
+    obs2 = _make_dummy_step_result(actions2)
+    chosen2 = tester.select_action(obs2)
+    assert chosen2 in ("equalize_pressure", "salvage_sunken_chest")
+
+
+def test_scout_enriched_heuristics():
+    """Scout prioritizes vertical cliff climbing, rope rigging, altitude stamina conservation, ridge overlook surveying, mountain vantage reconnaissance."""
+    actions = [
+        {"id": "rest_in_tavern", "label": "Rest in tavern", "category": "interaction", "risk": "low", "stamina_cost": 0},
+        {"id": "rig_rope_anchor", "label": "Rig rope anchor", "category": "systemic", "risk": "medium", "stamina_cost": 1},
+        {"id": "read_manifest", "label": "Read manifest", "category": "interaction", "risk": "low", "stamina_cost": 0},
+    ]
+    obs = _make_dummy_step_result(actions)
+    tester = BlindPlaytester(persona=PlaytesterPersona.SCOUT, seed=42)
+    chosen = tester.select_action(obs)
+    assert chosen == "rig_rope_anchor"
+
+    # Ridge overlook surveying and altitude stamina conservation
+    actions2 = [
+        {"id": "pick_lock", "label": "Pick lock", "category": "trait_exploit", "risk": "low", "stamina_cost": 0},
+        {"id": "survey_ridge_overlook", "label": "Survey ridge overlook", "category": "interaction", "risk": "low", "stamina_cost": 0},
+        {"id": "conserve_stamina_ledge", "label": "Conserve stamina ledge", "category": "systemic", "risk": "low", "stamina_cost": 0},
+    ]
+    obs2 = _make_dummy_step_result(actions2)
+    chosen2 = tester.select_action(obs2)
+    assert chosen2 in ("survey_ridge_overlook", "conserve_stamina_ledge")
+
+
+def test_session_telemetry_properties():
+    """SessionTelemetry exposes .decisions and .final_scene properties and serializes them."""
+    tel = SessionTelemetry(
+        persona="explorer",
+        seed=42,
+        turn_count=2,
+        decisions_made=["explore_ruins", "discover_passage"],
+        scenes_visited=["crags_base", "crags_ridge"],
+        fingerprints=["f1", "f2"],
+        terminal_outcome=None,
+        retention_score=1.0,
+        friction_notes=[],
+    )
+    assert tel.decisions == ["explore_ruins", "discover_passage"]
+    assert tel.final_scene == "crags_ridge"
+
+    as_dict = tel.to_dict()
+    assert as_dict["decisions"] == ["explore_ruins", "discover_passage"]
+    assert as_dict["final_scene"] == "crags_ridge"
+

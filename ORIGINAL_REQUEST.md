@@ -49,3 +49,28 @@ Execute the approved teamwork plan in prompt_draft.md:
 4. Run continuous blind playtester fleet (Explorer, Brute, Infiltrator, Speedrunner, Saboteur) and verify zero defects.
 5. Ensure 100% pass rate across all 7 verification gates in ./verify, 180+ pytests, ruff, and mypy.
 6. Commit and push all enhancements. Keep building and playtesting continuously.
+
+## 2026-09-05T02:41:17Z
+
+Continue to playtest and expand the game content for AdventureForge. Run an endless loop of multi-persona playtesting, triage defects, enrich provincial encounters across all 5 provinces, preserve Hemingway prose and all 7 verification gates, and commit and push all improvements to GitHub.
+
+Working directory: /home/micha/dev/adventure-forge-7
+Integrity mode: development
+Verification command: ./verify
+
+## Requirements
+### R1. Continuous Playtest Fleet
+Run multi-persona blind playtesting (Explorer, Brute, Infiltrator, Speedrunner, Saboteur, Nomad, Diver, Scout) via the flywheel orchestrator. Triage all friction notes and defects.
+
+### R2. Content Expansion
+Add new systemic encounters and rich interactive scenes to the 5 provinces. Maintain 7-axis character reactivity and unbounded legal choices.
+
+### R3. Verification Invariants
+Enforce bit-for-bit SHA-256 replay determinism, 100% BFS reachability across all scenes, Hemingway brevity (FKGL 6-8, <=18 words/sentence, <=3 words/UI label), and 100% interactable density.
+
+## Acceptance Criteria
+- 100% pass on all 7 gates in ./verify
+- 100% pass on pytest -v
+- Zero lint or type errors (ruff, mypy)
+- Commit and push each batch of enhancements to origin/main via git post-commit hook.
+

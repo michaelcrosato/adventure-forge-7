@@ -17,6 +17,7 @@ from adventure_forge.flywheel.triage import (
     triage_defect_report,
     triage_playtester_report,
     triage_session_telemetry,
+    reproduce_trace,
     PlaytesterDefectReport,
     TriageReport,
 )
@@ -214,3 +215,99 @@ def test_triage_character_trait_divergence():
     # Helpless character cannot pick the grate; action fails -> defect reproduced
     assert r_helpless.verified is True
     assert r_helpless.status == "VERIFIED_DEFECT"
+
+
+def test_reproduce_trace_api_skill_runbook():
+    """Verify reproduce_trace matches the exact usage contract from af-playtest/SKILL.md."""
+    result = reproduce_trace(seed=999, preset="cutpurse", action_sequence=["examine_lock", "pick_lock"])
+    assert result.matches_expected is True
+    assert result.actual_fingerprint == result.final_fingerprint
+    assert len(result.actual_fingerprint) == 64
+    assert result.status == "VERIFIED_DEFECT"
+    assert "examine_lock" in result.details or "failed" in result.details
+
+
+def test_reproduce_trace_valid_trace_verified():
+    """A valid action trace reproduces cleanly and verifies replay execution."""
+    result = reproduce_trace(
+        seed=42,
+        preset="cutpurse",
+        action_sequence=["slip_past_watch"],
+        start_scene="warrens_gate",
+    )
+    assert result.matches_expected is True
+    assert result.verified is True
+    assert result.status == "VERIFIED_REPLAY"
+    assert result.actual_fingerprint == result.final_fingerprint
+    assert len(result.actual_fingerprint) == 64
+
+    # Verification with matching expected_fingerprint
+    res_expected = reproduce_trace(
+        seed=42,
+        preset="cutpurse",
+        action_sequence=["slip_past_watch"],
+        start_scene="warrens_gate",
+        expected_fingerprint=result.actual_fingerprint,
+    )
+    assert res_expected.matches_expected is True
+    assert res_expected.verified is True
+    assert res_expected.status == "VERIFIED_REPLAY"
+
+    # Verification with mismatched expected_fingerprint
+    res_mismatch = reproduce_trace(
+        seed=42,
+        preset="cutpurse",
+        action_sequence=["slip_past_watch"],
+        start_scene="warrens_gate",
+        expected_fingerprint="0" * 64,
+    )
+    assert res_mismatch.matches_expected is False
+    assert res_mismatch.verified is False
+    assert res_mismatch.status == "FINGERPRINT_MISMATCH"
+
+    # Defect triage preservation: explicit defect claim on clean trace is rejected
+    res_unrep = reproduce_trace(
+        seed=42,
+        preset="cutpurse",
+        action_sequence=["slip_past_watch"],
+        start_scene="warrens_gate",
+        claimed_defect="Alleged game crash",
+    )
+    assert res_unrep.matches_expected is False
+    assert res_unrep.verified is False
+    assert res_unrep.status == "REJECTED_UNREPLAYABLE"
+
+
+def test_reproduce_trace_persona_fallback():
+    """reproduce_trace handles persona names like 'nomad', 'diver', and 'scout'."""
+    res_nomad = reproduce_trace(seed=100, preset="nomad", action_sequence=[])
+    assert res_nomad.failing_scene is None
+    assert len(res_nomad.actual_fingerprint) == 64
+
+    res_diver = reproduce_trace(seed=101, preset="diver", action_sequence=[])
+    assert len(res_diver.actual_fingerprint) == 64
+
+    res_scout = reproduce_trace(seed=102, preset="scout", action_sequence=[])
+    assert len(res_scout.actual_fingerprint) == 64
+
+
+def test_triage_report_properties_and_serialization():
+    """TriageReport actual_fingerprint and matches_expected properties match verified and final_fingerprint."""
+    report = TriageReport(
+        verified=True,
+        status="VERIFIED_DEFECT",
+        reproduction_trace=["step1"],
+        final_fingerprint="abc" * 21 + "d",
+        details="defect verified",
+        error_step=1,
+        failing_scene="test_scene",
+    )
+    assert report.matches_expected is True
+    assert report.actual_fingerprint == report.final_fingerprint
+
+    data = report.to_dict()
+    assert data["matches_expected"] is True
+    assert data["actual_fingerprint"] == "abc" * 21 + "d"
+    assert data["verified"] is True
+    assert data["final_fingerprint"] == "abc" * 21 + "d"
+

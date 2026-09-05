@@ -16,7 +16,8 @@ from typing import List, Dict, Any, Tuple, Optional
 FORBIDDEN_PURPLE_WORDS = {
     "tapestry", "gossamer", "labyrinthine", "palpable", "unfathomable",
     "eldritch", "malice", "kaleidoscope", "cacophony", "resplendent",
-    "scintillating", "coruscating", "sepulchral", "crepuscular"
+    "scintillating", "coruscating", "sepulchral", "crepuscular",
+    "whispers", "whisper", "whispering", "dance", "loom", "looming", "ethereal"
 }
 
 
