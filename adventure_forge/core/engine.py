@@ -81,10 +81,12 @@ class AdventureEngine:
         )
 
     def get_quest_progress(self, state: GameState) -> Dict[str, Any]:
-        """Compute current continental main quest progress for active state."""
-        from adventure_forge.content.quests import get_continental_main_quest
+        """Compute current continental main quest progress and subquests for active state."""
+        from adventure_forge.content.quests import get_continental_main_quest, evaluate_all_subquests
         quest = get_continental_main_quest()
-        return quest.evaluate_progress(state.character, state.world_flags)
+        progress = quest.evaluate_progress(state.character, state.world_flags)
+        progress["subquests"] = evaluate_all_subquests(state.character, state.world_flags)
+        return progress
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""
