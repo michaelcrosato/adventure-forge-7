@@ -68,6 +68,9 @@ Every feature from the Survey phase appears here with its assigned milestone.
 | M7 | Multi-Stage Systemic Encounters Across 5 Provinces | 10 high-reactivity multi-stage encounters with dynamic affordances | M6 | COMPLETE |
 | M8 | 5-Province Grand Campaign Replay & Divergence | End-to-end completion of "The Five Seals of Sovereignty" with bit-for-bit replay determinism | M7 | COMPLETE |
 | M9 | 100% Interactable Density & 6 Continental Archetypes | Achieve 520/520 (100.0%) interactable density; add Kael, Mara, Torin presets and web quest tracker | M8 | COMPLETE |
+| M10 | Playtester Fleet Expansion, Flywheel CLI & Triage | Formalized PlaytesterPersona enum (Nomad, Diver, Scout), enriched heuristics, CLI --persona/--personas flags, session JSONL telemetry, and reproduce_trace API | M9 | COMPLETE |
+| M11 | 5-Province Systemic Encounters Expansion & Prose Remediation | Purged 16 purple words, hardened FORBIDDEN_PURPLE_WORDS in prose_linter, authored 10 multi-stage systemic encounters across 5 provinces | M10 | COMPLETE |
+| M12 | Canonical Verification Bar, Fleet Soak & Git Sync | 100% pass on all 7 gates in ./verify, 447 pytests, ruff/mypy clean, 10-cycle unattended soak test, remote git push | M11 | COMPLETE |
 
 ## Interface Contracts
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`
