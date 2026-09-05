@@ -64,6 +64,10 @@ Every feature from the Survey phase appears here with its assigned milestone.
 | M3 | Canonical Verification Command, MCP Surface & Triage | Implement `./verify`, `adventure_forge.verify`, `player/mcp_server.py`, and wire/test `flywheel/triage.py` | M1 | COMPLETE |
 | M4 | 4-Tier Test Suite Expansion & E2E Gate Clearance | Comprehensive test suite covering Tiers 1–4 across all 23 modules, validating all acceptance criteria | M2, M3 | COMPLETE |
 | M5 | Adversarial Coverage Hardening (Tier 5) | Adversarial challenger analysis, gap detection, and test coverage hardening | M4 | COMPLETE |
+| M6 | Performance Profiling & Bottleneck Remediation | Fast memoized world loader (<25ms), sub-millisecond step transitions, sub-100ms ASGI API | M5 | COMPLETE |
+| M7 | Multi-Stage Systemic Encounters Across 5 Provinces | 10 high-reactivity multi-stage encounters with dynamic affordances | M6 | COMPLETE |
+| M8 | 5-Province Grand Campaign Replay & Divergence | End-to-end completion of "The Five Seals of Sovereignty" with bit-for-bit replay determinism | M7 | COMPLETE |
+| M9 | 100% Interactable Density & 6 Continental Archetypes | Achieve 520/520 (100.0%) interactable density; add Kael, Mara, Torin presets and web quest tracker | M8 | COMPLETE |
 
 ## Interface Contracts
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`

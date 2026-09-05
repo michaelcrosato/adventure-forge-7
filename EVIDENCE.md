@@ -21,13 +21,13 @@ All 7 mechanical gates execute headlessly and exit 0:
 4. I4/G1/G3 Counterfactual Character Sheet Witness Divergence
 5. G6 Unbounded Choice Scaling (100+ actions in single scene: Grand Bazaar = 115 actions)
 6. SYS-05 Non-LLM BFS/DFS Reachability Crawler (100% reachability across 520 scenes)
-7. SYS-06 Macro-World Interactable Density Invariant (510/520 scenes, 98.08% >= 3 interactables)
+7. SYS-06 Macro-World Interactable Density Invariant (520/520 scenes, 100.0% >= 3 interactables)
 
 ### 1.2 Automated Test Suite
 ```bash
 pytest -v
 ```
-Runs the full 4-tier + adversarial test suite (**180 tests passing in ~2.3 seconds**).
+Runs the full 4-tier + adversarial test suite (**220 tests passing in ~1.6 seconds**).
 
 ### 1.3 Interactive Play
 - **Terminal CLI (Interactive with categorized pagination):**
