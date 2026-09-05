@@ -221,3 +221,205 @@ def apply_hazard_combo(
     events.append(combo.description)
 
     return new_char, new_flags, events
+
+
+@dataclass(frozen=True)
+class RegionalAtmosphere:
+    """Atmospheric weather or systemic condition tied to a region."""
+    id: str
+    name: str
+    region_id: str
+    description: str
+    systemic_flags: Dict[str, Any] = field(default_factory=dict)
+    favored_items: Tuple[str, ...] = ()
+    rewarded_items: Tuple[str, ...] = ()
+    favored_traits: Tuple[str, ...] = ()
+    checked_traits: Tuple[str, ...] = ()
+    favored_skills: Tuple[str, ...] = ()
+    checked_skills: Tuple[str, ...] = ()
+    stamina_drain: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "region_id": self.region_id,
+            "description": self.description,
+            "systemic_flags": dict(self.systemic_flags),
+            "favored_items": list(self.favored_items),
+            "rewarded_items": list(self.rewarded_items),
+            "favored_traits": list(self.favored_traits),
+            "checked_traits": list(self.checked_traits),
+            "favored_skills": list(self.favored_skills),
+            "checked_skills": list(self.checked_skills),
+            "stamina_drain": self.stamina_drain,
+        }
+
+
+REGIONAL_ATMOSPHERES: Dict[str, RegionalAtmosphere] = {
+    "blizzard": RegionalAtmosphere(
+        id="blizzard",
+        name="Blizzard",
+        region_id="reach",
+        description="Severe frost and biting winds howl across the crags.",
+        systemic_flags={
+            "weather": "blizzard",
+            "atmosphere_blizzard": True,
+            "frost_severe": True,
+        },
+        favored_items=("climbing_rope",),
+        rewarded_items=("climbing_rope",),
+        favored_traits=("nimble",),
+        checked_traits=("nimble",),
+        favored_skills=(),
+        checked_skills=(),
+        stamina_drain=1,
+    ),
+    "heatwave": RegionalAtmosphere(
+        id="heatwave",
+        name="Heatwave",
+        region_id="scorchwaste",
+        description="Searing heat ripples across red sand and bakes the earth.",
+        systemic_flags={
+            "weather": "heatwave",
+            "atmosphere_heatwave": True,
+            "heat_searing": True,
+        },
+        favored_items=("water_skin", "waterskin"),
+        rewarded_items=("water_skin", "waterskin"),
+        favored_traits=("heat_tolerant",),
+        checked_traits=("heat_tolerant",),
+        favored_skills=(),
+        checked_skills=(),
+        stamina_drain=1,
+    ),
+    "bioluminescence": RegionalAtmosphere(
+        id="bioluminescence",
+        name="Bioluminescence",
+        region_id="sunken_hollows",
+        description="Radiant algae casts cold blue light across the dark cavern.",
+        systemic_flags={
+            "weather": "bioluminescence",
+            "atmosphere_bioluminescence": True,
+            "glowing_runes_revealed": True,
+        },
+        favored_items=(),
+        rewarded_items=(),
+        favored_traits=("water_breather", "night_eyed"),
+        checked_traits=("water_breather", "night_eyed"),
+        favored_skills=(),
+        checked_skills=(),
+        stamina_drain=0,
+    ),
+    "miasma": RegionalAtmosphere(
+        id="miasma",
+        name="Miasma",
+        region_id="lowlands",
+        description="Thick sewer vapor hangs in damp air and chokes the throat.",
+        systemic_flags={
+            "weather": "miasma",
+            "atmosphere_miasma": True,
+            "vapor_thick": True,
+        },
+        favored_items=("mask", "cloth_mask", "filter_mask", "plague_mask"),
+        rewarded_items=(),
+        favored_traits=("iron_gutted",),
+        checked_traits=("iron_gutted",),
+        favored_skills=(),
+        checked_skills=(),
+        stamina_drain=1,
+    ),
+    "curfew": RegionalAtmosphere(
+        id="curfew",
+        name="Curfew",
+        region_id="high_court",
+        description="Armed sentries patrol the dark streets with torches and iron spears.",
+        systemic_flags={
+            "weather": "curfew",
+            "atmosphere_curfew": True,
+            "martial_watch_active": True,
+        },
+        favored_items=("watch_crest", "court_pass"),
+        rewarded_items=("watch_crest",),
+        favored_traits=("shadow_cloaked", "stealthy"),
+        checked_traits=(),
+        favored_skills=("stealth",),
+        checked_skills=("stealth",),
+        stamina_drain=0,
+    ),
+}
+
+REGION_TO_ATMOSPHERE: Dict[str, str] = {
+    # Reach
+    "reach": "blizzard",
+    "province_reach": "blizzard",
+    "the_reach": "blizzard",
+    # Scorchwaste
+    "scorchwaste": "heatwave",
+    "province_scorchwaste": "heatwave",
+    "scorchwaste_local": "heatwave",
+    "the_scorchwaste": "heatwave",
+    # Hollows
+    "hollows": "bioluminescence",
+    "sunken_hollows": "bioluminescence",
+    "province_sunken_hollows": "bioluminescence",
+    "sunken_hollows_local": "bioluminescence",
+    "the_sunken_hollows": "bioluminescence",
+    "the_hollows": "bioluminescence",
+    # Lowlands
+    "lowlands": "miasma",
+    "province_lowlands": "miasma",
+    "the_lowlands": "miasma",
+    # High Court
+    "high_court": "curfew",
+    "province_high_court": "curfew",
+    "high_court_local": "curfew",
+    "court": "curfew",
+    "the_high_court": "curfew",
+}
+
+
+def get_regional_atmosphere(region_id: str, world_flags: Dict[str, Any]) -> Optional[RegionalAtmosphere]:
+    """Retrieve active regional atmosphere for a region, taking world flags into account."""
+    clean_reg = region_id.lower().strip()
+
+    atmo_id = REGION_TO_ATMOSPHERE.get(clean_reg)
+    if not atmo_id and clean_reg in REGIONAL_ATMOSPHERES:
+        atmo_id = clean_reg
+
+    if not atmo_id:
+        override = (
+            world_flags.get(f"{clean_reg}_atmosphere")
+            or world_flags.get(f"{clean_reg}_weather")
+            or world_flags.get("regional_atmosphere")
+            or world_flags.get("active_atmosphere")
+            or world_flags.get("atmosphere")
+            or world_flags.get("weather")
+        )
+        if isinstance(override, str):
+            clean_override = override.lower().strip()
+            atmo_id = REGION_TO_ATMOSPHERE.get(clean_override, clean_override)
+
+    if not atmo_id or atmo_id not in REGIONAL_ATMOSPHERES:
+        return None
+
+    atmo = REGIONAL_ATMOSPHERES[atmo_id]
+
+    # Check suppression or deactivation flags
+    if (
+        world_flags.get(f"{atmo_id}_cleared") is True
+        or world_flags.get(f"{atmo_id}_suppressed") is True
+        or world_flags.get(f"hazard_{atmo_id}_cleared") is True
+        or world_flags.get(f"{atmo_id}_active") is False
+        or world_flags.get(f"atmosphere_{atmo_id}_active") is False
+        or world_flags.get(f"{clean_reg}_weather_active") is False
+    ):
+        return None
+
+    return atmo
+
+
+def list_regional_atmospheres() -> List[RegionalAtmosphere]:
+    """Return all registered regional atmospheres sorted deterministically."""
+    return [REGIONAL_ATMOSPHERES[k] for k in sorted(REGIONAL_ATMOSPHERES.keys())]
+

@@ -4,9 +4,14 @@ Supports unbounded action possibility spaces (2 to 200+ actions).
 Choices = Base Actions ∪ Inventory Affordances ∪ Trait Exploits ∪ Environmental Systemics.
 """
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Set
 from adventure_forge.core.character import CharacterSheet
 from adventure_forge.core.conditions import evaluate_condition
+from adventure_forge.core.hazards import (
+    get_regional_atmosphere,
+    REGIONAL_ATMOSPHERES,
+    REGION_TO_ATMOSPHERE,
+)
 
 
 @dataclass(frozen=True)
@@ -61,7 +66,8 @@ def synthesize_affordances(
     base_actions: List[Action],
     scene_entities: List[Dict[str, Any]],
     character: CharacterSheet,
-    world_flags: Dict[str, Any]
+    world_flags: Dict[str, Any],
+    region_id: Optional[str] = None,
 ) -> List[Action]:
     """Synthesize all available actions for a scene according to the affordance equation.
     
@@ -378,5 +384,429 @@ def synthesize_affordances(
                         risk="low"
                     ))
                     seen_ids.add(bottle_act_id)
+
+    # 3. Regional Weather & Environmental Atmosphere System
+    active_atmo_ids: Set[str] = set()
+
+    # Determine region from argument or world flags
+    effective_region = (
+        region_id
+        or world_flags.get("current_region")
+        or world_flags.get("region_id")
+        or world_flags.get("region")
+    )
+    if effective_region:
+        reg_atmo = get_regional_atmosphere(str(effective_region), world_flags)
+        if reg_atmo:
+            active_atmo_ids.add(reg_atmo.id)
+
+    # Check direct world flag atmospheric indicators
+    for atmo_key in ("regional_atmosphere", "active_atmosphere", "atmosphere", "weather"):
+        val = world_flags.get(atmo_key)
+        if isinstance(val, str):
+            clean_val = val.lower().strip()
+            mapped = REGION_TO_ATMOSPHERE.get(clean_val, clean_val)
+            if mapped in REGIONAL_ATMOSPHERES:
+                if not (
+                    world_flags.get(f"{mapped}_cleared") is True
+                    or world_flags.get(f"{mapped}_suppressed") is True
+                    or world_flags.get(f"hazard_{mapped}_cleared") is True
+                    or world_flags.get(f"{mapped}_active") is False
+                ):
+                    active_atmo_ids.add(mapped)
+
+    # Check entities for atmosphere tags or attributes
+    for entity in scene_entities:
+        e_tags = entity.get("tags", [])
+        for tag in e_tags:
+            clean_tag = str(tag).lower().strip()
+            for prefix in ("atmosphere_", "weather_", "hazard_"):
+                if clean_tag.startswith(prefix):
+                    clean_tag = clean_tag[len(prefix):]
+            mapped = REGION_TO_ATMOSPHERE.get(clean_tag, clean_tag)
+            if mapped in REGIONAL_ATMOSPHERES:
+                if not (
+                    world_flags.get(f"{mapped}_cleared") is True
+                    or world_flags.get(f"{mapped}_suppressed") is True
+                    or world_flags.get(f"hazard_{mapped}_cleared") is True
+                    or world_flags.get(f"{mapped}_active") is False
+                ):
+                    active_atmo_ids.add(mapped)
+        ent_atmo = entity.get("atmosphere")
+        if isinstance(ent_atmo, str):
+            clean_ent_atmo = ent_atmo.lower().strip()
+            mapped = REGION_TO_ATMOSPHERE.get(clean_ent_atmo, clean_ent_atmo)
+            if mapped in REGIONAL_ATMOSPHERES:
+                if not (
+                    world_flags.get(f"{mapped}_cleared") is True
+                    or world_flags.get(f"{mapped}_suppressed") is True
+                    or world_flags.get(f"hazard_{mapped}_cleared") is True
+                    or world_flags.get(f"{mapped}_active") is False
+                ):
+                    active_atmo_ids.add(mapped)
+
+    # Synthesize systemic mitigation and exploitation actions for active atmospheres
+    for atmo_id in sorted(active_atmo_ids):
+        if atmo_id == "blizzard":
+            # Mitigation: Seek Shelter (rewards climbing_rope)
+            act_id = "seek_shelter"
+            if act_id not in seen_ids:
+                has_rope = character.has_item("climbing_rope")
+                if has_rope:
+                    shelter_act = Action(
+                        id=act_id,
+                        label="Seek Shelter",
+                        category="item_affordance",
+                        effects=[
+                            {"set_flag": {"flag": "blizzard_sheltered", "value": True}},
+                            {"log_event": "You used your climbing rope to anchor safe shelter from the blizzard."},
+                        ],
+                        result_text="You secure your climbing rope to the rock face and duck into a sheltered crevice.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    shelter_act = Action(
+                        id=act_id,
+                        label="Seek Shelter",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "blizzard_sheltered", "value": True}},
+                            {"log_event": "You found rough shelter from the biting blizzard."},
+                        ],
+                        result_text="You scramble into a shallow hollow in the stone and wait out the wind.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if shelter_act.is_legal(character, world_flags):
+                    legal_actions.append(shelter_act)
+                    seen_ids.add(act_id)
+
+            # Exploitation / Endurance: Brace Wind (checks nimble or stamina)
+            act_id = "brace_wind"
+            if act_id not in seen_ids:
+                has_nimble = character.has_trait("nimble") or character.get_attribute("agility") >= 12
+                if has_nimble:
+                    brace_act = Action(
+                        id=act_id,
+                        label="Brace Wind",
+                        category="trait_exploit",
+                        effects=[
+                            {"set_flag": {"flag": "blizzard_braced", "value": True}},
+                            {"log_event": "You braced nimbly against the freezing gale."},
+                        ],
+                        result_text="You lean into the gale and maintain your footing with agile balance.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    brace_act = Action(
+                        id=act_id,
+                        label="Brace Wind",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "blizzard_braced", "value": True}},
+                            {"log_event": "You braced your footing against the harsh blizzard."},
+                        ],
+                        result_text="You plant your boots firmly against the freezing wind and push forward.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if brace_act.is_legal(character, world_flags):
+                    legal_actions.append(brace_act)
+                    seen_ids.add(act_id)
+
+        elif atmo_id == "heatwave":
+            # Mitigation: Drink Water (rewards water_skin)
+            act_id = "drink_water"
+            if act_id not in seen_ids:
+                has_water = (
+                    character.has_item("water_skin")
+                    or character.has_item("waterskin")
+                    or character.has_item("canteen")
+                )
+                if has_water:
+                    drink_act = Action(
+                        id=act_id,
+                        label="Drink Water",
+                        category="item_affordance",
+                        effects=[
+                            {"set_flag": {"flag": "heatwave_mitigated", "value": True}},
+                            {"modify_stamina": 1},
+                            {"log_event": "You drank cool water and overcame the searing heat."},
+                        ],
+                        result_text="Cool water from your skin revives your dry mouth and restores your strength.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    drink_act = Action(
+                        id=act_id,
+                        label="Drink Water",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "heatwave_mitigated", "value": True}},
+                            {"log_event": "You endured the searing heatwave without clean water."},
+                        ],
+                        result_text="You scrape sparse moisture from canteen dregs to wet your parched throat.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if drink_act.is_legal(character, world_flags):
+                    legal_actions.append(drink_act)
+                    seen_ids.add(act_id)
+
+            # Exploitation: Rest Shade (checks heat_tolerant trait)
+            act_id = "rest_shade"
+            if act_id not in seen_ids:
+                has_heat = (
+                    character.has_trait("heat_tolerant")
+                    or character.has_trait("desert_born")
+                    or character.get_attribute("endurance") >= 12
+                )
+                if has_heat:
+                    shade_act = Action(
+                        id=act_id,
+                        label="Rest Shade",
+                        category="trait_exploit",
+                        effects=[
+                            {"set_flag": {"flag": "heatwave_rested", "value": True}},
+                            {"log_event": "Your heat tolerance let you rest easy in the shade."},
+                        ],
+                        result_text="Used to the heat, you rest in the rock shade and save your strength.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    shade_act = Action(
+                        id=act_id,
+                        label="Rest Shade",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "heatwave_rested", "value": True}},
+                            {"log_event": "You rested in the sparse shade against the heat."},
+                        ],
+                        result_text="You crouch under a dry ledge, but the sweltering heat still drains you.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if shade_act.is_legal(character, world_flags):
+                    legal_actions.append(shade_act)
+                    seen_ids.add(act_id)
+
+        elif atmo_id == "bioluminescence":
+            # Mitigation / Inspection: Inspect Glow
+            act_id = "inspect_glow"
+            if act_id not in seen_ids:
+                inspect_act = Action(
+                    id=act_id,
+                    label="Inspect Glow",
+                    category="systemic",
+                    effects=[
+                        {"set_flag": {"flag": "bioluminescence_inspected", "value": True}},
+                        {"log_event": "You inspected the glowing cave moss."},
+                    ],
+                    result_text="Soft green light from radiant moss illuminates the wet cavern walls.",
+                    risk="low",
+                    stamina_cost=0,
+                )
+                if inspect_act.is_legal(character, world_flags):
+                    legal_actions.append(inspect_act)
+                    seen_ids.add(act_id)
+
+            # Exploitation: Decipher Runes (reveals glowing runes for water_breather or night_eyed)
+            act_id = "decipher_runes"
+            if act_id not in seen_ids:
+                has_rune_trait = (
+                    character.has_trait("water_breather")
+                    or character.has_trait("night_eyed")
+                    or character.get_skill("cunning") >= 3
+                )
+                if has_rune_trait:
+                    runes_act = Action(
+                        id=act_id,
+                        label="Decipher Runes",
+                        category="trait_exploit",
+                        effects=[
+                            {"set_flag": {"flag": "glowing_runes_deciphered", "value": True}},
+                            {"set_flag": {"flag": "abyssal_lore_known", "value": True}},
+                            {"log_event": "Your keen sight deciphered the glowing runes."},
+                        ],
+                        result_text="Your keen sight spots the glowing runes under the cold water.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    runes_act = Action(
+                        id=act_id,
+                        label="Decipher Runes",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "glowing_runes_deciphered", "value": False}},
+                            {"log_event": "You tried to read the faint runes in the glow."},
+                        ],
+                        result_text="You squint at faint symbols underwater but struggle to read them clearly.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if runes_act.is_legal(character, world_flags):
+                    legal_actions.append(runes_act)
+                    seen_ids.add(act_id)
+
+        elif atmo_id == "miasma":
+            # Mitigation: Filter Air (checked by masks)
+            act_id = "filter_air"
+            if act_id not in seen_ids:
+                has_mask = (
+                    character.has_item("mask")
+                    or character.has_item("cloth_mask")
+                    or character.has_item("filter_mask")
+                    or character.has_item("plague_mask")
+                )
+                if has_mask:
+                    filter_act = Action(
+                        id=act_id,
+                        label="Filter Air",
+                        category="item_affordance",
+                        effects=[
+                            {"set_flag": {"flag": "miasma_filtered", "value": True}},
+                            {"log_event": "You filtered the bad sewer air with your mask."},
+                        ],
+                        result_text="You pull your protective mask tight and breathe clean filtered air.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    filter_act = Action(
+                        id=act_id,
+                        label="Filter Air",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "miasma_filtered", "value": True}},
+                            {"log_event": "You covered your face to filter the bad air."},
+                        ],
+                        result_text="You press a damp sleeve over your mouth to block the stench.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if filter_act.is_legal(character, world_flags):
+                    legal_actions.append(filter_act)
+                    seen_ids.add(act_id)
+
+            # Exploitation / Resistance: Endure Fumes (checked by iron_gutted trait)
+            act_id = "endure_fumes"
+            if act_id not in seen_ids:
+                has_iron = (
+                    character.has_trait("iron_gutted")
+                    or character.get_attribute("endurance") >= 14
+                )
+                if has_iron:
+                    endure_act = Action(
+                        id=act_id,
+                        label="Endure Fumes",
+                        category="trait_exploit",
+                        effects=[
+                            {"set_flag": {"flag": "miasma_endured", "value": True}},
+                            {"log_event": "Your iron gut shrugged off the bad fumes."},
+                        ],
+                        result_text="Your iron gut fights off the bad sewer air without sickness.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    endure_act = Action(
+                        id=act_id,
+                        label="Endure Fumes",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "miasma_endured", "value": True}},
+                            {"log_event": "You coughed while enduring the thick fumes."},
+                        ],
+                        result_text="You cough violently as the acrid sewer vapor burns your throat.",
+                        risk="high",
+                        stamina_cost=2,
+                    )
+                if endure_act.is_legal(character, world_flags):
+                    legal_actions.append(endure_act)
+                    seen_ids.add(act_id)
+
+        elif atmo_id == "curfew":
+            # Mitigation: Show Pass (checked by watch_crest)
+            act_id = "show_pass"
+            if act_id not in seen_ids:
+                has_crest = (
+                    character.has_item("watch_crest")
+                    or character.has_marker("watch_crest")
+                    or character.has_item("court_pass")
+                    or character.has_item("legal_dossier")
+                )
+                if has_crest:
+                    pass_act = Action(
+                        id=act_id,
+                        label="Show Pass",
+                        category="item_affordance",
+                        effects=[
+                            {"set_flag": {"flag": "curfew_cleared", "value": True}},
+                            {"log_event": "You flashed the watch crest to pass the curfew."},
+                        ],
+                        result_text="You display the watch crest. The sentries nod and let you pass.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    pass_act = Action(
+                        id=act_id,
+                        label="Show Pass",
+                        category="social",
+                        effects=[
+                            {"set_flag": {"flag": "curfew_confronted", "value": True}},
+                            {"log_event": "You talked your way past the watch patrol."},
+                        ],
+                        result_text="You give a quick excuse. The watchmen eye you but let you through.",
+                        risk="high",
+                        stamina_cost=1,
+                    )
+                if pass_act.is_legal(character, world_flags):
+                    legal_actions.append(pass_act)
+                    seen_ids.add(act_id)
+
+            # Exploitation: Slip Shadows (checked by stealth)
+            act_id = "slip_shadows"
+            if act_id not in seen_ids:
+                has_stealth = (
+                    character.get_skill("stealth") >= 2
+                    or character.has_trait("shadow_cloaked")
+                    or character.has_trait("streetwise")
+                    or character.get_attribute("agility") >= 12
+                )
+                if has_stealth:
+                    slip_act = Action(
+                        id=act_id,
+                        label="Slip Shadows",
+                        category="trait_exploit",
+                        effects=[
+                            {"set_flag": {"flag": "curfew_bypassed", "value": True}},
+                            {"log_event": "You slipped through shadows past the watch patrol."},
+                        ],
+                        result_text="You glide between street shadows and bypass the watch patrol undetected.",
+                        risk="low",
+                        stamina_cost=0,
+                    )
+                else:
+                    slip_act = Action(
+                        id=act_id,
+                        label="Slip Shadows",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": "curfew_bypassed", "value": True}},
+                            {"log_event": "You ducked into shadows to avoid the sentries."},
+                        ],
+                        result_text="You dart behind stone pillars, narrowly evading the sweep of sentry torches.",
+                        risk="medium",
+                        stamina_cost=1,
+                    )
+                if slip_act.is_legal(character, world_flags):
+                    legal_actions.append(slip_act)
+                    seen_ids.add(act_id)
 
     return legal_actions

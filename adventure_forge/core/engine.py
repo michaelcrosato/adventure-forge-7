@@ -77,7 +77,8 @@ class AdventureEngine:
             base_actions=scene.base_actions,
             scene_entities=scene.entities,
             character=state.character,
-            world_flags=state.world_flags
+            world_flags=state.world_flags,
+            region_id=scene.region or state.current_region,
         )
 
     def get_quest_progress(self, state: GameState) -> Dict[str, Any]:
