@@ -220,4 +220,163 @@ def synthesize_affordances(
                     ))
                     seen_ids.add(act_id)
 
+        # Oily systemic affordance
+        if "oily" in e_tags and e_state != "burned":
+            words = e_name.split()
+            short_target = words[-1] if len(words) > 2 else e_name
+            has_fire = (
+                character.has_item("torch")
+                or character.has_item("flint")
+                or character.has_trait("pyromaniac")
+                or character.has_item("fire_striker")
+                or character.has_item("match")
+                or character.has_item("fire_flask")
+                or bool(world_flags.get("has_fire"))
+                or bool(world_flags.get("fire_source"))
+            )
+            if has_fire:
+                act_id = f"ignite_{e_id}"
+                if act_id not in seen_ids:
+                    legal_actions.append(Action(
+                        id=act_id,
+                        label=f"Ignite {short_target}",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": f"entity_{e_id}_state", "value": "burned"}},
+                            {"trigger_hazard": {"hazard": "oil", "catalyst": "fire"}},
+                            {"log_event": f"You ignited the {e_name}."}
+                        ],
+                        result_text="Flames roar across the oil and incinerate all barriers.",
+                        risk="high"
+                    ))
+                    seen_ids.add(act_id)
+            else:
+                act_id = f"examine_{e_id}"
+                if act_id not in seen_ids:
+                    legal_actions.append(Action(
+                        id=act_id,
+                        label=f"Examine {short_target}",
+                        category="systemic",
+                        effects=[
+                            {"log_event": f"You examined the {e_name}."}
+                        ],
+                        result_text="Thick oil coats the stone floor in dark flammable streaks.",
+                        risk="low"
+                    ))
+                    seen_ids.add(act_id)
+
+        # Conductive water systemic affordance
+        if "conductive_water" in e_tags and e_state != "electrified":
+            words = e_name.split()
+            short_target = words[-1] if len(words) > 2 else e_name
+            has_shock = (
+                character.has_item("shock_stone")
+                or character.has_item("lightning_rod")
+                or character.has_item("shock_bomb")
+                or character.has_item("shock_scroll")
+                or character.has_trait("storm_caller")
+                or character.has_trait("galvanic")
+                or character.get_skill("channeling") >= 2
+                or bool(world_flags.get("has_shock"))
+            )
+            if has_shock:
+                act_id = f"shock_{e_id}"
+                if act_id not in seen_ids:
+                    legal_actions.append(Action(
+                        id=act_id,
+                        label=f"Shock {short_target}",
+                        category="systemic",
+                        effects=[
+                            {"set_flag": {"flag": f"entity_{e_id}_state", "value": "electrified"}},
+                            {"trigger_hazard": {"hazard": "conductive_water", "catalyst": "shock"}},
+                            {"log_event": f"You discharged shock into the {e_name}."}
+                        ],
+                        result_text="Sparks leap through the water. Sentries freeze as stamina drains.",
+                        risk="high",
+                        stamina_cost=2
+                    ))
+                    seen_ids.add(act_id)
+            else:
+                act_id = f"wade_{e_id}"
+                if act_id not in seen_ids:
+                    legal_actions.append(Action(
+                        id=act_id,
+                        label=f"Wade {short_target}",
+                        category="systemic",
+                        effects=[
+                            {"log_event": f"You waded through the {e_name}."}
+                        ],
+                        result_text="Cold water swirls around your boots as you push forward.",
+                        risk="low",
+                        stamina_cost=1
+                    ))
+                    seen_ids.add(act_id)
+
+        # Sandstorm systemic affordance
+        if "sandstorm" in e_tags and e_state != "cleared":
+            words = e_name.split()
+            short_target = words[-1] if len(words) > 2 else e_name
+            act_id = f"brave_{e_id}"
+            if act_id not in seen_ids:
+                has_cloak = character.has_item("cloak") or character.has_trait("heat_tolerant")
+                legal_actions.append(Action(
+                    id=act_id,
+                    label=f"Brave {short_target}",
+                    category="systemic",
+                    effects=[
+                        {"trigger_hazard": "sandstorm"},
+                        {"log_event": f"You stepped into the {e_name}."}
+                    ],
+                    result_text="Swirling sand veils your silhouette and masks your movement.",
+                    risk="low" if has_cloak else "medium",
+                    stamina_cost=0 if has_cloak else 1
+                ))
+                seen_ids.add(act_id)
+
+        # Acid pool systemic affordance
+        if "acid_pool" in e_tags and e_state != "depleted":
+            words = e_name.split()
+            short_target = words[-1] if len(words) > 2 else e_name
+            act_id = f"corrode_{e_id}"
+            if act_id not in seen_ids:
+                legal_actions.append(Action(
+                    id=act_id,
+                    label=f"Apply {short_target}",
+                    category="systemic",
+                    effects=[
+                        {"set_flag": {"flag": f"entity_{e_id}_state", "value": "depleted"}},
+                        {"trigger_hazard": "acid"},
+                        {"log_event": f"You applied acid from the {e_name}."}
+                    ],
+                    result_text="Fuming acid dissolves iron bars and heavy metal locks.",
+                    risk="medium",
+                    stamina_cost=1
+                ))
+                seen_ids.add(act_id)
+
+            has_container = (
+                character.has_item("empty_flask")
+                or character.has_item("vial")
+                or character.has_item("flask")
+            )
+            if has_container:
+                bottle_act_id = f"bottle_{e_id}"
+                if bottle_act_id not in seen_ids:
+                    container = "vial" if character.has_item("vial") else (
+                        "empty_flask" if character.has_item("empty_flask") else "flask"
+                    )
+                    legal_actions.append(Action(
+                        id=bottle_act_id,
+                        label=f"Bottle {short_target}",
+                        category="item_affordance",
+                        effects=[
+                            {"remove_item": container},
+                            {"add_item": "acid_vial"},
+                            {"log_event": f"You bottled acid from the {e_name}."}
+                        ],
+                        result_text="Green acid fills the glass vial and seals tight.",
+                        risk="low"
+                    ))
+                    seen_ids.add(bottle_act_id)
+
     return legal_actions

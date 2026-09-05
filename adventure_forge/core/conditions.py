@@ -3,7 +3,7 @@
 Enforces deterministic condition validation over character state, world flags,
 and environment context. No free-form runtime guessing.
 """
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union, Optional
 from adventure_forge.core.character import CharacterSheet
 
 
@@ -81,6 +81,37 @@ def evaluate_condition(condition: Union[Dict[str, Any], List[Any], None], charac
                 return False
         elif op == "lacks_flag":
             if world_flags.get(str(operand)):
+                return False
+        elif op == "has_status":
+            status_target: Optional[str] = None
+            if isinstance(operand, dict):
+                status_name = str(operand.get("status", ""))
+                raw_target = operand.get("target")
+                status_target = str(raw_target) if raw_target is not None else None
+            else:
+                status_name = str(operand)
+
+            s_low = status_name.lower().strip()
+            char_has = (
+                character.has_marker(s_low)
+                or character.has_marker(f"status_{s_low}")
+                or character.has_marker(status_name)
+            )
+            world_has = (
+                bool(world_flags.get(f"status_{s_low}"))
+                or bool(world_flags.get(s_low))
+                or bool(world_flags.get(f"status_{status_name}"))
+                or bool(world_flags.get(status_name))
+                or (s_low in [str(s).lower() for s in world_flags.get("statuses", [])])
+            )
+            if status_target == "character":
+                has_it = char_has
+            elif status_target in ("world", "scene", "environment"):
+                has_it = world_has
+            else:
+                has_it = char_has or world_has
+
+            if not has_it:
                 return False
         else:
             # Unknown operator rejected

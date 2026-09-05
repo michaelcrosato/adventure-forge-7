@@ -2,8 +2,9 @@
 
 Applies deterministic state transformations to CharacterSheet and world flags.
 """
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from adventure_forge.core.character import CharacterSheet
+from adventure_forge.core.hazards import resolve_hazard_combo, get_hazard_combo, HazardCombo
 
 
 def apply_effects(
@@ -92,6 +93,84 @@ def apply_effects(
                 next_scene = str(operand)
             elif op == "log_event":
                 events.append(str(operand))
+            elif op == "apply_status":
+                if isinstance(operand, dict):
+                    status = str(operand.get("status", "")).lower().strip()
+                    target = operand.get("target")
+                else:
+                    status = str(operand).lower().strip()
+                    target = None
+
+                # Update character markers
+                if target in ("character", None):
+                    if not new_char.has_marker(status):
+                        m = list(new_char.markers) + [status]
+                        new_char = new_char.modify(markers=m)
+
+                # Update world flags
+                new_flags[f"status_{status}"] = True
+                curr_statuses = list(new_flags.get("statuses", []))
+                if status not in curr_statuses:
+                    curr_statuses.append(status)
+                    new_flags["statuses"] = curr_statuses
+
+                # Apply systemic combo effects if known
+                status_combo = get_hazard_combo(status)
+                if status_combo:
+                    for flag_key, flag_val in status_combo.systemic_flags.items():
+                        new_flags[flag_key] = flag_val
+                    if status_combo.stamina_cost > 0 and target != "world":
+                        stam = max(0, new_char.stamina - status_combo.stamina_cost)
+                        new_char = new_char.modify(stamina=stam)
+                    events.append(status_combo.description)
+                else:
+                    events.append(f"Applied status: {status}.")
+            elif op == "trigger_hazard":
+                hazard_combo: Optional[HazardCombo] = None
+                hazard_key = ""
+                if isinstance(operand, dict):
+                    if "combo" in operand:
+                        hazard_key = str(operand["combo"])
+                        hazard_combo = get_hazard_combo(hazard_key)
+                    elif "hazard" in operand:
+                        h = str(operand["hazard"])
+                        hazard_key = h
+                        c = operand.get("catalyst")
+                        if c:
+                            hazard_combo = resolve_hazard_combo(h, str(c))
+                        else:
+                            hazard_combo = resolve_hazard_combo(h)
+                else:
+                    hazard_key = str(operand)
+                    hazard_combo = resolve_hazard_combo(hazard_key) or get_hazard_combo(hazard_key)
+
+                if hazard_combo:
+                    s = hazard_combo.resulting_status
+                    if not new_char.has_marker(s):
+                        m = list(new_char.markers) + [s]
+                        new_char = new_char.modify(markers=m)
+                    new_flags[f"status_{s}"] = True
+                    curr_statuses = list(new_flags.get("statuses", []))
+                    if s not in curr_statuses:
+                        curr_statuses.append(s)
+                        new_flags["statuses"] = curr_statuses
+
+                    for flag_key, flag_val in hazard_combo.systemic_flags.items():
+                        new_flags[flag_key] = flag_val
+
+                    if hazard_combo.stamina_cost > 0:
+                        stam = max(0, new_char.stamina - hazard_combo.stamina_cost)
+                        new_char = new_char.modify(stamina=stam)
+
+                    for clr in hazard_combo.cleared_hazards:
+                        new_flags[f"hazard_{clr}_cleared"] = True
+                        if f"hazard_{clr}" in new_flags:
+                            new_flags[f"hazard_{clr}"] = False
+
+                    events.append(hazard_combo.description)
+                else:
+                    new_flags[f"hazard_{hazard_key}"] = True
+                    events.append(f"Hazard triggered: {hazard_key}.")
             else:
                 raise ValueError(f"Unknown effect operator: {op}")
 
