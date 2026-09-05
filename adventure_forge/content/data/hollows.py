@@ -38,11 +38,31 @@ def build_sunken_hollows_region() -> RegionManifest:
                 id="dive_into_pool",
                 label="Dive underwater",
                 category="movement",
-                condition={"min_attribute": {"attribute": "endurance", "value": 12}},
+                condition={
+                    "any_of": [
+                        {"min_attribute": {"attribute": "endurance", "value": 12}},
+                        {"min_attribute": {"attribute": "agility", "value": 12}},
+                        {"has_trait": "water_breather"},
+                        {"has_trait": "nimble"}
+                    ]
+                },
                 target_scene="hollows_temple",
                 stamina_cost=2,
                 result_text="You hold your breath and plunge into the freezing subterranean river.",
                 risk="high"
+            ),
+            Action(
+                id="salvage_diving_gear",
+                label="Search grotto shore",
+                category="interaction",
+                condition={"lacks_flag": "salvaged_grotto_seal"},
+                effects=[
+                    {"add_item": "waterproof_seal"},
+                    {"set_flag": {"flag": "salvaged_grotto_seal", "value": True}},
+                    {"log_event": "You found a tin of waterproof pitch along the shore."}
+                ],
+                result_text="Your fingers pry a sealed tin of wax pitch from wet gravel.",
+                risk="low"
             ),
             Action(
                 id="board_diving_bell",

@@ -80,6 +80,12 @@ class AdventureEngine:
             world_flags=state.world_flags
         )
 
+    def get_quest_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current continental main quest progress for active state."""
+        from adventure_forge.content.quests import get_continental_main_quest
+        quest = get_continental_main_quest()
+        return quest.evaluate_progress(state.character, state.world_flags)
+
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""
         scene = self.get_scene(state.current_scene)

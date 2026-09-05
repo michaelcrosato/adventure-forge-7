@@ -59,6 +59,30 @@ def build_scorchwaste_region() -> RegionManifest:
                 risk="low"
             ),
             Action(
+                id="salvage_solar_compass",
+                label="Salvage compass",
+                category="systemic",
+                condition={
+                    "all_of": [
+                        {"lacks_flag": "scorch_compass_secured"},
+                        {
+                            "any_of": [
+                                {"has_trait": "keen_eyed"},
+                                {"min_skill": {"skill": "survival", "value": 3}},
+                                {"background_is": "dune_strider"}
+                            ]
+                        }
+                    ]
+                },
+                effects=[
+                    {"add_item": "desert_compass"},
+                    {"set_flag": {"flag": "scorch_compass_secured", "value": True}},
+                    {"log_event": "You discovered an intact solar compass in the sand."}
+                ],
+                result_text="Your keen eye spots brass gleaming beneath red dust.",
+                risk="low"
+            ),
+            Action(
                 id="march_to_oasis",
                 label="Trek to Oasis",
                 category="movement",
@@ -112,10 +136,35 @@ def build_scorchwaste_region() -> RegionManifest:
                 effects=[
                     {"remove_item": "silver_coin"},
                     {"add_item": "desert_compass"},
+                    {"set_flag": {"flag": "scorch_compass_secured", "value": True}},
                     {"log_event": "Nomads traded a brass desert compass for silver."}
                 ],
                 result_text="The elder offers a reliable sun compass.",
                 risk="low"
+            ),
+            Action(
+                id="pickpocket_nomad_compass",
+                label="Steal sun compass",
+                category="trait_exploit",
+                condition={
+                    "all_of": [
+                        {"lacks_flag": "scorch_compass_secured"},
+                        {
+                            "any_of": [
+                                {"min_skill": {"skill": "stealth", "value": 3}},
+                                {"min_skill": {"skill": "cunning", "value": 3}},
+                                {"has_trait": "streetwise"}
+                            ]
+                        }
+                    ]
+                },
+                effects=[
+                    {"add_item": "desert_compass"},
+                    {"set_flag": {"flag": "scorch_compass_secured", "value": True}},
+                    {"log_event": "You stole the sun compass from the caravan pack."}
+                ],
+                result_text="You lift the brass compass while the trader looks away.",
+                risk="medium"
             ),
             Action(
                 id="travel_to_dunes",

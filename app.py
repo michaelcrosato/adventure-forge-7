@@ -414,6 +414,14 @@ footer {
 
     <div style="margin-bottom: 1rem;" id="inventory-container" class="tag-row"></div>
 
+    <div id="quest-banner" style="background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <span style="color: #f59e0b; font-weight: 600;">👑 Grand Campaign:</span>
+        <span id="quest-stage-text" style="color: #f3f4f6; margin-left: 0.3rem;">Loading quest...</span>
+      </div>
+      <div id="quest-seals-count" style="font-size: 0.8rem; color: #fbbf24; font-weight: 600;">0/5 Seals</div>
+    </div>
+
     <div id="terminal-pane" class="terminal-banner" style="display: none;">
       <h2 id="terminal-title">Adventure Concluded</h2>
       <p id="terminal-desc" style="color: var(--text);"></p>
@@ -461,6 +469,27 @@ const PRESETS = {
     "desc": "Brute-force veteran warrior equipped with iron crowbar and water skin. Conquers sheer mountain cliff faces and martial duels.",
     "skills": ["athletics: 4", "brawling: 4"],
     "traits": ["iron_gutted"]
+  },
+  "nomad": {
+    "title": "Kael the Dune-Strider",
+    "meta": "Nomad &bull; Scorch Oasis",
+    "desc": "Hardy desert survivalist equipped with sun veil and flint. Endures blistering heat and navigates shifting dunes.",
+    "skills": ["survival: 4", "athletics: 3"],
+    "traits": ["heat_tolerant", "iron_gutted", "keen_eyed"]
+  },
+  "diver": {
+    "title": "Mara the Abyssal Diver",
+    "meta": "Deep-Dweller &bull; Sunken Grotto",
+    "desc": "Agile cavern diver equipped with waterproof sealant and crowbar. Explores submerged grottos and underwater vaults.",
+    "skills": ["athletics: 4", "cunning: 3"],
+    "traits": ["water_breather", "night_eyed", "nimble"]
+  },
+  "scout": {
+    "title": "Torin the Highland Scout",
+    "meta": "High-Kin &bull; Reach Central Hub",
+    "desc": "Vigilant mountain ranger equipped with climbing rope and torch. Scales vertical cliffs and tracks hidden highland trails.",
+    "skills": ["athletics: 4", "stealth: 3"],
+    "traits": ["nimble", "keen_eyed", "marked_outlaw"]
   }
 };
 
@@ -506,7 +535,7 @@ async function startAdventure() {
     if (!res.ok) throw new Error("Failed to start adventure: " + res.statusText);
     const data = await res.json();
     gameState = data.state;
-    renderGame(data.observation, data.character);
+    renderGame(data.observation, data.character, data.quest);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -531,14 +560,14 @@ async function stepAction(actionId) {
     if (!res.ok) throw new Error("Step failed: " + res.statusText);
     const data = await res.json();
     gameState = data.state;
-    renderGame(data.observation, data.character);
+    renderGame(data.observation, data.character, data.quest);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
   }
 }
 
-function renderGame(obs, char) {
+function renderGame(obs, char, quest) {
   // HUD
   document.getElementById("char-name").textContent = char.name;
   document.getElementById("char-origin").textContent = `${char.ancestry} &bull; ${char.background}`;
@@ -553,6 +582,23 @@ function renderGame(obs, char) {
 
   document.getElementById("turn-display").textContent = obs.turn_count;
   document.getElementById("fingerprint-display").textContent = obs.fingerprint ? obs.fingerprint.substring(0, 16) + "..." : "n/a";
+
+  // Quest Tracker
+  if (quest) {
+    const stageNames = {
+      "stage_crags_beacon": "Ignite Highland Beacon (The Reach)",
+      "stage_warrens_ledger": "Recover Shadow Ledger (The Lowlands)",
+      "stage_scorch_compass": "Acquire Solar Compass (The Scorchwaste)",
+      "stage_court_verdict": "Win Tribunal Verdict (The High Court)",
+      "stage_abyssal_pearl": "Retrieve Sunken Pearl (The Sunken Hollows)"
+    };
+    const activeText = quest.is_finished
+      ? "All 5 Sovereignty Seals Claimed! The Unbounded Throne awaits."
+      : (stageNames[quest.active_stage] || quest.active_stage || "Exploring Continent");
+    document.getElementById("quest-stage-text").textContent = activeText;
+    const completedCount = (quest.completed_stages || []).length;
+    document.getElementById("quest-seals-count").textContent = `${completedCount}/5 Seals`;
+  }
 
   // Inventory & Badges
   const invContainer = document.getElementById("inventory-container");
@@ -764,6 +810,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "observation": sanitize_observation(obs),
             "character": state.character.to_dict(),
             "state": state.to_dict(),
+            "quest": _ENGINE.get_quest_progress(state),
         }
         await _send_response(
             send,
@@ -824,6 +871,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "observation": sanitize_observation(obs),
             "character": new_state.character.to_dict(),
             "state": new_state.to_dict(),
+            "quest": _ENGINE.get_quest_progress(new_state),
         }
         await _send_response(
             send,

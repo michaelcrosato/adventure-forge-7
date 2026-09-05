@@ -54,6 +54,21 @@ def build_high_court_region() -> RegionManifest:
                 risk="medium"
             ),
             Action(
+                id="slip_into_tribunal",
+                label="Sneak past bailiff",
+                category="movement",
+                condition={
+                    "any_of": [
+                        {"min_skill": {"skill": "stealth", "value": 3}},
+                        {"min_skill": {"skill": "cunning", "value": 3}},
+                        {"has_trait": "streetwise"}
+                    ]
+                },
+                target_scene="court_tribunal",
+                result_text="You slip past the bailiff behind the tall velvet curtains.",
+                risk="medium"
+            ),
+            Action(
                 id="exit_to_bazaar",
                 label="Return to Bazaar",
                 category="movement",

@@ -203,3 +203,58 @@ def test_reputation_negative_and_zero_boundaries():
     assert evaluate_condition({"min_reputation": {"faction": "iron_guard", "value": 15}}, char_admired, {}) is True
     assert evaluate_condition({"max_reputation": {"faction": "iron_guard", "value": -10}}, char_hated, {}) is True
     assert evaluate_condition({"max_reputation": {"faction": "iron_guard", "value": -10}}, char_neutral, {}) is False
+
+
+def test_new_character_presets_integrity():
+    """All 6 character presets (including nomad, diver, scout) load with valid orthogonal axes."""
+    from adventure_forge.core.character import get_preset, list_presets
+    from adventure_forge.content.loader import build_world_registry
+    from adventure_forge.core.engine import AdventureEngine
+
+    presets = list_presets()
+    for expected in ["cutpurse", "noble", "warrior", "nomad", "diver", "scout"]:
+        assert expected in presets
+
+    engine = AdventureEngine(build_world_registry())
+
+    for pid in ["nomad", "diver", "scout"]:
+        preset = get_preset(pid)
+        assert preset.character.name
+        assert preset.character.ancestry
+        assert preset.character.background
+        assert len(preset.character.traits) >= 2
+        assert preset.character.health == 20
+        assert preset.character.stamina == 10
+
+        # Verify starting scene exists in engine and can be observed
+        scene = engine.get_scene(preset.start_scene)
+        assert scene is not None, f"Start scene {preset.start_scene} for {pid} not found"
+
+
+def test_scavenge_and_submersible_affordance_synthesis():
+    """Entities with scavengeable and submersible tags generate dynamic affordances."""
+    from adventure_forge.core.actions import synthesize_affordances
+    from adventure_forge.core.character import get_preset
+
+    char_diver = get_preset("diver").character
+    char_nomad = get_preset("nomad").character
+
+    entities = [
+        {"id": "salvage_box", "name": "Supply Crate", "tags": ["scavengeable"]},
+        {"id": "mini_sub", "name": "Deep Sub", "tags": ["submersible"]}
+    ]
+
+    # Nomad should see scavenge affordance
+    nomad_actions = synthesize_affordances([], entities, char_nomad, {})
+    scavenge_acts = [a for a in nomad_actions if a.id == "scavenge_salvage_box"]
+    assert len(scavenge_acts) == 1
+    assert scavenge_acts[0].label == "Scavenge Supply Crate"
+    assert len(scavenge_acts[0].label.split()) <= 3
+
+    # Diver has water_breather so should see submersible affordance
+    diver_actions = synthesize_affordances([], entities, char_diver, {})
+    dive_acts = [a for a in diver_actions if a.id == "dive_mini_sub"]
+    assert len(dive_acts) == 1
+    assert dive_acts[0].label == "Board Deep Sub"
+    assert len(dive_acts[0].label.split()) <= 3
+

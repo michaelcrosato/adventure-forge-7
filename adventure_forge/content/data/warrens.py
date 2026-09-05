@@ -190,6 +190,19 @@ def build_lower_warrens_region() -> RegionManifest:
                 risk="low"
             ),
             Action(
+                id="forge_watch_permit",
+                label="Buy forged pass",
+                category="interaction",
+                condition={"has_item": "silver_coin", "lacks_flag": "has_watch_badge"},
+                effects=[
+                    {"remove_item": "silver_coin"},
+                    {"set_flag": {"flag": "has_watch_badge", "value": True}},
+                    {"log_event": "You bought a forged watch badge and contraband ledger."}
+                ],
+                result_text="The fence slides a forged bronze crest across the table.",
+                risk="low"
+            ),
+            Action(
                 id="leave_market",
                 label="Leave cellar",
                 category="movement",
@@ -220,6 +233,7 @@ def build_lower_warrens_region() -> RegionManifest:
                 category="interaction",
                 effects=[
                     {"add_marker": "watch_crest"},
+                    {"set_flag": {"flag": "has_watch_badge", "value": True}},
                     {"log_event": "You pinned the bronze watch crest to your lapel."}
                 ],
                 condition={"lacks_flag": "has_watch_badge"},

@@ -179,4 +179,45 @@ def synthesize_affordances(
                     ))
                     seen_ids.add(act_id)
 
+        # Scavengeable systemic affordance
+        if "scavengeable" in e_tags and e_state != "scavenged":
+            act_id = f"scavenge_{e_id}"
+            if act_id not in seen_ids:
+                words = e_name.split()
+                short_target = words[0] if len(words) > 2 else e_name
+                legal_actions.append(Action(
+                    id=act_id,
+                    label=f"Scavenge {short_target}",
+                    category="systemic",
+                    effects=[
+                        {"set_flag": {"flag": f"entity_{e_id}_state", "value": "scavenged"}},
+                        {"log_event": f"You searched the {e_name}."}
+                    ],
+                    result_text="You search through the debris and find useful salvage.",
+                    risk="low"
+                ))
+                seen_ids.add(act_id)
+
+        # Submersible systemic affordance
+        if "submersible" in e_tags:
+            if character.has_item("waterproof_seal") or character.has_trait("water_breather") or character.get_attribute("endurance") >= 12:
+                act_id = f"dive_{e_id}"
+                target_dest = entity.get("submerge_destination")
+                if act_id not in seen_ids:
+                    words = e_name.split()
+                    short_target = words[0] if len(words) > 2 else e_name
+                    legal_actions.append(Action(
+                        id=act_id,
+                        label=f"Board {short_target}",
+                        category="systemic",
+                        target_scene=target_dest,
+                        effects=[
+                            {"log_event": f"You boarded the {e_name}."}
+                        ],
+                        result_text="The craft seals tight as you plunge into water.",
+                        risk="medium",
+                        stamina_cost=1
+                    ))
+                    seen_ids.add(act_id)
+
     return legal_actions
