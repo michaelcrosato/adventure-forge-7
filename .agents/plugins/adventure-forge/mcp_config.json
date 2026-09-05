@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "adventure-forge": {
+      "command": "python3",
+      "args": ["-m", "adventure_forge.player.mcp_server"]
+    }
+  }
+}

@@ -29,10 +29,16 @@ htmlcov/
 .ruff_cache/
 flywheel_audit.jsonl
 
-# Agent run logs (keep plugins and configs tracked)
+# Agent run logs (keep plugins, skills, rules, hooks, scripts, and configs tracked)
 .agents/*
 !.agents/plugins/
+!.agents/skills/
+!.agents/rules/
+!.agents/scripts/
 !.agents/mcp_config.json
+!.agents/hooks.json
+!.agents/skills.json
+!.agents/plugins.json
 
 # Deployments & Environments
 .vercel/

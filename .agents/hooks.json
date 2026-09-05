@@ -1,0 +1,32 @@
+{
+  "af-safety-gate": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/safety_gate.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "af-post-edit-lint": {
+    "enabled": true,
+    "PostToolUse": [
+      {
+        "matcher": "replace_file_content|write_to_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/post_edit_lint.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

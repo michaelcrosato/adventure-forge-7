@@ -1,0 +1,10 @@
+{
+  "entries": [
+    {
+      "path": ".agents/plugins/adventure-forge"
+    },
+    {
+      "path": ".agents/plugins/vercel"
+    }
+  ]
+}
