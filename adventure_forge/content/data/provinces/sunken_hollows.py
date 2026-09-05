@@ -807,13 +807,13 @@ def build_sunken_hollows_province() -> RegionManifest:
     # POI: Crystal Trench (10 nodes)
     scenes["sunken_hollows_coral_chasm_gate"] = SceneNode(
         id="sunken_hollows_coral_chasm_gate",
-        title="Crystal Trench - Outer Gate",
+        title="Crystal Trench - Outer Chasm",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. Glowing coral reefs thrive in subterranean warmth.",
+        description="Bioluminescent coral clings to the sheer chasm precipice. Cold seawater surges through deep fissures below. Dark abyssal currents pull at loose gravel.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "water_breather"},
+                text="Your gills adapt smoothly to the icy hydrostatic pressure."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -821,12 +821,12 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         entities=[
-            {'id': 'sunken_hollows_coral_chasm_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
+            {'id': 'hollows_coral_chasm_gate_pulley', 'name': 'Descent Winch', 'tags': ['lockable'], 'initial_state': 'locked'},
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="sunken_hollows_coral_chasm_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="sunken_hollows_coral_chasm_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="hollows_coral_scout_trench", label="Survey deep chasm", category="interaction", result_text="You study the sheer drop and locate anchoring points in the basalt shelf."),
+            Action(id="hollows_coral_anchor_winch", label="Rig descent winch", category="item_affordance", condition={"has_item": "climbing_rope"}, effects=[{'set_flag': {'flag': 'trench_descent_rigged', 'value': True}}, {'log_event': 'You rigged a weighted descent rope.'}], target_scene="sunken_hollows_coral_chasm_courtyard", result_text="You anchor a weighted descent line over the chasm lip and rappel downward."),
+            Action(id="hollows_coral_plunge_abyss", label="Plunge into abyss", category="trait_exploit", condition={"any_of": [{"has_trait": "water_breather"}, {"min_attribute": {"attribute": "endurance", "value": 14}}]}, target_scene="sunken_hollows_coral_chasm_courtyard", result_text="You leap directly into the icy underwater abyss and sink smoothly downward."),
             Action(id="sunken_hollows_coral_chasm_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_courtyard", result_text="You press on to the next area."),
         ]
@@ -834,13 +834,13 @@ def build_sunken_hollows_province() -> RegionManifest:
 
     scenes["sunken_hollows_coral_chasm_courtyard"] = SceneNode(
         id="sunken_hollows_coral_chasm_courtyard",
-        title="Crystal Trench - Main Courtyard",
+        title="Crystal Trench - Pressure Sluice",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. Glowing coral reefs thrive in subterranean warmth.",
+        description="Submerged hydraulic sluice gates shudder under immense ocean pressure. Serrated thickets of violet razor coral encircle the catwalk. Trapped geyser steam vents along the seabed floor.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "nimble"},
+                text="You dodge sharp polyps swaying in the cold water."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -848,12 +848,12 @@ def build_sunken_hollows_province() -> RegionManifest:
             ),
         ],
         entities=[
-            {'id': 'sunken_hollows_coral_chasm_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
+            {'id': 'hollows_coral_chasm_valve_mechanism', 'name': 'Bronze Sluice', 'tags': ['lockable'], 'initial_state': 'locked'},
         ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="sunken_hollows_coral_chasm_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="sunken_hollows_coral_chasm_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="hollows_coral_inspect_sluice", label="Inspect pressure valve", category="interaction", result_text="You inspect the corroded bronze wheel controlling the hydraulic drain."),
+            Action(id="hollows_coral_crank_valve", label="Crank pressure valve", category="systemic", condition={"any_of": [{"has_item": "crowbar"}, {"min_attribute": {"attribute": "strength", "value": 15}}]}, effects=[{'set_flag': {'flag': 'chasm_valve_opened', 'value': True}}, {'log_event': 'You cracked open the rusted pressure valve.'}], target_scene="sunken_hollows_coral_chasm_quarters", result_text="You strain against the rusted valve wheel until boiling steam vents outward."),
+            Action(id="hollows_coral_dodge_tendrils", label="Dodge razor spines", category="trait_exploit", condition={"has_trait": "nimble"}, effects=[{'log_event': 'You weaved nimbly through razor coral spines.'}], target_scene="sunken_hollows_coral_chasm_quarters", result_text="You twist deftly between vibrating razor spines and drop safely down."),
             Action(id="sunken_hollows_coral_chasm_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_quarters", result_text="You press on to the next area."),
         ]
@@ -861,23 +861,26 @@ def build_sunken_hollows_province() -> RegionManifest:
 
     scenes["sunken_hollows_coral_chasm_quarters"] = SceneNode(
         id="sunken_hollows_coral_chasm_quarters",
-        title="Crystal Trench - Living Quarters",
+        title="Crystal Trench - Abyssal Shelf",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. Glowing coral reefs thrive in subterranean warmth.",
+        description="Drained obsidian shelves glisten under radiant mineral glow. Subterranean thermal vents warm the exposed crystal seabed. Exhaust steam escapes through heavy relief valves.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "chasm_valve_opened", "value": True}},
+                text="The drained seabed reveals vibrant crystal clusters nestled in the basalt."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
                 text="You note tactical cover and exit routes."
             ),
         ],
+        entities=[
+            {'id': 'hollows_coral_chasm_quarters_crystal_bed', 'name': 'Crystal Bed', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_coral_chasm_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="sunken_hollows_coral_chasm_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="sunken_hollows_coral_chasm_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="hollows_coral_harvest_prism", label="Harvest seabed prism", category="interaction", condition={"all_of": [{"flag_is": {"flag": "chasm_valve_opened", "value": True}}, {"lacks_flag": "abyssal_prism_harvested"}]}, effects=[{'add_item': 'abyssal_prism_core'}, {'add_item': 'deep_trench_helm'}, {'set_flag': {'flag': 'abyssal_prism_harvested', 'value': True}}, {'modify_reputation': {'faction': 'hollow_dwellers', 'value': 25}}, {'log_event': 'You harvested the abyssal prism core.'}], result_text="You pry the glowing abyssal prism core and salvage an ancient diving helm."),
+            Action(id="hollows_coral_rest_shelf", label="Rest on shelf", category="interaction", effects=[{'modify_stamina': 3}], result_text="You rest on the warm volcanic stone and replenish your breath."),
+            Action(id="sunken_hollows_coral_chasm_quarters_act_2", label="Search coral shelf", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_coral_chasm_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the coral shelf.'}], result_text="You sift through mineral crusts along the exposed seabed."),
             Action(id="sunken_hollows_coral_chasm_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_coral_chasm_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_coral_chasm_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_coral_chasm_armory", result_text="You press on to the next area."),
         ]
@@ -2366,13 +2369,13 @@ def build_sunken_hollows_province() -> RegionManifest:
     # POI: The Echoing Dome (10 nodes)
     scenes["sunken_hollows_echoing_dome_gate"] = SceneNode(
         id="sunken_hollows_echoing_dome_gate",
-        title="The Echoing Dome - Outer Gate",
+        title="The Echoing Dome - Outer Arch",
         region="sunken_hollows",
-        description="Iron bars secure the heavy timber entrance. The huge dark caves carry quiet echoes for miles.",
+        description="Cold cavern winds hum through the stone archway. Towering dome vaults magnify footsteps into booming echoes.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"min_attribute": {"attribute": "endurance", "value": 14}},
+                text="Your sturdy endurance helps you resist loud ringing."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -2383,9 +2386,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             {'id': 'sunken_hollows_echoing_dome_gate_grate', 'name': 'Iron Grate', 'tags': ['lockable'], 'initial_state': 'locked'},
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_gate_act_0", label="Inspect gate", category="interaction", result_text="You carefully inspect the heavy entrance."),
-            Action(id="sunken_hollows_echoing_dome_gate_act_1", label="Check locks", category="interaction", result_text="You proceed to inspect the lock mechanism."),
-            Action(id="sunken_hollows_echoing_dome_gate_act_2", label="Inspect hinges", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_gate_hinges_checked', 'value': True}}, {'log_event': 'You checked the iron hinges.'}], result_text="You inspect the reinforced iron hinges."),
+            Action(id="hollows_dome_scout_entrance", label="Survey echoing dome", category="interaction", result_text="You inspect the towering stone vault and track acoustic reverberations."),
+            Action(id="hollows_dome_strike_tuning_fork", label="Strike tuning fork", category="interaction", result_text="You strike a bronze pitch fork against the arch to locate resonant frequency nodes."),
+            Action(id="hollows_dome_brace_ears", label="Brace against harmonics", category="systemic", condition={"min_attribute": {"attribute": "endurance", "value": 14}}, effects=[{'modify_stamina': 2}, {'log_event': 'You braced against ultrasonic harmonics.'}], result_text="You steel your resolve and steady your breathing against concussive acoustic waves."),
             Action(id="sunken_hollows_echoing_dome_gate_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_hub", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_gate_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_courtyard", result_text="You press on to the next area."),
         ]
@@ -2393,13 +2396,13 @@ def build_sunken_hollows_province() -> RegionManifest:
 
     scenes["sunken_hollows_echoing_dome_courtyard"] = SceneNode(
         id="sunken_hollows_echoing_dome_courtyard",
-        title="The Echoing Dome - Main Courtyard",
+        title="The Echoing Dome - Bell Chamber",
         region="sunken_hollows",
-        description="Cobblestones show heavy cart wheel wear. The huge dark caves carry quiet echoes for miles.",
+        description="Massive bronze bells hang suspended above dark reflecting pools. Sound waves vibrate through subterranean basalt arches. Droplets strike stone with ringing clarity.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"has_trait": "water_breather"},
+                text="You spot calm underwater currents below the quiet pool."
             ),
             DynamicDescription(
                 condition={"min_skill": {"skill": "cunning", "value": 2}},
@@ -2410,9 +2413,9 @@ def build_sunken_hollows_province() -> RegionManifest:
             {'id': 'sunken_hollows_echoing_dome_courtyard_hay_cart', 'name': 'Hay Cart', 'tags': ['flammable'], 'initial_state': 'intact'},
         ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_courtyard_act_0", label="Search yard", category="interaction", result_text="You carefully search the courtyard perimeter."),
-            Action(id="sunken_hollows_echoing_dome_courtyard_act_1", label="Survey area", category="interaction", result_text="You proceed to survey the open ground."),
-            Action(id="sunken_hollows_echoing_dome_courtyard_act_2", label="Inspect cart", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_courtyard_cart_checked', 'value': True}}, {'log_event': 'You checked the supply cart.'}], result_text="You search the weathered wagon bed."),
+            Action(id="hollows_dome_inspect_bells", label="Inspect bronze bells", category="interaction", result_text="You study the suspended acoustic bells and locate the fallen central chime."),
+            Action(id="hollows_dome_tune_bells", label="Tune resonator bells", category="trait_exploit", condition={"any_of": [{"min_skill": {"skill": "cunning", "value": 3}}, {"has_item": "crowbar"}]}, effects=[{'set_flag': {'flag': 'dome_bells_tuned', 'value': True}}, {'log_event': 'You aligned the acoustic resonator bells.'}], target_scene="sunken_hollows_echoing_dome_quarters", result_text="You adjust the heavy bronze bells until they ring in perfect harmony."),
+            Action(id="hollows_dome_dive_pool", label="Dive resonance pool", category="trait_exploit", condition={"has_trait": "water_breather"}, effects=[{'set_flag': {'flag': 'dome_pool_damped', 'value': True}}, {'log_event': 'You released the submerged acoustic damper.'}], target_scene="sunken_hollows_echoing_dome_quarters", result_text="You dive into the icy pool and release the jammed stone dampening block."),
             Action(id="sunken_hollows_echoing_dome_courtyard_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_gate", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_courtyard_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_quarters", result_text="You press on to the next area."),
         ]
@@ -2420,23 +2423,26 @@ def build_sunken_hollows_province() -> RegionManifest:
 
     scenes["sunken_hollows_echoing_dome_quarters"] = SceneNode(
         id="sunken_hollows_echoing_dome_quarters",
-        title="The Echoing Dome - Living Quarters",
+        title="The Echoing Dome - Harmonic Sanctuary",
         region="sunken_hollows",
-        description="Rows of wooden bunks line the walls. The huge dark caves carry quiet echoes for miles.",
+        description="Obsidian pillars stand around a circular stone dais. Gentle vibrations pulse through the quiet cavern sanctuary. Clear water laps against carved black steps.",
         dynamic_descriptions=[
             DynamicDescription(
-                condition={"has_trait": "night_eyed"},
-                text="Your keen eyes track motion in the dark."
+                condition={"flag_is": {"flag": "dome_bells_tuned", "value": True}},
+                text="The tuned bronze bells keep a gentle soothing chime."
             ),
             DynamicDescription(
-                condition={"min_skill": {"skill": "cunning", "value": 2}},
-                text="You note tactical cover and exit routes."
+                condition={"flag_is": {"flag": "dome_pool_damped", "value": True}},
+                text="The sunken stone damper quiets loud cavern echoes."
             ),
         ],
+        entities=[
+            {'id': 'sunken_hollows_echoing_dome_quarters_dais', 'name': 'Resonance Dais', 'tags': ['lockable'], 'initial_state': 'locked'},
+        ],
         base_actions=[
-            Action(id="sunken_hollows_echoing_dome_quarters_act_0", label="Search bunks", category="interaction", result_text="You carefully search beneath the rough bunks."),
-            Action(id="sunken_hollows_echoing_dome_quarters_act_1", label="Rest briefly", category="interaction", effects=[{'modify_stamina': 1}], result_text="You proceed to catch your breath."),
-            Action(id="sunken_hollows_echoing_dome_quarters_act_2", label="Search footlocker", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the barracks footlocker.'}], result_text="You search through a wooden footlocker."),
+            Action(id="hollows_dome_claim_chime", label="Claim harmonic chime", category="interaction", condition={"all_of": [{"any_of": [{"flag_is": {"flag": "dome_bells_tuned", "value": True}}, {"flag_is": {"flag": "dome_pool_damped", "value": True}}]}, {"lacks_flag": "harmonic_chime_taken"}]}, effects=[{'add_item': 'harmonic_obsidian_bell'}, {'set_flag': {'flag': 'harmonic_chime_taken', 'value': True}}, {'modify_reputation': {'faction': 'hollow_dwellers', 'value': 20}}, {'add_marker': 'echo_master'}, {'log_event': 'You claimed the harmonic obsidian bell.'}], result_text="You retrieve the humming harmonic obsidian bell from the center dais."),
+            Action(id="hollows_dome_rest_dais", label="Rest on dais", category="interaction", effects=[{'modify_stamina': 3}], result_text="You rest on the acoustic dais as soothing harmonics ease your fatigue."),
+            Action(id="sunken_hollows_echoing_dome_quarters_act_2", label="Search stone alcove", category="interaction", effects=[{'set_flag': {'flag': 'sunken_hollows_echoing_dome_quarters_footlocker_searched', 'value': True}}, {'log_event': 'You searched the stone alcove.'}], result_text="You search an acoustic niche carved into the obsidian wall."),
             Action(id="sunken_hollows_echoing_dome_quarters_to_prev", label="Return back", category="movement", target_scene="sunken_hollows_echoing_dome_courtyard", result_text="You retrace your steps."),
             Action(id="sunken_hollows_echoing_dome_quarters_to_next", label="Press forward", category="movement", target_scene="sunken_hollows_echoing_dome_armory", result_text="You press on to the next area."),
         ]
