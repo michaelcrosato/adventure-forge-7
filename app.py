@@ -12,14 +12,17 @@ Provides:
 from __future__ import annotations
 
 import json
+import time
 import urllib.parse
 from collections.abc import Awaitable, Callable
 from typing import Any
 
 from adventure_forge import __version__
 from adventure_forge.content.loader import build_world_registry
+from adventure_forge.content.quests import get_continental_main_quest, get_provincial_subquests
 from adventure_forge.core.character import CHARACTER_PRESETS, get_preset
 from adventure_forge.core.engine import AdventureEngine
+from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.core.state import GameState
 from adventure_forge.player.mcp_server import MCPServer, handle_jsonrpc_request, sanitize_observation
@@ -46,13 +49,14 @@ async def _read_body(receive: Receive) -> bytes:
     return bytes(body)
 
 
-async def _send_response(
+async def _send_response_impl(
     send: Send,
     *,
     status: int,
     body: bytes,
     content_type: bytes,
     include_body: bool = True,
+    duration_ms: float | None = None,
 ) -> None:
     headers = [
         (b"content-type", content_type),
@@ -62,6 +66,8 @@ async def _send_response(
         (b"access-control-allow-methods", b"GET, POST, HEAD, OPTIONS"),
         (b"access-control-allow-headers", b"content-type, authorization"),
     ]
+    if duration_ms is not None:
+        headers.append((b"server-timing", f"app;dur={duration_ms:.2f}".encode("ascii")))
     await send({"type": "http.response.start", "status": status, "headers": headers})
     await send({"type": "http.response.body", "body": body if include_body else b""})
 
@@ -412,14 +418,21 @@ footer {
       </div>
     </div>
 
+    <div style="margin-bottom: 0.5rem;" id="status-container" class="tag-row"></div>
     <div style="margin-bottom: 1rem;" id="inventory-container" class="tag-row"></div>
 
-    <div id="quest-banner" style="background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center;">
-      <div>
-        <span style="color: #f59e0b; font-weight: 600;">👑 Grand Campaign:</span>
-        <span id="quest-stage-text" style="color: #f3f4f6; margin-left: 0.3rem;">Loading quest...</span>
+    <div id="quest-banner" style="background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="color: #f59e0b; font-weight: 600;">👑 Grand Campaign:</span>
+          <span id="quest-stage-text" style="color: #f3f4f6; margin-left: 0.3rem;">Loading quest...</span>
+        </div>
+        <div id="quest-seals-count" style="font-size: 0.8rem; color: #fbbf24; font-weight: 600;">0/5 Seals</div>
       </div>
-      <div id="quest-seals-count" style="font-size: 0.8rem; color: #fbbf24; font-weight: 600;">0/5 Seals</div>
+      <div id="subquest-banner" style="margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px dashed rgba(217, 119, 6, 0.25); display: none; font-size: 0.8rem;">
+        <span style="color: #60a5fa; font-weight: 600;">📜 Provincial Subquest:</span>
+        <span id="subquest-text" style="color: #e5e7eb; margin-left: 0.3rem;"></span>
+      </div>
     </div>
 
     <div id="terminal-pane" class="terminal-banner" style="display: none;">
@@ -442,7 +455,7 @@ footer {
   </section>
 
   <footer>
-    <div>AdventureForge &bull; Zero-Config Vercel Serverless Function</div>
+    <div>AdventureForge &bull; Zero-Config Vercel Serverless Function &bull; Latency: <span id="latency-display" style="color: #3fb950; font-weight: 600;">~1ms</span></div>
     <div>Deterministic Hash: <code id="fingerprint-display" style="font-size: 0.75rem;">initial</code></div>
   </footer>
 </div>
@@ -527,11 +540,15 @@ async function startAdventure() {
   startBtn.textContent = "Entering World...";
 
   try {
+    const t0 = performance.now();
     const res = await fetch("/api/game/new", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ preset: selectedPreset, seed: seed })
     });
+    const dur = (performance.now() - t0).toFixed(1);
+    const latEl = document.getElementById("latency-display");
+    if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Failed to start adventure: " + res.statusText);
     const data = await res.json();
     gameState = data.state;
@@ -552,11 +569,15 @@ async function stepAction(actionId) {
   btns.forEach(b => b.disabled = true);
 
   try {
+    const t0 = performance.now();
     const res = await fetch("/api/game/step", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ state: gameState, action_id: actionId })
     });
+    const dur = (performance.now() - t0).toFixed(1);
+    const latEl = document.getElementById("latency-display");
+    if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Step failed: " + res.statusText);
     const data = await res.json();
     gameState = data.state;
@@ -598,6 +619,37 @@ function renderGame(obs, char, quest) {
     document.getElementById("quest-stage-text").textContent = activeText;
     const completedCount = (quest.completed_stages || []).length;
     document.getElementById("quest-seals-count").textContent = `${completedCount}/5 Seals`;
+
+    // Subquests
+    const subquestBanner = document.getElementById("subquest-banner");
+    const subquestText = document.getElementById("subquest-text");
+    if (quest.subquests && subquestBanner && subquestText) {
+      const activeSubEntry = Object.entries(quest.subquests).find(([k, v]) => !v.is_finished && v.active_stage);
+      if (activeSubEntry) {
+        const qName = activeSubEntry[0].replace(/^subquest_/, '').replace(/_/g, ' ').toUpperCase();
+        subquestText.textContent = `${qName}: Stage ${activeSubEntry[1].active_stage}`;
+        subquestBanner.style.display = "block";
+      } else {
+        subquestBanner.style.display = "none";
+      }
+    }
+  }
+
+  // Status Effects & Hazards
+  const statusContainer = document.getElementById("status-container");
+  if (statusContainer) {
+    const statusBadges = [];
+    const markers = char.markers || [];
+    markers.forEach(m => {
+      let bg = "rgba(168, 85, 247, 0.25)";
+      let color = "#c084fc";
+      if (m.includes("conflagration") || m.includes("fire")) { bg = "rgba(249, 115, 22, 0.25)"; color = "#fb923c"; }
+      else if (m.includes("stun") || m.includes("shock")) { bg = "rgba(234, 179, 8, 0.25)"; color = "#facc15"; }
+      else if (m.includes("water") || m.includes("wet")) { bg = "rgba(56, 189, 248, 0.25)"; color = "#38bdf8"; }
+      else if (m.includes("corroded") || m.includes("acid")) { bg = "rgba(132, 204, 22, 0.25)"; color = "#a3e635"; }
+      statusBadges.push(`<span class="tag" style="background: ${bg}; color: ${color}; font-weight: 600;">⚡ ${m}</span>`);
+    });
+    statusContainer.innerHTML = statusBadges.join("");
   }
 
   // Inventory & Badges
@@ -680,10 +732,43 @@ _PRESETS_RESPONSE_BYTES = json.dumps(
     sort_keys=True,
     separators=(",", ":"),
 ).encode("utf-8")
+_QUESTS_RESPONSE_BYTES = json.dumps(
+    {
+        "campaign": get_continental_main_quest().to_dict(),
+        "subquests": {k: v.to_dict() for k, v in get_provincial_subquests().items()},
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_HAZARDS_RESPONSE_BYTES = json.dumps(
+    {"hazards": {k: v.to_dict() for k, v in HAZARD_COMBOS.items()}},
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
 
 
 async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
     """Serve the landing page, health check, REST game API, and MCP JSON-RPC endpoint."""
+    start_time = time.perf_counter()
+
+    async def _send_response(
+        send_fn: Send,
+        *,
+        status: int,
+        body: bytes,
+        content_type: bytes,
+        include_body: bool = True,
+    ) -> None:
+        dur = (time.perf_counter() - start_time) * 1000.0
+        await _send_response_impl(
+            send_fn,
+            status=status,
+            body=body,
+            content_type=content_type,
+            include_body=include_body,
+            duration_ms=dur,
+        )
+
     if scope["type"] == "lifespan":
         while True:
             message = await receive()
@@ -766,6 +851,46 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             send,
             status=200,
             body=_PRESETS_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
+    # Route: /api/game/quests
+    if path == "/api/game/quests":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_QUESTS_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
+    # Route: /api/game/hazards
+    if path == "/api/game/hazards":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_HAZARDS_RESPONSE_BYTES,
             content_type=b"application/json; charset=utf-8",
             include_body=include_body,
         )

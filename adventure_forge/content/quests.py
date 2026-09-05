@@ -22,6 +22,16 @@ class QuestStage:
     reputation_rewards: Dict[str, int]
     approaches: List[str]  # e.g. ["force", "stealth", "diplomacy", "trait"]
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "province": self.province,
+            "description": self.description,
+            "reputation_rewards": dict(self.reputation_rewards),
+            "approaches": list(self.approaches),
+        }
+
 
 @dataclass
 class QuestLine:
@@ -31,6 +41,15 @@ class QuestLine:
     stages: List[QuestStage]
     endings: Dict[str, str]
     ending_conditions: Optional[Dict[str, Dict[str, Any]]] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "synopsis": self.synopsis,
+            "stages": [s.to_dict() for s in self.stages],
+            "endings": dict(self.endings),
+        }
 
     def resolve_ending(self, world_flags: Dict[str, Any]) -> Optional[str]:
         """Determine which ending is active based on world flags."""

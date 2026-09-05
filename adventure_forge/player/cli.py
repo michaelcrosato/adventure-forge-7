@@ -6,17 +6,31 @@ Enforces:
 - I8: Observation budget with clean pagination for large action sets.
 """
 import sys
-from typing import Tuple
+from typing import Tuple, Optional, Dict, Any
 from adventure_forge.core.state import GameState
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.content.loader import build_world_registry
 
 
-def render_ui(obs, page: int = 0, page_size: int = 15):
+def render_ui(
+    obs,
+    page: int = 0,
+    page_size: int = 15,
+    state: Optional[GameState] = None,
+    quest_info: Optional[Dict[str, Any]] = None
+):
     """Render a clean, high-velocity, action-first player screen with categorized pagination."""
     print("\n" + "=" * 65)
     print(f" {obs.title.upper()}  [{obs.region_id}]")
+    if state:
+        c = state.character
+        status_str = f" | Status: {', '.join(c.markers)}" if c.markers else " | Status: Normal"
+        items_str = f" | Items: {len(c.inventory)}"
+        print(f" HP: {c.health}/{c.max_health} | SP: {c.stamina}/{c.max_stamina}{status_str}{items_str}")
+    if quest_info:
+        active_stg = quest_info.get("active_stage", "Exploring Continent")
+        print(f" Quest: {active_stg}")
     print("=" * 65)
     print(f"\n{obs.description}\n")
 
@@ -91,7 +105,8 @@ def main():
     page_size = 15
 
     while True:
-        render_ui(obs, page, page_size)
+        quest_info = engine.get_quest_progress(state)
+        render_ui(obs, page=page, page_size=page_size, state=state, quest_info=quest_info)
         try:
             choice = input("\nChoose action [number or command]: ").strip().lower()
         except (EOFError, KeyboardInterrupt):
