@@ -95,10 +95,21 @@ AdventureForge deploys seamlessly to Vercel with zero configuration:
 - **`GET /health` & `HEAD /health`**: Machine-readable JSON health monitor (`service`, `status`, `version`).
 - **`POST /api/game/new`**: Stateless session initialization with preset character and deterministic seed.
 - **`POST /api/game/step`**: Stateless transition step returning sanitized observations and updated state.
+- **`POST /api/game/observe`**: Stateless state re-observation for turn undo, state inspection, and checkpointing.
+- **`POST /api/game/replay`**: Pure deterministic trace verification executing action sequences and matching state hashes.
 - **`GET /api/game/presets`**: Archetype catalogue and starting scene metadata.
-- **`GET /api/game/quests`**: Continental campaign and 5 provincial subquest DAGs.
+- **`GET /api/game/quests`**: Continental campaign, 5 provincial subquests, and 5 faction intrigue quest lines.
 - **`GET /api/game/hazards`**: Deterministic hazard combo definitions and status reactions.
 - **`POST /api/mcp` & `/mcp`**: JSON-RPC 2.0 Model Context Protocol endpoint for AI coding agents.
+
+### CLI Player Features & Deterministic Replay
+```bash
+# Interactive play with 7-axis sheet ('sheet'), quest log ('quest'), and undo ('u')
+python3 -m adventure_forge.player.cli [preset]
+
+# Replay and verify an action trace bit-for-bit
+python3 -m adventure_forge.player.cli --replay '{"preset":"cutpurse","seed":42,"actions":["flash_thief_signet"]}'
+```
 
 ### Local Development Preview
 ```bash
