@@ -102,6 +102,17 @@ AdventureForge deploys seamlessly to Vercel with zero configuration:
 - **`GET /api/game/hazards`**: Deterministic hazard combo definitions and status reactions.
 - **`POST /api/mcp` & `/mcp`**: JSON-RPC 2.0 Model Context Protocol endpoint for AI coding agents.
 
+### Web UI Suite & Interactive Features
+The browser player at `/` provides an immersive, action-first interface:
+- **Interactive Quest Journal (`📜 Quests`, Key: `Q`):** 3-tab modal tracking the Five Seals of Sovereignty, 5 Provincial Narrative Chains, and 5 Faction Intrigue Arcs.
+- **Continental Province World Map Atlas (`🗺️ Map`, Key: `M`):** Interactive map showing active player location, regional mechanics, environmental hazard warnings, and transit connections across the 5 provinces and Central Bazaar.
+- **Session Auto-Save & Resume:** Automatically persists game state in browser `localStorage` across turns with an instant resume card on the character selection screen.
+- **Real-Time Action Search (`🔍 Search`):** Dynamic instant text filtering for seamless navigation in scenes with 100+ legal actions.
+- **7-Axis Character Sheet Modal (`📊 Sheet`, Key: `C`):** Full inspection of ancestry, background, attributes, skills, traits, flaws, active markers, and inventory.
+- **Instant Turn Undo (`↩ Undo`, Key: `U`):** Stateless rollback stack to safely experiment with high-risk choices.
+- **Deterministic Replay Verification (`📜 Replay`):** Export or paste JSON traces to verify bit-for-bit SHA-256 state matching in engine.
+- **Hotkeys:** `1`–`9` (action selection), `Q` (quest journal), `M` (continental map), `C` (character sheet), `U` (undo), `Escape` (close modals).
+
 ### CLI Player Features & Deterministic Replay
 ```bash
 # Interactive play with 7-axis sheet ('sheet'), quest log ('quest'), and undo ('u')

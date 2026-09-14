@@ -38,7 +38,14 @@ def request(
 def test_home() -> None:
     messages = request()
     assert messages[0]["status"] == 200
-    assert b"AdventureForge" in messages[1]["body"]
+    body = messages[1]["body"]
+    assert b"AdventureForge" in body
+    assert b"quest-modal" in body
+    assert b"map-modal" in body
+    assert b"resume-session-box" in body
+    assert b"action-search" in body
+    assert b"PROVINCES_MAP_DATA" in body
+    assert b"SEALS_METADATA" in body
 
 
 def test_health() -> None:
@@ -210,8 +217,12 @@ def test_game_quests_endpoint() -> None:
     data = json.loads(msgs[1]["body"])
     assert "campaign" in data
     assert "subquests" in data
+    assert "intrigue_quests" in data
     assert data["campaign"]["id"] == "five_seals_campaign"
     assert len(data["subquests"]) == 5
+    assert len(data["intrigue_quests"]) == 5
+    assert "quest_reach_faction_intrigue" in data["intrigue_quests"]
+    assert "subquest_lowlands_river_intrigue" in data["intrigue_quests"]
 
     # HEAD method
     head_msgs = request("/api/game/quests", "HEAD")
@@ -304,5 +315,18 @@ def test_game_replay_endpoint() -> None:
     assert data["observation"]["scene_id"] == "warrens_black_market"
     assert len(data["fingerprints"]) == 2  # initial + 1 step
     assert data["final_fingerprint"] == data["fingerprints"][-1]
+
+
+def test_game_new_contains_intrigue_progress() -> None:
+    """Verify /api/game/new initializes quest progress with intrigue arcs."""
+    msgs = request("/api/game/new", "POST", body=b'{"preset":"cutpurse","seed":42}')
+    assert msgs[0]["status"] == 200
+    data = json.loads(msgs[1]["body"])
+    assert "quest" in data
+    quest = data["quest"]
+    assert "intrigue_quests" in quest
+    assert len(quest["intrigue_quests"]) == 5
+    assert "subquest_lowlands_river_intrigue" in quest["intrigue_quests"]
+
 
 

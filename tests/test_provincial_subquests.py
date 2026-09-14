@@ -293,6 +293,16 @@ def test_adventure_engine_quest_progress_integration(test_character: CharacterSh
     assert "subquest_court_decrees" in subquests
     assert "subquest_hollows_abyssal_keystones" in subquests
 
+    # Intrigue quests key
+    assert "intrigue_quests" in progress
+    intrigue_quests = progress["intrigue_quests"]
+    assert len(intrigue_quests) == 5
+    assert "quest_reach_faction_intrigue" in intrigue_quests
+    assert "quest_high_court_faction_intrigue" in intrigue_quests
+    assert "subquest_scorchwaste_water_wars" in intrigue_quests
+    assert "subquest_hollows_abyssal_schism" in intrigue_quests
+    assert "subquest_lowlands_river_intrigue" in intrigue_quests
+
 
 def test_step_systemic_subquest_actions_in_engine(test_character: CharacterSheet):
     """Verify taking systemic subquest actions directly updates state and quest progress."""

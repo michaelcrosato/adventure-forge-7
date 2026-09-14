@@ -407,6 +407,139 @@ a:hover { text-decoration: underline; }
   margin-right: 0.4rem;
 }
 
+/* Tabs & Navigation */
+.quest-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--panel-border);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0 0.5rem;
+  gap: 0.25rem;
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.tab-btn:hover { color: #fff; }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Action Search Bar */
+.action-search-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  outline: none;
+  width: 140px;
+  transition: all 0.15s ease;
+}
+.action-search-input:focus {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.09);
+  width: 180px;
+}
+
+/* Session Resume Banner */
+.resume-card {
+  background: linear-gradient(135deg, rgba(88, 166, 255, 0.12), rgba(63, 185, 80, 0.08));
+  border: 1px solid var(--accent-dim);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+/* Continental Map Styles */
+.map-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.map-card {
+  background: var(--card);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+.map-card:hover {
+  border-color: var(--accent);
+  background: var(--card-hover);
+  transform: translateY(-2px);
+}
+.map-card.active-region {
+  border-color: var(--green);
+  box-shadow: 0 0 12px rgba(63, 185, 80, 0.35);
+}
+.map-card.selected-province {
+  border-color: var(--accent);
+}
+.pulse-beacon {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7);
+  animation: beacon-pulse 1.8s infinite;
+  margin-right: 0.4rem;
+}
+@keyframes beacon-pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(63, 185, 80, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); }
+}
+
+/* Quest Journal Styles */
+.seal-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.15s ease;
+}
+.seal-card.claimed {
+  border-color: rgba(63, 185, 80, 0.4);
+  background: rgba(63, 185, 80, 0.04);
+}
+.seal-card.active {
+  border-color: rgba(245, 158, 11, 0.5);
+  background: rgba(245, 158, 11, 0.06);
+}
+.progress-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0.5rem 0 1rem 0;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #3fb950);
+  border-radius: 5px;
+  transition: width 0.3s ease;
+}
+
 /* Terminal Screen */
 .terminal-banner {
   background: #1f1414;
@@ -448,6 +581,8 @@ footer {
 
   <!-- SELECT VIEW -->
   <section id="select-view">
+    <div id="resume-session-box" class="resume-card" style="display: none;"></div>
+
     <div style="margin-bottom: 1rem;">
       <h2 style="font-size: 1.25rem;">Choose Protagonist Build</h2>
       <p style="color: var(--text-muted); font-size: 0.9rem;">
@@ -493,6 +628,8 @@ footer {
       <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
         <button class="btn btn-secondary" id="undo-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="undoTurn()" disabled title="Undo last turn (Key: U)">↩ Undo (<span id="undo-count">0</span>)</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSheetModal()" title="View 7-Axis Character Sheet (Key: C)">📊 Sheet</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleQuestModal()" title="View Quest Journal (Key: Q)">📜 Quests</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
       </div>
@@ -501,7 +638,7 @@ footer {
     <div style="margin-bottom: 0.5rem;" id="status-container" class="tag-row"></div>
     <div style="margin-bottom: 1rem;" id="inventory-container" class="tag-row"></div>
 
-    <div id="quest-banner" style="background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+    <div id="quest-banner" style="background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem; cursor: pointer;" onclick="toggleQuestModal()" title="Click to open Quest Journal (Key: Q)">
       <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <span style="color: #f59e0b; font-weight: 600;">👑 Grand Campaign:</span>
@@ -522,7 +659,7 @@ footer {
     </div>
 
     <div class="scene-panel">
-      <div class="scene-breadcrumb" id="scene-region">Region</div>
+      <div class="scene-breadcrumb" id="scene-region" style="cursor: pointer;" onclick="toggleMapModal()" title="Click to view Continental Atlas (Key: M)">Region</div>
       <h2 class="scene-title" id="scene-title">Scene Title</h2>
       <p class="scene-prose" id="scene-description">Prose loading...</p>
       <div class="events-box" id="scene-events" style="display: none;"></div>
@@ -531,7 +668,10 @@ footer {
     <div>
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
         <div class="action-section-title" style="margin-bottom: 0;">Legal Actions (<span id="action-count">0</span> Available)</div>
-        <div id="category-filters" style="display: flex; gap: 0.35rem; flex-wrap: wrap;"></div>
+        <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+          <input type="search" id="action-search" class="action-search-input" placeholder="🔍 Search actions..." oninput="onActionSearch(this.value)">
+          <div id="category-filters" style="display: flex; gap: 0.35rem; flex-wrap: wrap;"></div>
+        </div>
       </div>
       <div class="actions-grid" id="actions-container"></div>
     </div>
@@ -544,6 +684,33 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleSheetModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-sheet-content"></div>
+      </div>
+    </div>
+
+    <!-- QUEST JOURNAL MODAL -->
+    <div id="quest-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleQuestModal()">
+      <div class="modal-card" style="max-width: 700px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">📜 Continental Quest Journal</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleQuestModal()">✕</button>
+        </div>
+        <div class="quest-tab-bar">
+          <button class="tab-btn active" id="tab-btn-campaign" onclick="switchQuestTab('campaign')">👑 Grand Campaign</button>
+          <button class="tab-btn" id="tab-btn-subquests" onclick="switchQuestTab('subquests')">📜 Provincial Subquests</button>
+          <button class="tab-btn" id="tab-btn-intrigue" onclick="switchQuestTab('intrigue')">⚔️ Faction Intrigue</button>
+        </div>
+        <div class="modal-body" id="modal-quest-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL ATLAS MODAL -->
+    <div id="map-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleMapModal()">
+      <div class="modal-card" style="max-width: 750px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🗺️ Continental Atlas of the Five Provinces</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleMapModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-map-content"></div>
       </div>
     </div>
 
@@ -628,11 +795,136 @@ const PRESETS = {
   }
 };
 
+const PROVINCES_MAP_DATA = {
+  "province_reach": {
+    "id": "province_reach",
+    "name": "The Reach",
+    "icon": "⛰️",
+    "theme": "Highland Peaks & Crags",
+    "mechanic": "Verticality & Climbing Stamina",
+    "hazards": "Altitude Sickness & Sheer Falls",
+    "regions": ["province_reach", "iron_crags"],
+    "desc": "Highland mountain range ruled by clan sentinels and sky rangers.",
+    "connections": ["The Grand Bazaar", "The High Court"]
+  },
+  "province_sunken_hollows": {
+    "id": "province_sunken_hollows",
+    "name": "The Sunken Hollows",
+    "icon": "🌊",
+    "theme": "Flooded Vaults & Submerged Trenches",
+    "mechanic": "Underwater Diving & Hydrostatic Pressure",
+    "hazards": "Oxygen Depletion & Drowning",
+    "regions": ["province_sunken_hollows", "sunken_hollows_local"],
+    "desc": "Subterranean flooded grottoes harboring primeval abyssal secrets.",
+    "connections": ["The Grand Bazaar", "The Lowlands"]
+  },
+  "province_scorchwaste": {
+    "id": "province_scorchwaste",
+    "name": "The Scorchwaste",
+    "icon": "☀️",
+    "theme": "Blistering Dunes & Canyon Wastes",
+    "mechanic": "Heat Survival & Hydration",
+    "hazards": "Sunstroke & Salt Flats",
+    "regions": ["province_scorchwaste", "scorchwaste_local"],
+    "desc": "Arid desert expanse where nomads trade water and survive boiling winds.",
+    "connections": ["The Grand Bazaar", "The Lowlands"]
+  },
+  "province_high_court": {
+    "id": "province_high_court",
+    "name": "The High Court",
+    "icon": "🏛️",
+    "theme": "Imperial Spires & Tribunal Halls",
+    "mechanic": "Court Intrigue & Noble Decorum",
+    "hazards": "Diplomatic Contempt & Slander",
+    "regions": ["province_high_court", "high_court_local"],
+    "desc": "Gilded palaces and imperial courts rife with aristocratic plots.",
+    "connections": ["The Grand Bazaar", "The Reach"]
+  },
+  "province_lowlands": {
+    "id": "province_lowlands",
+    "name": "The Lowlands",
+    "icon": "🗝️",
+    "theme": "Shadow Warrens & River Canals",
+    "mechanic": "Social Stealth & Suspicion",
+    "hazards": "Bounties & Watch Infiltration",
+    "regions": ["province_lowlands", "lower_warrens"],
+    "desc": "Dense canal city and crime syndicates thriving in shadow.",
+    "connections": ["The Grand Bazaar", "The Scorchwaste", "The Sunken Hollows"]
+  },
+  "stress_market": {
+    "id": "stress_market",
+    "name": "The Grand Bazaar",
+    "icon": "⚖️",
+    "theme": "Continental Crossroads Hub",
+    "mechanic": "Unbounded Choice Synthesis",
+    "hazards": "Cutpurses & Market Chaos",
+    "regions": ["stress_market"],
+    "desc": "Continental crossroads linking all five provinces with open markets.",
+    "connections": ["All Five Provinces"]
+  }
+};
+
+const SEALS_METADATA = [
+  {
+    "id": "stage_crags_beacon",
+    "flag": "crags_beacon_lit",
+    "province": "The Reach",
+    "title": "The Highland Beacon",
+    "icon": "🔥",
+    "desc": "Ignite the ancient beacon to rally the mountain clans.",
+    "approaches": ["Climbing", "Iron Crowbar", "Martial Force"]
+  },
+  {
+    "id": "stage_warrens_ledger",
+    "flag": "warrens_ledger_recovered",
+    "province": "The Lowlands",
+    "title": "The Shadow Ledger",
+    "icon": "📜",
+    "desc": "Recover the syndicate ledger from the canal vault.",
+    "approaches": ["Lockpicks", "Social Stealth", "Underworld Bribery"]
+  },
+  {
+    "id": "stage_scorch_compass",
+    "flag": "scorch_compass_acquired",
+    "province": "The Scorchwaste",
+    "title": "The Solar Compass",
+    "icon": "🧭",
+    "desc": "Secure the solar compass across the blistering salt dunes.",
+    "approaches": ["Survival", "Water Conservation", "Desert Camouflage"]
+  },
+  {
+    "id": "stage_court_verdict",
+    "flag": "court_verdict_won",
+    "province": "The High Court",
+    "title": "The Tribunal Verdict",
+    "icon": "⚖️",
+    "desc": "Win tribunal judgment through aristocratic rhetoric and favor.",
+    "approaches": ["Rhetoric", "Courtly Decorum", "Imperial Decrees"]
+  },
+  {
+    "id": "stage_abyssal_pearl",
+    "flag": "hollows_pearl_retrieved",
+    "province": "The Sunken Hollows",
+    "title": "The Sunken Pearl",
+    "icon": "💎",
+    "desc": "Retrieve the abyssal keystone from the submerged ocean trench.",
+    "approaches": ["Diving Bell", "Waterproof Sealant", "Athletics"]
+  }
+];
+
+const STORAGE_KEY = "adventureforge_saved_session_v1";
 let selectedPreset = "cutpurse";
 let gameState = null;
 let stateHistory = [];
 let activeCategoryFilter = "all";
+let actionSearchQuery = "";
 let currentObsActions = [];
+let currentQuestData = null;
+let lastObservation = null;
+let lastCharacter = null;
+let cachedQuestsMetadata = null;
+let activeQuestTab = "campaign";
+let selectedMapProvince = null;
 
 function renderPresetCards() {
   const container = document.getElementById("preset-container");
@@ -772,14 +1064,37 @@ function renderCategoryFilters(actions) {
   }
 }
 
+function onActionSearch(val) {
+  actionSearchQuery = (val || "").trim().toLowerCase();
+  renderActionButtons(currentObsActions);
+}
+
 function renderActionButtons(actions) {
   const container = document.getElementById("actions-container");
   container.innerHTML = "";
-  const filtered = activeCategoryFilter === "all"
+  let filtered = activeCategoryFilter === "all"
     ? actions
     : actions.filter(a => (a.category || "general") === activeCategoryFilter);
 
-  document.getElementById("action-count").textContent = `${filtered.length} of ${actions.length}`;
+  if (actionSearchQuery) {
+    filtered = filtered.filter(a =>
+      (a.label && a.label.toLowerCase().includes(actionSearchQuery)) ||
+      (a.id && a.id.toLowerCase().includes(actionSearchQuery)) ||
+      (a.category && a.category.toLowerCase().includes(actionSearchQuery))
+    );
+  }
+
+  const countEl = document.getElementById("action-count");
+  if (actionSearchQuery || activeCategoryFilter !== "all") {
+    countEl.textContent = `${filtered.length} of ${actions.length}`;
+  } else {
+    countEl.textContent = `${actions.length}`;
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.9rem; padding: 1rem;">No legal actions match current filters.</div>';
+    return;
+  }
 
   filtered.forEach((act, idx) => {
     const btn = document.createElement("button");
@@ -788,7 +1103,7 @@ function renderActionButtons(actions) {
 
     const catClass = "cat-" + (act.category || "general");
     const costHtml = act.stamina_cost > 0 ? `<span class="badge-cost">⚡ ${act.stamina_cost} SP</span>` : "";
-    const keyHint = idx < 9 ? `<span class="key-badge">[${idx + 1}]</span>` : "";
+    const keyHint = (!actionSearchQuery && idx < 9) ? `<span class="key-badge">[${idx + 1}]</span>` : "";
 
     btn.innerHTML = `
       <div class="action-label">${keyHint}${act.label}</div>
@@ -803,17 +1118,34 @@ function renderActionButtons(actions) {
 }
 
 function renderGame(obs, char, quest) {
+  currentQuestData = quest;
+  lastObservation = obs;
+  lastCharacter = char;
+  saveSessionToLocalStorage(obs, char, quest);
+
   // HUD
   document.getElementById("char-name").textContent = char.name;
   document.getElementById("char-origin").textContent = `${char.ancestry} &bull; ${char.background}`;
   
   const hpPct = Math.max(0, Math.min(100, (char.health / char.max_health) * 100));
-  document.getElementById("hp-bar").style.width = hpPct + "%";
+  const hpBar = document.getElementById("hp-bar");
+  hpBar.style.width = hpPct + "%";
   document.getElementById("hp-text").textContent = `${char.health}/${char.max_health}`;
+  if (hpPct <= 25) {
+    hpBar.style.boxShadow = "0 0 8px #f85149";
+  } else {
+    hpBar.style.boxShadow = "none";
+  }
 
   const spPct = Math.max(0, Math.min(100, (char.stamina / char.max_stamina) * 100));
-  document.getElementById("sp-bar").style.width = spPct + "%";
+  const spBar = document.getElementById("sp-bar");
+  spBar.style.width = spPct + "%";
   document.getElementById("sp-text").textContent = `${char.stamina}/${char.max_stamina}`;
+  if (spPct <= 20) {
+    spBar.style.boxShadow = "0 0 8px #d29922";
+  } else {
+    spBar.style.boxShadow = "none";
+  }
 
   document.getElementById("turn-display").textContent = obs.turn_count;
   document.getElementById("fingerprint-display").textContent = obs.fingerprint ? obs.fingerprint.substring(0, 16) + "..." : "n/a";
@@ -1042,10 +1374,336 @@ async function runImportedReplay() {
   }
 }
 
+function saveSessionToLocalStorage(obs, char, quest) {
+  if (!gameState) return;
+  try {
+    const session = {
+      state: gameState,
+      history: stateHistory,
+      preset: selectedPreset,
+      seed: parseInt(document.getElementById("seed-input").value, 10) || 42,
+      obs: obs,
+      char: char,
+      quest: quest,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  } catch (e) {
+    console.warn("Storage save skipped:", e);
+  }
+}
+
+function checkResumeSession() {
+  const box = document.getElementById("resume-session-box");
+  if (!box) return;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      box.style.display = "none";
+      return;
+    }
+    const session = JSON.parse(raw);
+    if (!session || !session.state || !session.char) {
+      box.style.display = "none";
+      return;
+    }
+    const dateStr = new Date(session.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    box.innerHTML = `
+      <div>
+        <div style="font-size: 0.8rem; color: var(--green); font-weight: 600; text-transform: uppercase;">Saved Adventure Found</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: #fff;">${session.char.name} — ${session.char.ancestry} (${session.char.background})</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+          Turn ${session.state.turn_count} &bull; ${session.obs ? session.obs.title : session.state.current_scene} &bull; Saved at ${dateStr}
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn" style="padding: 0.45rem 0.9rem;" onclick="resumeSavedAdventure()">▶ Resume Adventure</button>
+        <button class="btn btn-secondary" style="padding: 0.45rem 0.7rem;" onclick="discardSavedSession()">✕ Discard</button>
+      </div>
+    `;
+    box.style.display = "flex";
+  } catch (e) {
+    box.style.display = "none";
+  }
+}
+
+async function resumeSavedAdventure() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const session = JSON.parse(raw);
+    gameState = session.state;
+    stateHistory = session.history && session.history.length > 0 ? session.history : [JSON.parse(JSON.stringify(gameState))];
+    selectedPreset = session.preset || "cutpurse";
+    document.getElementById("seed-input").value = session.seed || 42;
+    updateUndoButton();
+
+    const res = await fetch("/api/game/observe", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ state: gameState })
+    });
+    if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
+    const data = await res.json();
+    renderGame(data.observation, data.character, data.quest);
+    document.getElementById("select-view").style.display = "none";
+    document.getElementById("play-view").style.display = "block";
+  } catch (err) {
+    alert("Could not resume saved adventure: " + err.message);
+    discardSavedSession();
+  }
+}
+
+function discardSavedSession() {
+  localStorage.removeItem(STORAGE_KEY);
+  const box = document.getElementById("resume-session-box");
+  if (box) box.style.display = "none";
+}
+
+async function fetchQuestsDataIfNeeded() {
+  if (cachedQuestsMetadata) return cachedQuestsMetadata;
+  try {
+    const res = await fetch("/api/game/quests");
+    if (res.ok) {
+      cachedQuestsMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Quests fetch failed:", e);
+  }
+  return cachedQuestsMetadata;
+}
+
+async function toggleQuestModal() {
+  const modal = document.getElementById("quest-modal");
+  if (modal.style.display === "none") {
+    await fetchQuestsDataIfNeeded();
+    renderQuestModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function switchQuestTab(tab) {
+  activeQuestTab = tab;
+  document.querySelectorAll(".quest-tab-bar .tab-btn").forEach(b => b.classList.remove("active"));
+  const btn = document.getElementById(`tab-btn-${tab}`);
+  if (btn) btn.classList.add("active");
+  renderQuestModalContent();
+}
+
+function renderQuestModalContent() {
+  const content = document.getElementById("modal-quest-content");
+  if (!content) return;
+  const q = currentQuestData;
+  const flags = gameState ? (gameState.world_flags || {}) : {};
+
+  if (activeQuestTab === "campaign") {
+    const completedStages = (q && q.completed_stages) || [];
+    const completedCount = completedStages.length;
+    const pct = Math.round((completedCount / 5) * 100);
+
+    let sealsHtml = SEALS_METADATA.map(s => {
+      const isClaimed = completedStages.includes(s.id) || flags[s.flag] === true;
+      const isActive = !isClaimed && (q && q.active_stage === s.id);
+      let cardClass = "seal-card";
+      let statusBadge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">🔒 PENDING</span>';
+
+      if (isClaimed) {
+        cardClass += " claimed";
+        statusBadge = '<span class="tag" style="background: rgba(63,185,80,0.25); color: #3fb950; font-weight: 600;">✓ CLAIMED</span>';
+      } else if (isActive) {
+        cardClass += " active";
+        statusBadge = '<span class="tag" style="background: rgba(245,158,11,0.25); color: #f59e0b; font-weight: 600;">▶ ACTIVE OBJECTIVE</span>';
+      }
+
+      const approachesTags = s.approaches.map(a => `<span class="tag" style="background: rgba(255,255,255,0.05); font-size: 0.7rem;">${a}</span>`).join("");
+
+      return `
+        <div class="${cardClass}">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">${s.icon} ${s.title} (${s.province})</div>
+            <div>${statusBadge}</div>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem;">${s.desc}</div>
+          <div class="tag-row" style="margin-top: 0.2rem;">
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-right: 0.3rem;">Viable Approaches:</span>
+            ${approachesTags}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    content.innerHTML = `
+      <div style="margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h4 style="font-size: 0.95rem; color: #fff;">The Five Seals of Sovereignty</h4>
+          <span style="font-size: 0.85rem; color: #fbbf24; font-weight: 700;">${completedCount}/5 Seals (${pct}%)</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: ${pct}%;"></div>
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Unite or exploit the five regional powers of the continent to claim the Unbounded Throne.
+        </p>
+      </div>
+      <div>${sealsHtml}</div>
+    `;
+  } else if (activeQuestTab === "subquests") {
+    const subquestsMeta = (cachedQuestsMetadata && cachedQuestsMetadata.subquests) || {};
+    const subProgress = (q && q.subquests) || {};
+
+    let listHtml = Object.entries(subquestsMeta).map(([qid, qData]) => {
+      const prog = subProgress[qid] || {};
+      const isDone = prog.is_finished === true;
+      const activeStage = prog.active_stage || "Stage 1";
+      const badge = isDone
+        ? '<span class="tag" style="background: rgba(63,185,80,0.25); color: #3fb950; font-weight: 600;">✓ COMPLETE</span>'
+        : `<span class="tag" style="background: rgba(88,166,255,0.2); color: #58a6ff; font-weight: 600;">STAGE: ${activeStage}</span>`;
+
+      return `
+        <div class="seal-card" style="margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">📜 ${qData.name}</div>
+            <div>${badge}</div>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">${qData.synopsis}</div>
+        </div>
+      `;
+    }).join("");
+
+    content.innerHTML = `
+      <div style="margin-bottom: 0.75rem;">
+        <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem;">Provincial Narrative Chains</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Deep multi-stage side quests unique to each of the 5 macro-provinces.
+        </p>
+      </div>
+      <div>${listHtml || '<p style="color: var(--text-muted);">No subquests loaded.</p>'}</div>
+    `;
+  } else if (activeQuestTab === "intrigue") {
+    const intrigueMeta = (cachedQuestsMetadata && cachedQuestsMetadata.intrigue_quests) || {};
+    const intrigueProg = (q && q.intrigue_quests) || {};
+
+    let listHtml = Object.entries(intrigueMeta).map(([qid, qData]) => {
+      const prog = intrigueProg[qid] || {};
+      const isDone = prog.is_finished === true;
+      const ending = prog.ending ? `<div style="font-size: 0.8rem; color: #a3e635; margin-top: 0.3rem;">Outcome: ${prog.ending}</div>` : "";
+      const badge = isDone
+        ? '<span class="tag" style="background: rgba(168,85,247,0.25); color: #c084fc; font-weight: 600;">✓ RESOLVED</span>'
+        : '<span class="tag" style="background: rgba(248,81,73,0.2); color: #f85149; font-weight: 600;">ACTIVE CONFLICT</span>';
+
+      return `
+        <div class="seal-card" style="margin-bottom: 0.75rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+            <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">⚔️ ${qData.name}</div>
+            <div>${badge}</div>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">${qData.synopsis}</div>
+          ${ending}
+        </div>
+      `;
+    }).join("");
+
+    content.innerHTML = `
+      <div style="margin-bottom: 0.75rem;">
+        <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem;">Faction Intrigue Arcs</h4>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          High-stakes political conflicts with mutually exclusive endings and shifting faction balances.
+        </p>
+      </div>
+      <div>${listHtml || '<p style="color: var(--text-muted);">No intrigue arcs loaded.</p>'}</div>
+    `;
+  }
+}
+
+function toggleMapModal() {
+  const modal = document.getElementById("map-modal");
+  if (modal.style.display === "none") {
+    const currRegion = (lastObservation && lastObservation.region_id) || (gameState && gameState.current_region) || "";
+    for (const [k, p] of Object.entries(PROVINCES_MAP_DATA)) {
+      if (p.regions.includes(currRegion)) {
+        selectedMapProvince = k;
+        break;
+      }
+    }
+    if (!selectedMapProvince) selectedMapProvince = "province_reach";
+    renderMapModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function selectProvinceMap(provKey) {
+  selectedMapProvince = provKey;
+  renderMapModalContent();
+}
+
+function renderMapModalContent() {
+  const content = document.getElementById("modal-map-content");
+  if (!content) return;
+  const currRegion = (lastObservation && lastObservation.region_id) || (gameState && gameState.current_region) || "";
+
+  let cardsHtml = Object.entries(PROVINCES_MAP_DATA).map(([k, p]) => {
+    const isPlayerHere = p.regions.includes(currRegion);
+    const isSelected = selectedMapProvince === k;
+    let cardClass = "map-card";
+    if (isPlayerHere) cardClass += " active-region";
+    if (isSelected) cardClass += " selected-province";
+
+    const beacon = isPlayerHere ? '<span class="pulse-beacon"></span>' : '';
+    const hereBadge = isPlayerHere ? '<span class="tag" style="background: rgba(63,185,80,0.25); color: #3fb950; font-weight: 600; font-size: 0.7rem;">YOU ARE HERE</span>' : '';
+
+    return `
+      <div class="${cardClass}" onclick="selectProvinceMap('${k}')">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">${beacon}${p.icon} ${p.name}</div>
+          ${hereBadge}
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">${p.theme}</div>
+      </div>
+    `;
+  }).join("");
+
+  const activeProv = PROVINCES_MAP_DATA[selectedMapProvince] || PROVINCES_MAP_DATA["province_reach"];
+  const isPlayerHere = activeProv.regions.includes(currRegion);
+  const connPills = activeProv.connections.map(c => `<span class="tag" style="background: rgba(255,255,255,0.06); font-size: 0.75rem;">${c}</span>`).join("");
+
+  content.innerHTML = `
+    <div style="margin-bottom: 1rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Select Territory to Inspect</h4>
+      <div class="map-grid">${cardsHtml}</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <div style="font-size: 1.2rem; font-weight: 700; color: #fff;">${activeProv.icon} ${activeProv.name}</div>
+        ${isPlayerHere ? '<span class="tag" style="background: rgba(63,185,80,0.25); color: #3fb950; font-weight: 600;">ACTIVE LOCATION</span>' : ''}
+      </div>
+      <p style="font-size: 0.9rem; color: var(--text); margin-bottom: 0.75rem;">${activeProv.desc}</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem;">
+        <div class="stat-box">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Regional Mechanic</div>
+          <div style="font-size: 0.9rem; font-weight: 600; color: #58a6ff; margin-top: 0.2rem;">${activeProv.mechanic}</div>
+        </div>
+        <div class="stat-box">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Environmental Hazards</div>
+          <div style="font-size: 0.9rem; font-weight: 600; color: #f85149; margin-top: 0.2rem;">${activeProv.hazards}</div>
+        </div>
+      </div>
+      <div>
+        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-right: 0.4rem;">Direct Transit Connections:</span>
+        <span class="tag-row" style="display: inline-flex;">${connPills}</span>
+      </div>
+    </div>
+  `;
+}
+
 function resetToSelect() {
   document.getElementById("play-view").style.display = "none";
   document.getElementById("select-view").style.display = "block";
   renderPresetCards();
+  checkResumeSession();
 }
 
 window.addEventListener("keydown", (e) => {
@@ -1055,6 +1713,8 @@ window.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     document.getElementById("sheet-modal").style.display = "none";
     document.getElementById("replay-modal").style.display = "none";
+    document.getElementById("quest-modal").style.display = "none";
+    document.getElementById("map-modal").style.display = "none";
     return;
   }
   if (e.key.toLowerCase() === "u") {
@@ -1063,6 +1723,14 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "c") {
     toggleSheetModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "q") {
+    toggleQuestModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "m") {
+    toggleMapModal();
     return;
   }
   if (e.key >= "1" && e.key <= "9") {
@@ -1076,6 +1744,7 @@ window.addEventListener("keydown", (e) => {
 
 window.addEventListener("DOMContentLoaded", () => {
   renderPresetCards();
+  checkResumeSession();
 });
 </script>
 </body>

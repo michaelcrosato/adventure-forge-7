@@ -14,7 +14,11 @@ from adventure_forge.core.state import GameState
 from adventure_forge.core.actions import Action, synthesize_affordances
 from adventure_forge.core.effects import apply_effects
 from adventure_forge.content.schema import RegionManifest, SceneNode
-from adventure_forge.content.quests import get_continental_main_quest, evaluate_all_subquests
+from adventure_forge.content.quests import (
+    evaluate_all_subquests,
+    get_continental_main_quest,
+    get_faction_intrigue_quests,
+)
 
 
 @dataclass
@@ -92,6 +96,10 @@ class AdventureEngine:
         quest = get_continental_main_quest()
         progress = quest.evaluate_progress(state.character, state.world_flags)
         progress["subquests"] = evaluate_all_subquests(state.character, state.world_flags)
+        progress["intrigue_quests"] = {
+            qid: q.evaluate_progress(state.character, state.world_flags)
+            for qid, q in get_faction_intrigue_quests().items()
+        }
         return progress
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
