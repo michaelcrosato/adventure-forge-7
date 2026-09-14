@@ -1,8 +1,4 @@
 {
-  "mcpServers": {
-    "vercel": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.vercel.com"]
-    }
-  }
+  "mcpServers": {}
 }
+
