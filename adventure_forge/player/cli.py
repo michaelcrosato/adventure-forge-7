@@ -5,13 +5,89 @@ Enforces:
 - I6: Information Firewall — player sees only player-safe observations.
 - I8: Observation budget with clean pagination for large action sets.
 """
+import json
 import sys
-from typing import Tuple, Optional, Dict, Any
+from typing import Tuple, Optional, Dict, Any, List
 from adventure_forge.core.character import get_preset
 from adventure_forge.core.state import GameState
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.content.loader import build_world_registry
+
+
+def render_character_sheet(state: GameState) -> None:
+    """Display full 7-axis character state vector."""
+    c = state.character
+    print("\n" + "=" * 65)
+    print(f" CHARACTER SHEET: {c.name.upper()} ({c.ancestry} • {c.background})")
+    print("=" * 65)
+    print(f" Health: {c.health}/{c.max_health} | Stamina: {c.stamina}/{c.max_stamina}")
+    print("\n [ATTRIBUTES]")
+    for attr, val in sorted(c.attributes.items()):
+        print(f"   {attr.capitalize():14s}: {val}")
+    print("\n [SKILLS]")
+    for skill, val in sorted(c.skills.items()):
+        print(f"   {skill.capitalize():14s}: {val}")
+    print(f"\n [TRAITS]  ({len(c.traits)}): {', '.join(c.traits) if c.traits else 'None'}")
+    print(f" [FLAWS]   ({len(c.flaws)}): {', '.join(c.flaws) if c.flaws else 'None'}")
+    print(f" [MARKERS] ({len(c.markers)}): {', '.join(c.markers) if c.markers else 'None'}")
+    print("\n [FACTION REPUTATION]")
+    if c.reputation:
+        for faction, rep in sorted(c.reputation.items()):
+            sign = "+" if rep > 0 else ""
+            print(f"   {faction.replace('_', ' ').capitalize():18s}: {sign}{rep}")
+    else:
+        print("   Neutral with all factions.")
+    print(f"\n [INVENTORY] ({len(c.inventory)} items):")
+    if c.inventory:
+        for item in sorted(c.inventory):
+            print(f"   • {item}")
+    else:
+        print("   (Empty)")
+    print("=" * 65 + "\n")
+
+
+def render_quest_log(quest_info: Dict[str, Any]) -> None:
+    """Display comprehensive continental and provincial quest progress."""
+    print("\n" + "=" * 65)
+    print(" QUEST LOG: CONTINENTAL CAMPAIGN & PROVINCIAL SUBQUESTS")
+    print("=" * 65)
+    active_stg = quest_info.get("active_stage", "None")
+    is_fin = quest_info.get("is_finished", False)
+    comp_stages = quest_info.get("completed_stages", [])
+    print(" Main Campaign: The Five Seals of Sovereignty")
+    print(f" Status       : {'COMPLETED' if is_fin else f'Active Stage -> {active_stg}'}")
+    print(f" Seals Won    : {len(comp_stages)}/5 ({', '.join(comp_stages) if comp_stages else 'None'})")
+
+    subquests = quest_info.get("subquests", {})
+    if subquests:
+        print("\n [PROVINCIAL SUBQUESTS]")
+        for qid, qprog in sorted(subquests.items()):
+            q_name = qid.replace("subquest_", "").replace("quest_", "").replace("_", " ").title()
+            if qprog.get("is_finished"):
+                print(f"   • {q_name:32s}: [COMPLETED]")
+            elif qprog.get("active_stage"):
+                print(f"   • {q_name:32s}: Stage -> {qprog['active_stage']}")
+            else:
+                print(f"   • {q_name:32s}: [Undiscovered]")
+    print("=" * 65 + "\n")
+
+
+def render_history(state: GameState) -> None:
+    """Display turn-by-turn history of actions and recent events."""
+    print("\n" + "=" * 65)
+    print(f" ACTION & EVENT HISTORY ({len(state.history)} steps, Turn {state.turn_count})")
+    print("=" * 65)
+    if not state.history:
+        print("  No actions taken yet.")
+    else:
+        for idx, act in enumerate(state.history, start=1):
+            print(f"  Turn {idx:2d}: {act}")
+    if state.event_log:
+        print("\n [RECENT EVENTS]")
+        for ev in state.event_log[-5:]:
+            print(f"  • {ev}")
+    print("=" * 65 + "\n")
 
 
 def render_ui(
@@ -71,6 +147,10 @@ def render_ui(
         nav_hints.append("'p' for prev page")
     if total_pages > 1:
         nav_hints.append("'page <num>' to jump")
+    nav_hints.append("'sheet' for stats")
+    nav_hints.append("'quest' for log")
+    if state and state.turn_count > 0:
+        nav_hints.append("'u' to undo")
     nav_hints.append("'q' to quit")
     print("Commands: " + ", ".join(nav_hints))
 
@@ -101,6 +181,7 @@ def main():
     engine, state = start_new_game(preset)
     obs = engine.observe(state)
 
+    state_history: List[GameState] = [state]
     page = 0
     page_size = 15
 
@@ -116,6 +197,39 @@ def main():
         if choice in ("q", "quit", "exit"):
             print("Session ended.")
             break
+        elif choice in ("sheet", "c", "stats"):
+            render_character_sheet(state)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("quest", "quests", "log"):
+            render_quest_log(quest_info)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("history", "hist"):
+            render_history(state)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("u", "undo"):
+            if len(state_history) > 1:
+                state_history.pop()
+                state = state_history[-1]
+                obs = engine.observe(state)
+                page = 0
+                print(f"\n[✓] Turn undone. Reverted to Turn {state.turn_count}.")
+            else:
+                print("\n[!] Already at initial state; cannot undo further.")
+            continue
+        elif choice == "export":
+            export_payload = {
+                "preset": preset,
+                "turn_count": state.turn_count,
+                "history": list(state.history),
+                "fingerprint": state.fingerprint(),
+            }
+            print("\n[Deterministic Replay Payload]:")
+            print(json.dumps(export_payload, indent=2))
+            input("\nPress Enter to return to action screen...")
+            continue
         elif choice == "n":
             total_pages = max(1, (len(obs.legal_actions) + page_size - 1) // page_size)
             if page + 1 < total_pages:
@@ -148,7 +262,7 @@ def main():
             if matches:
                 selected_action_id = matches[0]["id"]
             else:
-                print(f"Invalid input '{choice}'. Enter a number from the action list.")
+                print(f"Invalid input '{choice}'. Enter a number from the action list, or 'sheet' / 'quest' / 'u'.")
                 continue
         else:
             num = int(choice)
@@ -159,6 +273,8 @@ def main():
                 continue
 
         state, obs = engine.step(state, selected_action_id)
+        if obs.success:
+            state_history.append(state)
         page = 0  # Reset page on state transition
 
         if obs.is_terminal:

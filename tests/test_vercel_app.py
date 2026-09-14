@@ -252,5 +252,57 @@ def test_method_not_allowed_endpoints() -> None:
     assert request("/api/game/step", "GET")[0]["status"] == 405
     # DELETE to api/mcp
     assert request("/api/mcp", "DELETE")[0]["status"] == 405
+    # GET to game/observe
+    assert request("/api/game/observe", "GET")[0]["status"] == 405
+    # GET to game/replay
+    assert request("/api/game/replay", "GET")[0]["status"] == 405
+
+
+def test_game_observe_endpoint() -> None:
+    """Test pure stateless observation of an existing GameState dictionary."""
+    # 1. Start a game to get valid state
+    new_msgs = request("/api/game/new", "POST", body=b'{"preset":"cutpurse","seed":42}')
+    assert new_msgs[0]["status"] == 200
+    new_data = json.loads(new_msgs[1]["body"])
+    state = new_data["state"]
+
+    # 2. Re-observe via /api/game/observe
+    obs_msgs = request(
+        "/api/game/observe",
+        "POST",
+        body=json.dumps({"state": state}).encode("utf-8"),
+    )
+    assert obs_msgs[0]["status"] == 200
+    obs_data = json.loads(obs_msgs[1]["body"])
+    assert obs_data["success"] is True
+    assert "observation" in obs_data
+    assert obs_data["observation"]["scene_id"] == "warrens_gate"
+    assert "legal_actions" in obs_data["observation"]
+    assert len(obs_data["observation"]["legal_actions"]) > 0
+
+    # 3. Validation errors
+    bad_req = request("/api/game/observe", "POST", body=b'{}')
+    assert bad_req[0]["status"] == 400
+
+
+def test_game_replay_endpoint() -> None:
+    """Test pure deterministic trace verification via /api/game/replay."""
+    replay_body = {
+        "preset": "cutpurse",
+        "seed": 42,
+        "actions": ["flash_thief_signet"],
+    }
+    msgs = request(
+        "/api/game/replay",
+        "POST",
+        body=json.dumps(replay_body).encode("utf-8"),
+    )
+    assert msgs[0]["status"] == 200
+    data = json.loads(msgs[1]["body"])
+    assert data["success"] is True
+    assert data["turn_count"] == 1
+    assert data["observation"]["scene_id"] == "warrens_black_market"
+    assert len(data["fingerprints"]) == 2  # initial + 1 step
+    assert data["final_fingerprint"] == data["fingerprints"][-1]
 
 

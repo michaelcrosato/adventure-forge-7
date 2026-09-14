@@ -19,7 +19,11 @@ from typing import Any
 
 from adventure_forge import __version__
 from adventure_forge.content.loader import build_world_registry
-from adventure_forge.content.quests import get_continental_main_quest, get_provincial_subquests
+from adventure_forge.content.quests import (
+    get_continental_main_quest,
+    get_faction_intrigue_quests,
+    get_provincial_subquests,
+)
 from adventure_forge.core.character import CHARACTER_PRESETS, get_preset
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
@@ -330,6 +334,79 @@ a:hover { text-decoration: underline; }
 .cat-general { background: rgba(110,118,129,0.2); color: var(--text-muted); }
 .badge-cost { color: var(--gold); }
 
+/* Modals & Dialogs */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.modal-card {
+  background: var(--card);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 650px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+}
+.modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-body {
+  padding: 1.25rem;
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.6rem;
+}
+.stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+.filter-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  border-radius: 4px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.filter-btn:hover { color: #fff; border-color: var(--accent); }
+.filter-btn.active {
+  background: rgba(88, 166, 255, 0.2);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+.key-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  font-size: 0.7rem;
+  color: var(--gold);
+  margin-right: 0.4rem;
+}
+
 /* Terminal Screen */
 .terminal-banner {
   background: #1f1414;
@@ -413,8 +490,11 @@ footer {
           Turn: <span id="turn-display" style="color: #fff; font-weight: 600;">0</span>
         </div>
       </div>
-      <div>
-        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;" onclick="resetToSelect()">Restart</button>
+      <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+        <button class="btn btn-secondary" id="undo-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="undoTurn()" disabled title="Undo last turn (Key: U)">↩ Undo (<span id="undo-count">0</span>)</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSheetModal()" title="View 7-Axis Character Sheet (Key: C)">📊 Sheet</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
       </div>
     </div>
 
@@ -449,8 +529,50 @@ footer {
     </div>
 
     <div>
-      <div class="action-section-title">Legal Actions (<span id="action-count">0</span> Available)</div>
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <div class="action-section-title" style="margin-bottom: 0;">Legal Actions (<span id="action-count">0</span> Available)</div>
+        <div id="category-filters" style="display: flex; gap: 0.35rem; flex-wrap: wrap;"></div>
+      </div>
       <div class="actions-grid" id="actions-container"></div>
+    </div>
+
+    <!-- CHARACTER SHEET MODAL -->
+    <div id="sheet-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleSheetModal()">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="modal-sheet-title" style="margin: 0; font-size: 1.15rem; color: #fff;">Character Sheet</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleSheetModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-sheet-content"></div>
+      </div>
+    </div>
+
+    <!-- REPLAY TRACE MODAL -->
+    <div id="replay-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleReplayModal()">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">Deterministic Replay & Trace Verification</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleReplayModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            AdventureForge transitions are 100% deterministic (SplitMix64 PRNG + canonical SHA-256 state fingerprints).
+          </p>
+          <div style="margin-bottom: 1rem;">
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Current Action Trace JSON</label>
+            <textarea id="trace-textarea" readonly style="width: 100%; height: 110px; background: #0d1117; border: 1px solid var(--panel-border); border-radius: 4px; color: #7ee787; font-family: monospace; font-size: 0.8rem; padding: 0.5rem;"></textarea>
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem;">
+            <button class="btn" style="font-size: 0.85rem;" onclick="copyTraceToClipboard()">Copy Trace to Clipboard</button>
+          </div>
+          <div style="border-top: 1px solid var(--panel-border); padding-top: 1rem;">
+            <label style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem;">Load & Run Deterministic Replay</label>
+            <textarea id="load-trace-textarea" placeholder='Paste replay trace JSON here...' style="width: 100%; height: 80px; background: #0d1117; border: 1px solid var(--panel-border); border-radius: 4px; color: #e6edf3; font-family: monospace; font-size: 0.8rem; padding: 0.5rem;"></textarea>
+            <button class="btn btn-secondary" style="font-size: 0.85rem; margin-top: 0.5rem;" onclick="runImportedReplay()">Execute & Verify Replay</button>
+            <div id="replay-status" style="margin-top: 0.5rem; font-size: 0.85rem;"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -508,6 +630,9 @@ const PRESETS = {
 
 let selectedPreset = "cutpurse";
 let gameState = null;
+let stateHistory = [];
+let activeCategoryFilter = "all";
+let currentObsActions = [];
 
 function renderPresetCards() {
   const container = document.getElementById("preset-container");
@@ -533,6 +658,14 @@ function renderPresetCards() {
   }
 }
 
+function updateUndoButton() {
+  const btn = document.getElementById("undo-btn");
+  const countEl = document.getElementById("undo-count");
+  const canUndo = stateHistory.length > 1;
+  if (btn) btn.disabled = !canUndo;
+  if (countEl) countEl.textContent = Math.max(0, stateHistory.length - 1);
+}
+
 async function startAdventure() {
   const seed = parseInt(document.getElementById("seed-input").value, 10) || 42;
   const startBtn = document.getElementById("start-btn");
@@ -552,6 +685,8 @@ async function startAdventure() {
     if (!res.ok) throw new Error("Failed to start adventure: " + res.statusText);
     const data = await res.json();
     gameState = data.state;
+    stateHistory = [JSON.parse(JSON.stringify(gameState))];
+    updateUndoButton();
     renderGame(data.observation, data.character, data.quest);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
@@ -581,11 +716,90 @@ async function stepAction(actionId) {
     if (!res.ok) throw new Error("Step failed: " + res.statusText);
     const data = await res.json();
     gameState = data.state;
+    stateHistory.push(JSON.parse(JSON.stringify(gameState)));
+    updateUndoButton();
     renderGame(data.observation, data.character, data.quest);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
   }
+}
+
+async function undoTurn() {
+  if (stateHistory.length <= 1) return;
+  stateHistory.pop();
+  const prevState = stateHistory[stateHistory.length - 1];
+  gameState = JSON.parse(JSON.stringify(prevState));
+  updateUndoButton();
+
+  try {
+    const t0 = performance.now();
+    const res = await fetch("/api/game/observe", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ state: gameState })
+    });
+    const dur = (performance.now() - t0).toFixed(1);
+    const latEl = document.getElementById("latency-display");
+    if (latEl) latEl.textContent = `${dur}ms`;
+    if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
+    const data = await res.json();
+    renderGame(data.observation, data.character, data.quest);
+  } catch (err) {
+    alert("Undo error: " + err.message);
+  }
+}
+
+function renderCategoryFilters(actions) {
+  const filterContainer = document.getElementById("category-filters");
+  if (!filterContainer) return;
+  const counts = { all: actions.length };
+  for (const act of actions) {
+    const c = act.category || "general";
+    counts[c] = (counts[c] || 0) + 1;
+  }
+  filterContainer.innerHTML = "";
+  for (const [cat, count] of Object.entries(counts)) {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn" + (cat === activeCategoryFilter ? " active" : "");
+    btn.textContent = `${cat.toUpperCase()} (${count})`;
+    btn.onclick = () => {
+      activeCategoryFilter = cat;
+      renderCategoryFilters(actions);
+      renderActionButtons(actions);
+    };
+    filterContainer.appendChild(btn);
+  }
+}
+
+function renderActionButtons(actions) {
+  const container = document.getElementById("actions-container");
+  container.innerHTML = "";
+  const filtered = activeCategoryFilter === "all"
+    ? actions
+    : actions.filter(a => (a.category || "general") === activeCategoryFilter);
+
+  document.getElementById("action-count").textContent = `${filtered.length} of ${actions.length}`;
+
+  filtered.forEach((act, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "action-btn";
+    btn.onclick = () => stepAction(act.id);
+
+    const catClass = "cat-" + (act.category || "general");
+    const costHtml = act.stamina_cost > 0 ? `<span class="badge-cost">⚡ ${act.stamina_cost} SP</span>` : "";
+    const keyHint = idx < 9 ? `<span class="key-badge">[${idx + 1}]</span>` : "";
+
+    btn.innerHTML = `
+      <div class="action-label">${keyHint}${act.label}</div>
+      <div class="action-meta">
+        <span class="badge-category ${catClass}">${act.category}</span>
+        <span>Risk: ${act.risk}</span>
+        ${costHtml}
+      </div>
+    `;
+    container.appendChild(btn);
+  });
 }
 
 function renderGame(obs, char, quest) {
@@ -626,7 +840,7 @@ function renderGame(obs, char, quest) {
     if (quest.subquests && subquestBanner && subquestText) {
       const activeSubEntry = Object.entries(quest.subquests).find(([k, v]) => !v.is_finished && v.active_stage);
       if (activeSubEntry) {
-        const qName = activeSubEntry[0].replace(/^subquest_/, '').replace(/_/g, ' ').toUpperCase();
+        const qName = activeSubEntry[0].replace(/^subquest_/, '').replace(/^quest_/, '').replace(/_/g, ' ').toUpperCase();
         subquestText.textContent = `${qName}: Stage ${activeSubEntry[1].active_stage}`;
         subquestBanner.style.display = "block";
       } else {
@@ -681,29 +895,150 @@ function renderGame(obs, char, quest) {
     termPane.style.display = "none";
   }
 
-  // Legal Actions
-  const actionsContainer = document.getElementById("actions-container");
-  actionsContainer.innerHTML = "";
-  const actions = obs.legal_actions || [];
-  document.getElementById("action-count").textContent = actions.length;
+  // Legal Actions with Category Filtering
+  currentObsActions = obs.legal_actions || [];
+  renderCategoryFilters(currentObsActions);
+  renderActionButtons(currentObsActions);
+}
 
-  for (const act of actions) {
-    const btn = document.createElement("button");
-    btn.className = "action-btn";
-    btn.onclick = () => stepAction(act.id);
+function toggleSheetModal() {
+  const modal = document.getElementById("sheet-modal");
+  if (modal.style.display === "none") {
+    renderSheetModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
 
-    const catClass = "cat-" + (act.category || "general");
-    const costHtml = act.stamina_cost > 0 ? `<span class="badge-cost">⚡ ${act.stamina_cost} SP</span>` : "";
+function renderSheetModalContent() {
+  if (!gameState || !gameState.character) return;
+  const char = gameState.character;
+  document.getElementById("modal-sheet-title").textContent = `${char.name} — ${char.ancestry} (${char.background})`;
+  const content = document.getElementById("modal-sheet-content");
 
-    btn.innerHTML = `
-      <div class="action-label">${act.label}</div>
-      <div class="action-meta">
-        <span class="badge-category ${catClass}">${act.category}</span>
-        <span>Risk: ${act.risk}</span>
-        ${costHtml}
+  let attrsHtml = Object.entries(char.attributes || {}).map(([k, v]) => `
+    <div class="stat-box">
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">${k}</div>
+      <div style="font-size: 1.1rem; font-weight: 700; color: #58a6ff;">${v}</div>
+    </div>
+  `).join("") || '<div style="color: var(--text-muted);">None</div>';
+
+  let skillsHtml = Object.entries(char.skills || {}).map(([k, v]) => `
+    <div class="stat-box">
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">${k}</div>
+      <div style="font-size: 1.1rem; font-weight: 700; color: #3fb950;">+${v}</div>
+    </div>
+  `).join("") || '<div style="color: var(--text-muted);">None</div>';
+
+  let repHtml = Object.entries(char.reputation || {}).map(([k, v]) => {
+    const col = v > 0 ? "#3fb950" : (v < 0 ? "#f85149" : "var(--text-muted)");
+    const sign = v > 0 ? "+" : "";
+    return `
+      <div class="stat-box">
+        <div style="font-size: 0.75rem; color: var(--text-muted);">${k.replace(/_/g, ' ').toUpperCase()}</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: ${col};">${sign}${v}</div>
       </div>
     `;
-    actionsContainer.appendChild(btn);
+  }).join("") || '<div style="color: var(--text-muted); font-size: 0.85rem;">Neutral with all factions</div>';
+
+  let invHtml = (char.inventory || []).map(i => `<span class="tag" style="background: rgba(255,255,255,0.08);">🎒 ${i}</span>`).join("") || '<span style="color: var(--text-muted);">Empty</span>';
+  let traitsHtml = (char.traits || []).map(t => `<span class="tag trait">✨ ${t}</span>`).join("") || '<span style="color: var(--text-muted);">None</span>';
+  let flawsHtml = (char.flaws || []).map(f => `<span class="tag" style="background: rgba(248,81,73,0.15); color: #f85149;">⚠️ ${f}</span>`).join("") || '<span style="color: var(--text-muted);">None</span>';
+  let markersHtml = (char.markers || []).map(m => `<span class="tag" style="background: rgba(168,85,247,0.15); color: #c084fc;">⚡ ${m}</span>`).join("") || '<span style="color: var(--text-muted);">None</span>';
+
+  content.innerHTML = `
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Core Attributes</h4>
+      <div class="stat-grid">${attrsHtml}</div>
+    </div>
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Skills</h4>
+      <div class="stat-grid">${skillsHtml}</div>
+    </div>
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Faction Standings</h4>
+      <div class="stat-grid">${repHtml}</div>
+    </div>
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Traits & Flaws</h4>
+      <div class="tag-row">${traitsHtml}${flawsHtml}</div>
+    </div>
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Active Markers</h4>
+      <div class="tag-row">${markersHtml}</div>
+    </div>
+    <div>
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Inventory Items</h4>
+      <div class="tag-row">${invHtml}</div>
+    </div>
+  `;
+}
+
+function toggleReplayModal() {
+  const modal = document.getElementById("replay-modal");
+  if (modal.style.display === "none") {
+    const payload = {
+      preset: selectedPreset,
+      seed: parseInt(document.getElementById("seed-input").value, 10) || 42,
+      turn_count: gameState ? gameState.turn_count : 0,
+      actions: gameState ? gameState.history : [],
+      fingerprint: gameState ? document.getElementById("fingerprint-display").textContent : ""
+    };
+    document.getElementById("trace-textarea").value = JSON.stringify(payload, null, 2);
+    document.getElementById("replay-status").textContent = "";
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function copyTraceToClipboard() {
+  const text = document.getElementById("trace-textarea").value;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Trace JSON copied to clipboard!");
+    }).catch(() => {
+      document.getElementById("trace-textarea").select();
+      document.execCommand("copy");
+      alert("Trace JSON copied to clipboard!");
+    });
+  } else {
+    document.getElementById("trace-textarea").select();
+    document.execCommand("copy");
+    alert("Trace JSON copied to clipboard!");
+  }
+}
+
+async function runImportedReplay() {
+  const text = document.getElementById("load-trace-textarea").value.trim();
+  const statusEl = document.getElementById("replay-status");
+  if (!text) {
+    statusEl.innerHTML = '<span style="color: #f85149;">Please paste a valid replay JSON payload.</span>';
+    return;
+  }
+  try {
+    const payload = JSON.parse(text);
+    statusEl.innerHTML = '<span style="color: #58a6ff;">Executing replay trace on engine...</span>';
+    const res = await fetch("/api/game/replay", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error("Replay verification failed: " + res.statusText);
+    const data = await res.json();
+    gameState = data.state;
+    stateHistory = [JSON.parse(JSON.stringify(gameState))];
+    updateUndoButton();
+    renderGame(data.observation, data.character, data.quest);
+    statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
+    setTimeout(() => {
+      document.getElementById("replay-modal").style.display = "none";
+      document.getElementById("select-view").style.display = "none";
+      document.getElementById("play-view").style.display = "block";
+    }, 1200);
+  } catch (err) {
+    statusEl.innerHTML = `<span style="color: #f85149;">Error: ${err.message}</span>`;
   }
 }
 
@@ -712,6 +1047,32 @@ function resetToSelect() {
   document.getElementById("select-view").style.display = "block";
   renderPresetCards();
 }
+
+window.addEventListener("keydown", (e) => {
+  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+  if (document.getElementById("play-view").style.display !== "block") return;
+
+  if (e.key === "Escape") {
+    document.getElementById("sheet-modal").style.display = "none";
+    document.getElementById("replay-modal").style.display = "none";
+    return;
+  }
+  if (e.key.toLowerCase() === "u") {
+    undoTurn();
+    return;
+  }
+  if (e.key.toLowerCase() === "c") {
+    toggleSheetModal();
+    return;
+  }
+  if (e.key >= "1" && e.key <= "9") {
+    const idx = parseInt(e.key, 10) - 1;
+    const btns = document.querySelectorAll("#actions-container .action-btn");
+    if (btns[idx] && !btns[idx].disabled) {
+      btns[idx].click();
+    }
+  }
+});
 
 window.addEventListener("DOMContentLoaded", () => {
   renderPresetCards();
@@ -736,6 +1097,7 @@ _QUESTS_RESPONSE_BYTES = json.dumps(
     {
         "campaign": get_continental_main_quest().to_dict(),
         "subquests": {k: v.to_dict() for k, v in get_provincial_subquests().items()},
+        "intrigue_quests": {k: v.to_dict() for k, v in get_faction_intrigue_quests().items()},
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -997,6 +1359,136 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "character": new_state.character.to_dict(),
             "state": new_state.to_dict(),
             "quest": _ENGINE.get_quest_progress(new_state),
+        }
+        await _send_response(
+            send,
+            status=200,
+            body=_json_response(response_data),
+            content_type=b"application/json; charset=utf-8",
+        )
+        return
+
+    # Route: /api/game/observe (Pure stateless observe)
+    if path == "/api/game/observe":
+        if method != "POST":
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        raw_body = await _read_body(receive)
+        try:
+            req_data = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+        except json.JSONDecodeError as exc:
+            await _send_response(
+                send,
+                status=400,
+                body=_json_response({"error": f"Invalid JSON: {exc}"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        state_dict = req_data.get("state")
+        if not state_dict:
+            await _send_response(
+                send,
+                status=400,
+                body=_json_response({"error": "Missing 'state'"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        try:
+            state = GameState.from_dict(state_dict)
+            obs = _ENGINE.observe(state)
+        except Exception as exc:
+            await _send_response(
+                send,
+                status=400,
+                body=_json_response({"error": f"Failed to observe state: {exc}"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        response_data = {
+            "success": True,
+            "observation": sanitize_observation(obs),
+            "character": state.character.to_dict(),
+            "state": state.to_dict(),
+            "quest": _ENGINE.get_quest_progress(state),
+        }
+        await _send_response(
+            send,
+            status=200,
+            body=_json_response(response_data),
+            content_type=b"application/json; charset=utf-8",
+        )
+        return
+
+    # Route: /api/game/replay (Pure deterministic trace verification & replay)
+    if path == "/api/game/replay":
+        if method != "POST":
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        raw_body = await _read_body(receive)
+        try:
+            req_data = json.loads(raw_body.decode("utf-8")) if raw_body else {}
+        except json.JSONDecodeError as exc:
+            await _send_response(
+                send,
+                status=400,
+                body=_json_response({"error": f"Invalid JSON: {exc}"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        preset_name = str(req_data.get("preset", "cutpurse"))
+        seed = req_data.get("seed", 42)
+        actions = req_data.get("actions", [])
+        if not isinstance(actions, list):
+            actions = []
+
+        try:
+            preset = get_preset(preset_name)
+        except KeyError:
+            preset = get_preset("cutpurse")
+
+        effective_seed = int(seed) if isinstance(seed, (int, float)) else 42
+        state = GameState(
+            build_id="af-build-001",
+            session_id=f"replay-{preset.id}-{effective_seed}",
+            character=preset.character,
+            current_region=preset.start_region,
+            current_scene=preset.start_scene,
+            rng=DeterministicRNG.from_seed(effective_seed),
+        )
+        obs = _ENGINE.observe(state)
+        fingerprints = [state.fingerprint()]
+
+        for act_id in actions:
+            state, obs = _ENGINE.step(state, str(act_id))
+            fingerprints.append(state.fingerprint())
+            if not obs.success or obs.is_terminal:
+                break
+
+        response_data = {
+            "success": True,
+            "turn_count": state.turn_count,
+            "observation": sanitize_observation(obs),
+            "character": state.character.to_dict(),
+            "state": state.to_dict(),
+            "quest": _ENGINE.get_quest_progress(state),
+            "fingerprints": fingerprints,
+            "final_fingerprint": state.fingerprint(),
         }
         await _send_response(
             send,

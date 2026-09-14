@@ -191,3 +191,61 @@ def test_start_new_game_presets():
     # Fallback to warrior on invalid preset
     eng4, state4 = start_new_game("nonexistent_preset")
     assert state4.character.name == "Garron"
+
+
+def test_render_character_sheet_output(capsys):
+    """Character sheet displays all 7 axes and stats cleanly."""
+    from adventure_forge.player.cli import render_character_sheet
+    _, state = start_new_game("cutpurse")
+    render_character_sheet(state)
+    captured = capsys.readouterr().out
+    assert "CHARACTER SHEET: SILAS (Deep-Dweller • cutpurse)" in captured
+    assert "Health: 20/20" in captured
+    assert "Stamina: 10/10" in captured
+    assert "[ATTRIBUTES]" in captured
+    assert "[SKILLS]" in captured
+    assert "[TRAITS]" in captured
+    assert "night_eyed" in captured
+    assert "[FACTION REPUTATION]" in captured
+    assert "Smugglers" in captured
+    assert "[INVENTORY]" in captured
+    assert "lockpick" in captured
+
+
+def test_render_quest_log_output(capsys):
+    """Quest log displays continental campaign and provincial subquests."""
+    from adventure_forge.player.cli import render_quest_log
+    quest_info = {
+        "active_stage": "stage_crags_beacon",
+        "is_finished": False,
+        "completed_stages": ["stage_crags_beacon"],
+        "subquests": {
+            "subquest_reach_smuggler_caches": {
+                "active_stage": "reach_cache_stage_scout",
+                "is_finished": False,
+            }
+        },
+    }
+    render_quest_log(quest_info)
+    captured = capsys.readouterr().out
+    assert "QUEST LOG: CONTINENTAL CAMPAIGN & PROVINCIAL SUBQUESTS" in captured
+    assert "Main Campaign: The Five Seals of Sovereignty" in captured
+    assert "Seals Won    : 1/5" in captured
+    assert "Reach Smuggler Caches" in captured
+
+
+def test_render_history_output(capsys):
+    """Action and event history displays past steps."""
+    from adventure_forge.player.cli import render_history
+    _, state = start_new_game("cutpurse")
+    new_state = state.evolve(
+        history=["flash_thief_signet", "buy_lockpicks"],
+        event_log=["You flash the thieves guild signet.", "You acquired lockpicks."],
+        turn_count=2,
+    )
+    render_history(new_state)
+    captured = capsys.readouterr().out
+    assert "ACTION & EVENT HISTORY (2 steps, Turn 2)" in captured
+    assert "Turn  1: flash_thief_signet" in captured
+    assert "Turn  2: buy_lockpicks" in captured
+    assert "You acquired lockpicks." in captured
