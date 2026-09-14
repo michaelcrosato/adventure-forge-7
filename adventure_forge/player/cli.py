@@ -70,7 +70,45 @@ def render_quest_log(quest_info: Dict[str, Any]) -> None:
                 print(f"   • {q_name:32s}: Stage -> {qprog['active_stage']}")
             else:
                 print(f"   • {q_name:32s}: [Undiscovered]")
+
+    intrigue = quest_info.get("intrigue_quests", {})
+    if intrigue:
+        print("\n [FACTION INTRIGUE ARCS]")
+        for qid, qprog in sorted(intrigue.items()):
+            q_name = qid.replace("subquest_", "").replace("quest_", "").replace("_", " ").title()
+            if qprog.get("is_finished"):
+                ending = f" ({qprog['ending']})" if qprog.get("ending") else ""
+                print(f"   • {q_name:32s}: [RESOLVED]{ending}")
+            elif qprog.get("active_stage"):
+                print(f"   • {q_name:32s}: Stage -> {qprog['active_stage']}")
+            else:
+                print(f"   • {q_name:32s}: [Undiscovered]")
     print("=" * 65 + "\n")
+
+
+def render_continental_map(state: GameState) -> None:
+    """Display ASCII schematic of the 5 provinces and Central Bazaar."""
+    reg = state.current_region
+    print("\n" + "=" * 65)
+    print(" CONTINENTAL ATLAS: THE FIVE PROVINCES")
+    print("=" * 65)
+
+    provinces = [
+        ("The Reach", ["province_reach", "iron_crags"], "Highland peaks. Verticality & climbing stamina."),
+        ("The High Court", ["province_high_court", "high_court_local"], "Imperial halls. Court intrigue & noble decorum."),
+        ("The Grand Bazaar", ["stress_market"], "Continental crossroads. Unbounded choice market hub."),
+        ("The Sunken Hollows", ["province_sunken_hollows", "sunken_hollows_local"], "Flooded grottos. Underwater diving & pressure."),
+        ("The Lowlands", ["province_lowlands", "lower_warrens"], "Canal warrens. Social stealth & suspicion."),
+        ("The Scorchwaste", ["province_scorchwaste", "scorchwaste_local"], "Arid desert. Heat survival & hydration."),
+    ]
+
+    for name, regions, desc in provinces:
+        is_here = reg in regions
+        badge = " [YOU ARE HERE]" if is_here else ""
+        print(f"\n  • {name.upper()}{badge}")
+        print(f"    Mechanic: {desc}")
+
+    print("\n" + "=" * 65 + "\n")
 
 
 def render_history(state: GameState) -> None:
@@ -149,6 +187,7 @@ def render_ui(
         nav_hints.append("'page <num>' to jump")
     nav_hints.append("'sheet' for stats")
     nav_hints.append("'quest' for log")
+    nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
     nav_hints.append("'q' to quit")
@@ -277,6 +316,10 @@ def main():
             continue
         elif choice in ("quest", "quests", "log"):
             render_quest_log(quest_info)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("map", "m", "atlas"):
+            render_continental_map(state)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

@@ -213,7 +213,7 @@ def test_render_character_sheet_output(capsys):
 
 
 def test_render_quest_log_output(capsys):
-    """Quest log displays continental campaign and provincial subquests."""
+    """Quest log displays continental campaign, subquests, and faction intrigue arcs."""
     from adventure_forge.player.cli import render_quest_log
     quest_info = {
         "active_stage": "stage_crags_beacon",
@@ -225,6 +225,12 @@ def test_render_quest_log_output(capsys):
                 "is_finished": False,
             }
         },
+        "intrigue_quests": {
+            "quest_reach_faction_intrigue": {
+                "active_stage": "reach_intrigue_stage_clans",
+                "is_finished": False,
+            }
+        },
     }
     render_quest_log(quest_info)
     captured = capsys.readouterr().out
@@ -232,6 +238,24 @@ def test_render_quest_log_output(capsys):
     assert "Main Campaign: The Five Seals of Sovereignty" in captured
     assert "Seals Won    : 1/5" in captured
     assert "Reach Smuggler Caches" in captured
+    assert "[FACTION INTRIGUE ARCS]" in captured
+    assert "Reach Faction Intrigue" in captured
+
+
+def test_render_continental_map_output(capsys):
+    """Continental map displays all 5 provinces, central bazaar, and player location badge."""
+    from adventure_forge.player.cli import render_continental_map
+    _, state = start_new_game("cutpurse")
+    render_continental_map(state)
+    captured = capsys.readouterr().out
+    assert "CONTINENTAL ATLAS: THE FIVE PROVINCES" in captured
+    assert "THE REACH" in captured
+    assert "THE LOWLANDS [YOU ARE HERE]" in captured
+    assert "THE HIGH COURT" in captured
+    assert "THE SUNKEN HOLLOWS" in captured
+    assert "THE SCORCHWASTE" in captured
+    assert "THE GRAND BAZAAR" in captured
+    assert "Social stealth & suspicion." in captured
 
 
 def test_render_history_output(capsys):
