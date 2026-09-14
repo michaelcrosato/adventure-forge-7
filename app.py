@@ -26,6 +26,7 @@ from adventure_forge.content.quests import (
 )
 from adventure_forge.core.character import CHARACTER_PRESETS, get_preset
 from adventure_forge.core.codex import CODEX_ENTRIES, PROVINCIAL_MASTERIES
+from adventure_forge.core.transit import CHARTERED_ROUTES
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -1845,6 +1846,16 @@ function renderMapModalContent() {
         <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-right: 0.4rem;">Direct Transit Connections:</span>
         <span class="tag-row" style="display: inline-flex;">${connPills}</span>
       </div>
+      <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--panel-border);">
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem;">Chartered Fast-Travel Network</div>
+        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+          <span class="tag" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.75rem;">🚠 Highland Cable Lift</span>
+          <span class="tag" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.75rem;">⛵ Canal River Barge</span>
+          <span class="tag" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.75rem;">🏜️ Desert Silt-Skiff</span>
+          <span class="tag" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.75rem;">🎠 Imperial High Carriage</span>
+          <span class="tag" style="background: rgba(56,189,248,0.15); color: #38bdf8; font-size: 0.75rem;">🤿 Submersible Siphon Ferry</span>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -1936,6 +1947,14 @@ _CODEX_RESPONSE_BYTES = json.dumps(
         "total_entries": len(CODEX_ENTRIES),
         "masteries": PROVINCIAL_MASTERIES,
         "entries": [entry.to_dict(unlocked=False) for entry in CODEX_ENTRIES.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_TRANSIT_RESPONSE_BYTES = json.dumps(
+    {
+        "total_routes": len(CHARTERED_ROUTES),
+        "routes": [r.to_dict(traveled=False) for r in CHARTERED_ROUTES],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -2111,6 +2130,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/transit
+    if path == "/api/game/transit":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_TRANSIT_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -2152,6 +2191,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "state": state.to_dict(),
             "quest": _ENGINE.get_quest_progress(state),
             "codex": _ENGINE.get_codex_progress(state),
+            "transit": _ENGINE.get_transit_progress(state),
         }
         await _send_response(
             send,
@@ -2214,6 +2254,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "state": new_state.to_dict(),
             "quest": _ENGINE.get_quest_progress(new_state),
             "codex": _ENGINE.get_codex_progress(new_state),
+            "transit": _ENGINE.get_transit_progress(new_state),
         }
         await _send_response(
             send,
@@ -2275,6 +2316,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "state": state.to_dict(),
             "quest": _ENGINE.get_quest_progress(state),
             "codex": _ENGINE.get_codex_progress(state),
+            "transit": _ENGINE.get_transit_progress(state),
         }
         await _send_response(
             send,
@@ -2344,6 +2386,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "state": state.to_dict(),
             "quest": _ENGINE.get_quest_progress(state),
             "codex": _ENGINE.get_codex_progress(state),
+            "transit": _ENGINE.get_transit_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

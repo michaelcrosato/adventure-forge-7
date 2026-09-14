@@ -101,12 +101,14 @@ AdventureForge deploys seamlessly to Vercel with zero configuration:
 - **`GET /api/game/quests`**: Continental campaign, 5 provincial subquests, and 5 faction intrigue quest lines.
 - **`GET /api/game/hazards`**: Deterministic hazard combo definitions and status reactions.
 - **`GET /api/game/codex`**: Ancient lore codex catalogue and provincial mastery specifications.
+- **`GET /api/game/transit`**: Chartered continental transit network, route prerequisites, and player progress.
 - **`POST /api/mcp` & `/mcp`**: JSON-RPC 2.0 Model Context Protocol endpoint for AI coding agents.
 
 ### Web UI Suite & Interactive Features
 The browser player at `/` provides an immersive, action-first interface:
 - **Interactive Quest Journal (`📜 Quests`, Key: `Q`):** 3-tab modal tracking the Five Seals of Sovereignty, 5 Provincial Narrative Chains, and 5 Faction Intrigue Arcs.
 - **Continental Province World Map Atlas (`🗺️ Map`, Key: `M`):** Interactive map showing active player location, regional mechanics, environmental hazard warnings, and transit connections across the 5 provinces and Central Bazaar.
+- **Chartered Continental Transit & Regional Caravan Network (`[TRANSIT]`):** 10 bidirectional routes linking Central Bazaar directly to the 5 provincial gateway fortresses (Highland Cable Lift, Canal River Barge, Desert Silt-Skiff, Imperial High Carriage, Submersible Siphon Ferry) reacting dynamically to character background, traits, equipment, and coinage, awarding the `Continental Wayfarer` milestone.
 - **Session Auto-Save & Resume:** Automatically persists game state in browser `localStorage` across turns with an instant resume card on the character selection screen.
 - **Real-Time Action Search (`🔍 Search`):** Dynamic instant text filtering for seamless navigation in scenes with 100+ legal actions.
 - **7-Axis Character Sheet Modal (`📊 Sheet`, Key: `C`):** Full inspection of ancestry, background, attributes, skills, traits, flaws, active markers, and inventory.

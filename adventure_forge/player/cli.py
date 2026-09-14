@@ -108,6 +108,22 @@ def render_continental_map(state: GameState) -> None:
         print(f"\n  • {name.upper()}{badge}")
         print(f"    Mechanic: {desc}")
 
+    print("\n [CHARTERED CONTINENTAL TRANSIT]")
+    routes = [
+        ("Highland Cable Lift", "The Reach", "route_reach"),
+        ("Canal River Barge", "The Lowlands", "route_lowlands"),
+        ("Desert Silt-Skiff", "The Scorchwaste", "route_scorchwaste"),
+        ("Imperial High Carriage", "The High Court", "route_high_court"),
+        ("Submersible Siphon Ferry", "The Sunken Hollows", "route_sunken_hollows"),
+    ]
+    for r_name, r_prov, r_flag in routes:
+        status = "[TRAVELED]" if state.world_flags.get(r_flag) else "[AVAILABLE]"
+        print(f"   • {r_name:24s} -> {r_prov:20s}: {status}")
+
+    if state.world_flags.get("continental_wayfarer_unlocked"):
+        print("\n [CONTINENTAL MILESTONE]")
+        print("   • Continental Wayfarer: Traveled all five chartered routes across the realm!")
+
     print("\n" + "=" * 65 + "\n")
 
 

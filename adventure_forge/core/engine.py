@@ -20,6 +20,7 @@ from adventure_forge.content.quests import (
     get_faction_intrigue_quests,
 )
 from adventure_forge.core.codex import evaluate_codex_progress
+from adventure_forge.core.transit import evaluate_transit_progress
 
 
 @dataclass
@@ -108,6 +109,10 @@ class AdventureEngine:
     def get_codex_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current ancient lore codex progress for active state."""
         return evaluate_codex_progress(state.world_flags)
+
+    def get_transit_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current continental transit route progress for active state."""
+        return evaluate_transit_progress(state.world_flags)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

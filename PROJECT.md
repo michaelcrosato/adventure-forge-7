@@ -78,6 +78,7 @@ Every feature from the Survey phase appears here with its assigned milestone.
 | M17 | Master Field Crafting & Alchemical Synthesis | Shipped 10 field crafting recipes (tools, alchemical tonics, protective gear) with dynamic affordance synthesis, ingredient consumption, downstream systemic unlock, and bit-for-bit replay | M16 | COMPLETE |
 | M18 | Continental Dynamic Event & World Calamity System | Shipped 5 provincial incursion calamities (Crag Tremor, Siphon Surge, Glass Tempest, Inquisitor Lockdown, Sluice Breach) with cyclical activation, dynamic affordance mitigations, salvage rewards, and deterministic replay | M17 | COMPLETE |
 | M19 | Continental Ancient Lore Codex & Relic Deciphering Engine | Shipped 15 provincial ancient lore codices (3 per province across 5 provinces) with 7-axis reactivity, stamina-based deciphering affordances, provincial lore masteries, dedicated Codex UI modal (Key: X), CLI `codex` command, and REST API | M18 | COMPLETE |
+| M20 | Continental Chartered Transit & Regional Caravan Network | Shipped 10 bidirectional chartered routes linking Central Bazaar to 5 provinces (Highland Cable Lift, Canal River Barge, Desert Silt-Skiff, Imperial High Carriage, Submersible Siphon Ferry) with 7-axis reactivity, Continental Wayfarer milestone, and REST API | M19 | COMPLETE |
 
 ## Interface Contracts
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`

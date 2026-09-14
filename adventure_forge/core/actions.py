@@ -19,6 +19,7 @@ from adventure_forge.core.stances import (
 from adventure_forge.core.crafting import CRAFTING_RECIPES
 from adventure_forge.core.calamities import get_active_calamity
 from adventure_forge.core.codex import get_codex_entries_for_scene
+from adventure_forge.core.transit import get_transit_routes_for_scene
 
 
 @dataclass(frozen=True)
@@ -947,5 +948,23 @@ def synthesize_affordances(
                 )
                 legal_actions.append(codex_act)
                 seen_ids.add(entry.action_id)
+
+    # 8. Continental Chartered Transit & Fast-Travel Network (Milestone 20)
+    if effective_scene_id:
+        transit_routes = get_transit_routes_for_scene(effective_scene_id)
+        for route in transit_routes:
+            if route.action_id not in seen_ids and route.is_available(character, world_flags):
+                transit_act = Action(
+                    id=route.action_id,
+                    label=route.action_label,
+                    category=route.category,
+                    effects=route.build_effects(world_flags),
+                    target_scene=route.destination_scene,
+                    result_text=route.result_text,
+                    risk="low",
+                    stamina_cost=route.stamina_cost,
+                )
+                legal_actions.append(transit_act)
+                seen_ids.add(route.action_id)
 
     return legal_actions
