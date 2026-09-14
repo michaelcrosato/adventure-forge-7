@@ -47,8 +47,8 @@ def apply_effects(
                 inv = list(new_char.inventory)
                 if item in inv:
                     inv.remove(item)
-                new_char = new_char.modify(inventory=inv)
-                events.append(f"Lost item: {item}")
+                    new_char = new_char.modify(inventory=inv)
+                    events.append(f"Lost item: {item}")
             elif op == "modify_health":
                 delta = int(operand)
                 hp = max(0, min(new_char.max_health, new_char.health + delta))

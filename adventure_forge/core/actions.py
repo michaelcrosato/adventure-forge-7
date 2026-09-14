@@ -16,6 +16,7 @@ from adventure_forge.core.stances import (
     TACTICAL_STANCES,
     ALL_STANCE_MARKERS,
 )
+from adventure_forge.core.crafting import CRAFTING_RECIPES
 
 
 @dataclass(frozen=True)
@@ -889,5 +890,22 @@ def synthesize_affordances(
                     if shift_act.is_legal(character, world_flags):
                         legal_actions.append(shift_act)
                         seen_ids.add(stance.shift_action_id)
+
+    # 5. Master Field Crafting & Alchemical Synthesis (Milestone 17)
+    if len(base_actions) > 0 or len(scene_entities) > 0 or bool(world_flags.get("crafting_enabled")):
+        for recipe in CRAFTING_RECIPES.values():
+            if recipe.action_id not in seen_ids and recipe.is_available(character, world_flags):
+                craft_act = Action(
+                    id=recipe.action_id,
+                    label=recipe.label,
+                    category=recipe.category,
+                    effects=recipe.build_effects(),
+                    result_text=recipe.result_text,
+                    risk="low",
+                    stamina_cost=recipe.stamina_cost,
+                )
+                if craft_act.is_legal(character, world_flags):
+                    legal_actions.append(craft_act)
+                    seen_ids.add(recipe.action_id)
 
     return legal_actions

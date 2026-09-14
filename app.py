@@ -331,6 +331,7 @@ a:hover { text-decoration: underline; }
 .cat-interaction { background: rgba(88,166,255,0.2); color: var(--accent); }
 .cat-combat { background: rgba(248,81,73,0.2); color: var(--red); }
 .cat-tactical { background: rgba(187,128,255,0.2); color: #d2a8ff; border: 1px solid rgba(187,128,255,0.35); }
+.cat-crafting { background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid rgba(56,189,248,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
 .cat-general { background: rgba(110,118,129,0.2); color: var(--text-muted); }
 .badge-cost { color: var(--gold); }
