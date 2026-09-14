@@ -176,10 +176,84 @@ def start_new_game(char_preset: str = "cutpurse") -> Tuple[AdventureEngine, Game
     return engine, state
 
 
-def main():
-    preset = sys.argv[1] if len(sys.argv) > 1 else "cutpurse"
-    engine, state = start_new_game(preset)
+def execute_replay(
+    replay_data: Dict[str, Any],
+    engine: Optional[AdventureEngine] = None,
+) -> Tuple[GameState, Any, List[str]]:
+    """Deterministically execute an action trace and return final state, obs, and fingerprints."""
+    if engine is None:
+        registry = build_world_registry()
+        engine = AdventureEngine(registry)
+
+    preset_name = str(replay_data.get("preset", "cutpurse"))
+    seed = int(replay_data.get("seed", 42))
+    actions = replay_data.get("actions", replay_data.get("history", []))
+
+    try:
+        preset = get_preset(preset_name)
+    except KeyError:
+        preset = get_preset("cutpurse")
+
+    state = GameState(
+        build_id="af-build-001",
+        session_id=f"cli-replay-{preset.id}-{seed}",
+        character=preset.character,
+        current_region=preset.start_region,
+        current_scene=preset.start_scene,
+        rng=DeterministicRNG.from_seed(seed),
+    )
     obs = engine.observe(state)
+    fingerprints = [state.fingerprint()]
+
+    for act_id in actions:
+        state, obs = engine.step(state, str(act_id))
+        fingerprints.append(state.fingerprint())
+        if not obs.success or obs.is_terminal:
+            break
+
+    return state, obs, fingerprints
+
+
+def main():
+    import os
+    if len(sys.argv) > 1 and sys.argv[1] == "--replay":
+        if len(sys.argv) < 3:
+            print("Usage: python3 -m adventure_forge.player.cli --replay <replay.json>")
+            sys.exit(1)
+        src = sys.argv[2]
+        if os.path.exists(src):
+            with open(src, "r", encoding="utf-8") as f:
+                replay_payload = json.load(f)
+        else:
+            replay_payload = json.loads(src)
+
+        registry = build_world_registry()
+        engine = AdventureEngine(registry)
+        state, obs, fps = execute_replay(replay_payload, engine)
+
+        print("\n" + "=" * 65)
+        print(" ADVENTUREFORGE DETERMINISTIC REPLAY EXECUTION")
+        print("=" * 65)
+        print(f" Preset           : {replay_payload.get('preset', 'cutpurse')}")
+        print(f" Seed             : {replay_payload.get('seed', 42)}")
+        print(f" Executed Steps   : {state.turn_count}")
+        print(f" Final Scene      : {state.current_scene} [{state.current_region}]")
+        print(f" Final SHA-256    : {state.fingerprint()}")
+        expected_fp = replay_payload.get("fingerprint")
+        if expected_fp:
+            matches = (expected_fp == state.fingerprint())
+            status_text = "BIT-FOR-BIT IDENTICAL ✓" if matches else f"MISMATCH (expected {expected_fp})"
+            print(f" Fingerprint Match: {status_text}")
+        print("=" * 65 + "\n")
+
+        if obs.is_terminal:
+            print(f"*** OUTCOME REACHED: {obs.outcome or 'JOURNEY CONCLUDED'} ***\n")
+            return
+        preset = str(replay_payload.get("preset", "cutpurse"))
+    else:
+        preset = sys.argv[1] if len(sys.argv) > 1 else "cutpurse"
+        engine, state = start_new_game(preset)
+        obs = engine.observe(state)
 
     state_history: List[GameState] = [state]
     page = 0

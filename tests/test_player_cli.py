@@ -249,3 +249,20 @@ def test_render_history_output(capsys):
     assert "Turn  1: flash_thief_signet" in captured
     assert "Turn  2: buy_lockpicks" in captured
     assert "You acquired lockpicks." in captured
+
+
+def test_execute_replay_cli():
+    """execute_replay faithfully reproduces deterministic states."""
+    from adventure_forge.player.cli import execute_replay
+    payload = {
+        "preset": "cutpurse",
+        "seed": 42,
+        "actions": ["flash_thief_signet"],
+    }
+    state, obs, fps = execute_replay(payload)
+    assert state.turn_count == 1
+    assert state.current_scene == "warrens_black_market"
+    assert obs.scene_id == "warrens_black_market"
+    assert len(fps) == 2
+    assert fps[1] == state.fingerprint()
+
