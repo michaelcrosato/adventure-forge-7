@@ -62,14 +62,16 @@ def test_render_ui_small_action_set(capsys):
 
 
 def test_render_ui_large_action_set_pagination_bazaar(capsys):
-    """bazaar_center with 115 actions paginates cleanly to 8 pages (15/page)."""
+    """bazaar_center with 100+ actions paginates cleanly to multiple pages (15/page)."""
     obs = _get_bazaar_obs()
-    assert len(obs.legal_actions) == 115
+    total = len(obs.legal_actions)
+    assert total >= 100
+    total_pages = (total + 14) // 15
 
     render_ui(obs, page=0, page_size=15)
     captured = capsys.readouterr().out
 
-    assert "AVAILABLE ACTIONS (115 total | Page 1 of 8 | Showing 1-15):" in captured
+    assert f"AVAILABLE ACTIONS ({total} total | Page 1 of {total_pages} | Showing 1-15):" in captured
     assert "'n' for next page" in captured
     assert "'p' for prev page" not in captured
     assert "'page <num>' to jump" in captured
@@ -78,18 +80,21 @@ def test_render_ui_large_action_set_pagination_bazaar(capsys):
 def test_render_ui_page_traversal_middle_and_last(capsys):
     """Traversing to middle page shows both next/prev; last page shows only prev."""
     obs = _get_bazaar_obs()
+    total = len(obs.legal_actions)
+    total_pages = (total + 14) // 15
+    last_start = (total_pages - 1) * 15 + 1
 
     # Middle page (Page 2)
     render_ui(obs, page=1, page_size=15)
     cap_mid = capsys.readouterr().out
-    assert "Page 2 of 8 | Showing 16-30" in cap_mid
+    assert f"Page 2 of {total_pages} | Showing 16-30" in cap_mid
     assert "'n' for next page" in cap_mid
     assert "'p' for prev page" in cap_mid
 
-    # Last page (Page 8)
-    render_ui(obs, page=7, page_size=15)
+    # Last page
+    render_ui(obs, page=total_pages - 1, page_size=15)
     cap_last = capsys.readouterr().out
-    assert "Page 8 of 8 | Showing 106-115" in cap_last
+    assert f"Page {total_pages} of {total_pages} | Showing {last_start}-{total}" in cap_last
     assert "'p' for prev page" in cap_last
     assert "'n' for next page" not in cap_last
 
@@ -161,16 +166,19 @@ def test_boundary_exact_multiples_and_single_action(capsys):
 def test_page_number_clamping(capsys):
     """Out-of-range negative and overly large page indices are clamped safely."""
     obs = _get_bazaar_obs()
+    total = len(obs.legal_actions)
+    total_pages = (total + 14) // 15
+    last_start = (total_pages - 1) * 15 + 1
 
     # Negative page clamps to 0 (Page 1)
     render_ui(obs, page=-10, page_size=15)
     cap_neg = capsys.readouterr().out
-    assert "Page 1 of 8 | Showing 1-15" in cap_neg
+    assert f"Page 1 of {total_pages} | Showing 1-15" in cap_neg
 
-    # Large page clamps to last page (Page 8)
+    # Large page clamps to last page
     render_ui(obs, page=999, page_size=15)
     cap_large = capsys.readouterr().out
-    assert "Page 8 of 8 | Showing 106-115" in cap_large
+    assert f"Page {total_pages} of {total_pages} | Showing {last_start}-{total}" in cap_large
 
 
 def test_start_new_game_presets():

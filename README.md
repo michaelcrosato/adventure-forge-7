@@ -103,6 +103,7 @@ AdventureForge deploys seamlessly to Vercel with zero configuration:
 - **`GET /api/game/codex`**: Ancient lore codex catalogue and provincial mastery specifications.
 - **`GET /api/game/transit`**: Chartered continental transit network, route prerequisites, and player progress.
 - **`GET /api/game/trade`**: Continental commodity manifest, trading hubs, import price bonuses, and trade progress.
+- **`GET /api/game/weather`**: Continental weather dynamics, 12 atmospheric conditions, and provincial forecasts.
 - **`POST /api/mcp` & `/mcp`**: JSON-RPC 2.0 Model Context Protocol endpoint for AI coding agents.
 
 ### Web UI Suite & Interactive Features
@@ -111,6 +112,7 @@ The browser player at `/` provides an immersive, action-first interface:
 - **Continental Province World Map Atlas (`🗺️ Map`, Key: `M`):** Interactive map showing active player location, regional mechanics, environmental hazard warnings, and transit connections across the 5 provinces and Central Bazaar.
 - **Chartered Continental Transit & Regional Caravan Network (`[TRANSIT]`):** 10 bidirectional routes linking Central Bazaar directly to the 5 provincial gateway fortresses (Highland Cable Lift, Canal River Barge, Desert Silt-Skiff, Imperial High Carriage, Submersible Siphon Ferry) reacting dynamically to character background, traits, equipment, and coinage, awarding the `Continental Wayfarer` milestone.
 - **Continental Trade Economy & Regional Commodity Exchange (`[TRADE]`, Key: `T`):** 5 provincial trade goods (Highland Iron Ore, Aged Bog Whiskey, Sunfire Spice, Imperial Silk Bolt, Abyssal Pearl Essence) with supply-demand price arbitrage across 6 trading hubs. Features 7-axis barter alternatives and clan discounts, Merchant Consortium Recognition, and Master Trader milestones.
+- **Continental Weather Dynamics & Provincial Micro-Climates (`⛅ Weather`, Key: `W`):** 12 deterministic atmospheric conditions cycling every 6 turns across the 5 provinces and Central Crossroads (e.g., Clear Alpine Air vs Blinding Blizzard in the Reach; Dusk Dune Chill vs Solar Heatwave in the Scorchwaste; Canal River Breeze vs Marsh Low Fog in the Lowlands). Dynamically synthesizes systemic environmental affordances (melt gathering, grotto shelter, shade rigging, marsh skulking) with turn cycle deduplication and live HUD weather badges.
 - **Session Auto-Save & Resume:** Automatically persists game state in browser `localStorage` across turns with an instant resume card on the character selection screen.
 - **Real-Time Action Search (`🔍 Search`):** Dynamic instant text filtering for seamless navigation in scenes with 100+ legal actions.
 - **7-Axis Character Sheet Modal (`📊 Sheet`, Key: `C`):** Full inspection of ancestry, background, attributes, skills, traits, flaws, active markers, and inventory.
@@ -120,11 +122,11 @@ The browser player at `/` provides an immersive, action-first interface:
 - **Master Field Crafting & Alchemical Synthesis (`[CRAFTING]`):** Deterministic recipe synthesis (lockpicks, torches, crowbar levers, filter masks, detox salves, waterproof pitch seals, climbing ropes, desert cowls, acid vials, and fire strikers) dynamically synthesized when holding required salvage, instantly unlocking downstream world affordances.
 - **Continental Dynamic Event & World Calamities (`[SYSTEMIC]` / `[SOCIAL]`):** Turn-cyclical provincial incursions (Crag Tremor, Siphon Surge, Glass Tempest, Inquisitor Lockdown, Sluice Breach) challenging players with environmental threats and yielding dynamic mitigations that award crafting salvage and unlock safe passage.
 - **Continental Ancient Lore Codex & Relic Deciphering Engine (`[CODEX]`, Key: `X`):** 15 ancient lore codices (3 per province across 5 provinces) situated at historical sanctums and shrines. Deciphering relics leverages 7-axis traits, skills, and tools to unlock rich Hemingway lore excerpts, and mastering all 3 relics in a province awards prestigious provincial lore masteries (Reach Archivist, Lowlands Chronicler, Dune Antiquarian, Court Historian, Abyssal Scholar).
-- **Hotkeys:** `1`–`9` (action selection), `Q` (quest journal), `X` (ancient codex), `T` (commodity exchange), `M` (continental map), `C` (character sheet), `U` (undo), `Escape` (close modals).
+- **Hotkeys:** `1`–`9` (action selection), `Q` (quest journal), `X` (ancient codex), `T` (commodity exchange), `W` (weather forecast), `M` (continental map), `C` (character sheet), `U` (undo), `Escape` (close modals).
 
 ### CLI Player Features & Deterministic Replay
 ```bash
-# Interactive play with 7-axis sheet ('sheet'), quest log ('quest'), codex ('codex'), and undo ('u')
+# Interactive play with 7-axis sheet ('sheet'), quest log ('quest'), codex ('codex'), trade ('trade'), weather ('weather'), and undo ('u')
 python3 -m adventure_forge.player.cli [preset]
 
 # Replay and verify an action trace bit-for-bit

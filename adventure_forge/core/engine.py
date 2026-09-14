@@ -22,6 +22,7 @@ from adventure_forge.content.quests import (
 from adventure_forge.core.codex import evaluate_codex_progress
 from adventure_forge.core.transit import evaluate_transit_progress
 from adventure_forge.core.trade import evaluate_trade_progress
+from adventure_forge.core.weather import get_weather_for_region, get_all_provincial_weather
 
 
 @dataclass
@@ -118,6 +119,15 @@ class AdventureEngine:
     def get_trade_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current continental trade and commodity progress for active state."""
         return evaluate_trade_progress(state.world_flags, state.character.inventory)
+
+    def get_weather_state(self, state: GameState) -> Dict[str, Any]:
+        """Compute current local weather condition for active region and turn."""
+        w = get_weather_for_region(state.turn_count, state.current_region)
+        return w.to_dict()
+
+    def get_weather_forecast(self, state: GameState) -> Dict[str, Any]:
+        """Compute current weather conditions across all provinces."""
+        return get_all_provincial_weather(state.turn_count)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

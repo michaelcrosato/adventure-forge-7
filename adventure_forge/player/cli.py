@@ -14,6 +14,7 @@ from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.content.loader import build_world_registry
 from adventure_forge.core.trade import COMMODITIES, TRADE_HUBS
+from adventure_forge.core.weather import get_weather_for_region
 
 
 def render_character_sheet(state: GameState) -> None:
@@ -198,6 +199,25 @@ def render_trade_market(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_weather_forecast(state: GameState, engine: AdventureEngine) -> None:
+    """Display current continental weather conditions across all provinces."""
+    forecast = engine.get_weather_forecast(state)
+    local = engine.get_weather_state(state)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL WEATHER FORECAST (Turn {state.turn_count})")
+    print("=" * 65)
+    print(f"\n [LOCAL ATMOSPHERE: {local['name'].upper()}]")
+    print(f"   {local['description']}")
+
+    print("\n [PROVINCIAL CLIMATE FORECAST]")
+    for prov, w in forecast.items():
+        hazard = f" [{w['hazard_type'].upper()}]" if w.get("hazard_type") else ""
+        print(f"   • {prov:20s}: {w['name']}{hazard}")
+        print(f"     \"{w['description']}\"")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -229,7 +249,8 @@ def render_ui(
         c = state.character
         status_str = f" | Status: {', '.join(c.markers)}" if c.markers else " | Status: Normal"
         items_str = f" | Items: {len(c.inventory)}"
-        print(f" HP: {c.health}/{c.max_health} | SP: {c.stamina}/{c.max_stamina}{status_str}{items_str}")
+        w = get_weather_for_region(state.turn_count, state.current_region)
+        print(f" HP: {c.health}/{c.max_health} | SP: {c.stamina}/{c.max_stamina}{status_str}{items_str} | Weather: {w.name}")
     if quest_info:
         active_stg = quest_info.get("active_stage", "Exploring Continent")
         print(f" Quest: {active_stg}")
@@ -276,6 +297,7 @@ def render_ui(
     nav_hints.append("'quest' for log")
     nav_hints.append("'codex' for lore")
     nav_hints.append("'trade' for market")
+    nav_hints.append("'weather' for climate")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -418,6 +440,10 @@ def main():
             continue
         elif choice in ("trade", "t"):
             render_trade_market(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("weather", "w"):
+            render_weather_forecast(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

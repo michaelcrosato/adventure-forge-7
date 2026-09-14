@@ -28,6 +28,7 @@ from adventure_forge.core.character import CHARACTER_PRESETS, get_preset
 from adventure_forge.core.codex import CODEX_ENTRIES, PROVINCIAL_MASTERIES
 from adventure_forge.core.transit import CHARTERED_ROUTES
 from adventure_forge.core.trade import COMMODITIES, TRADE_HUBS
+from adventure_forge.core.weather import WEATHER_CONDITIONS, get_all_provincial_weather
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -338,6 +339,7 @@ a:hover { text-decoration: underline; }
 .cat-codex { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.35); }
 .cat-transit { background: rgba(45,212,191,0.2); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.35); }
 .cat-trade { background: rgba(234,179,8,0.2); color: #facc15; border: 1px solid rgba(234,179,8,0.35); }
+.cat-weather { background: rgba(56,189,248,0.25); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4); }
 .cat-systemic { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.35); }
 .cat-social { background: rgba(236,72,153,0.2); color: #ec4899; border: 1px solid rgba(236,72,153,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
@@ -641,6 +643,7 @@ footer {
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleQuestModal()" title="View Quest Journal (Key: Q)">📜 Quests</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCodexModal()" title="View Ancient Lore Codex (Key: X)">📖 Codex</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleTradeModal()" title="View Commodity Exchange (Key: T)">⚖️ Trade</button>
+        <button class="btn btn-secondary" id="weather-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleWeatherModal()" title="View Continental Weather Forecast (Key: W)">⛅ Weather</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -745,6 +748,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleTradeModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-trade-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL WEATHER FORECAST MODAL -->
+    <div id="weather-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleWeatherModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">⛅ Continental Weather Dynamics & Provincial Forecast</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleWeatherModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-weather-content"></div>
       </div>
     </div>
 
@@ -961,6 +975,8 @@ let lastCharacter = null;
 let cachedQuestsMetadata = null;
 let cachedCodexMetadata = null;
 let cachedTradeMetadata = null;
+let currentWeatherData = null;
+let cachedWeatherMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1017,7 +1033,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1048,7 +1064,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1074,7 +1090,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1155,10 +1171,11 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade) {
+function renderGame(obs, char, quest, codex, transit, trade, weather) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
+  if (weather) currentWeatherData = weather;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1189,6 +1206,11 @@ function renderGame(obs, char, quest, codex, transit, trade) {
 
   document.getElementById("turn-display").textContent = obs.turn_count;
   document.getElementById("fingerprint-display").textContent = obs.fingerprint ? obs.fingerprint.substring(0, 16) + "..." : "n/a";
+
+  const weatherBtn = document.getElementById("weather-btn");
+  if (weatherBtn && currentWeatherData) {
+    weatherBtn.textContent = `⛅ ${currentWeatherData.name}`;
+  }
 
   // Quest Tracker
   if (quest) {
@@ -1407,7 +1429,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1491,7 +1513,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1898,6 +1920,119 @@ function renderTradeModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchWeatherDataIfNeeded() {
+  if (cachedWeatherMetadata) return cachedWeatherMetadata;
+  try {
+    const res = await fetch("/api/game/weather");
+    if (res.ok) {
+      cachedWeatherMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Weather fetch failed:", e);
+  }
+  return cachedWeatherMetadata;
+}
+
+async function toggleWeatherModal() {
+  const modal = document.getElementById("weather-modal");
+  if (modal.style.display === "none") {
+    await fetchWeatherDataIfNeeded();
+    renderWeatherModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderWeatherModalContent() {
+  const content = document.getElementById("modal-weather-content");
+  if (!content) return;
+  const meta = cachedWeatherMetadata;
+  const w = currentWeatherData;
+  const turn = (lastObservation && lastObservation.turn_count) || (gameState && gameState.turn_count) || 0;
+  const turnsInCycle = turn % 6;
+  const remaining = 6 - turnsInCycle;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Weather Dynamics</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Deterministic regional micro-climates cycle every 6 turns.</div>
+      </div>
+      <div>
+        <span class="tag" style="background: rgba(56,189,248,0.2); color: #38bdf8; font-weight: 600; font-size: 0.8rem;">
+          Turn ${turn} &bull; Next Shift in ${remaining} turn${remaining === 1 ? '' : 's'}
+        </span>
+      </div>
+    </div>
+  `;
+
+  if (w) {
+    html += `
+      <div style="background: var(--bg-card); border: 1px solid rgba(56,189,248,0.4); border-radius: 6px; padding: 0.8rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+          <div style="font-size: 0.95rem; font-weight: 700; color: #fff;">
+            Local Micro-Climate: <span style="color: #38bdf8;">${w.name}</span>
+          </div>
+          <span class="tag" style="background: rgba(234,179,8,0.15); color: #facc15; font-size: 0.75rem;">
+            ${w.hazard_type ? ('Hazard: ' + w.hazard_type.toUpperCase()) : 'MILD FRONT'}
+          </span>
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${w.description}</div>
+        <div style="display: flex; gap: 0.6rem; font-size: 0.75rem; align-items: center;">
+          <span style="color: var(--text-muted);">Systemic Affordance:</span>
+          <span class="tag" style="background: rgba(63,185,80,0.15); color: #3fb950; font-weight: 600;">${w.action_label}</span>
+          <span style="color: var(--text-muted);">Province: ${w.province}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `
+    <div style="margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 700; color: #fff;">Provincial Micro-Climates (12 Total Fronts)</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+  `;
+
+  const conditions = (meta && meta.conditions) || [];
+  const provGroups = {
+    "The Reach": { icon: "🏔️", list: [] },
+    "The Scorchwaste": { icon: "🏜️", list: [] },
+    "The Lowlands": { icon: "🌾", list: [] },
+    "The High Court": { icon: "🏛️", list: [] },
+    "The Sunken Hollows": { icon: "🌊", list: [] },
+    "Central Crossroads": { icon: "⚖️", list: [] }
+  };
+
+  for (const c of conditions) {
+    if (provGroups[c.province]) {
+      provGroups[c.province].list.push(c);
+    }
+  }
+
+  for (const [pName, pData] of Object.entries(provGroups)) {
+    const isCurrentProv = w && w.province === pName;
+    html += `
+      <div style="background: var(--bg-card); border: 1px solid ${isCurrentProv ? '#38bdf8' : 'var(--panel-border)'}; border-radius: 6px; padding: 0.6rem 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+          <span style="font-weight: 700; font-size: 0.85rem; color: #fff;">${pData.icon} ${pName}</span>
+          ${isCurrentProv ? '<span class="tag" style="background: rgba(56,189,248,0.25); color: #38bdf8; font-size: 0.7rem; font-weight: 700;">CURRENT</span>' : ''}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+          ${pData.list.map(c => `
+            <div style="font-size: 0.75rem; color: ${w && w.id === c.id ? '#7dd3fc' : 'var(--text-muted)'}; display: flex; justify-content: space-between;">
+              <span>&bull; ${c.name}</span>
+              <span style="font-size: 0.7rem; opacity: 0.8;">${c.action_label}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -2007,6 +2142,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("quest-modal").style.display = "none";
     document.getElementById("codex-modal").style.display = "none";
     document.getElementById("trade-modal").style.display = "none";
+    document.getElementById("weather-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -2028,6 +2164,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "t") {
     toggleTradeModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "w") {
+    toggleWeatherModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -2119,6 +2259,15 @@ _TRADE_RESPONSE_BYTES = json.dumps(
             }
             for k, v in TRADE_HUBS.items()
         },
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_WEATHER_RESPONSE_BYTES = json.dumps(
+    {
+        "total_conditions": len(WEATHER_CONDITIONS),
+        "conditions": [w.to_dict() for w in WEATHER_CONDITIONS.values()],
+        "forecast": get_all_provincial_weather(0),
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -2334,6 +2483,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/weather
+    if path == "/api/game/weather":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_WEATHER_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -2377,6 +2546,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "codex": _ENGINE.get_codex_progress(state),
             "transit": _ENGINE.get_transit_progress(state),
             "trade": _ENGINE.get_trade_progress(state),
+            "weather": _ENGINE.get_weather_state(state),
         }
         await _send_response(
             send,
@@ -2441,6 +2611,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "codex": _ENGINE.get_codex_progress(new_state),
             "transit": _ENGINE.get_transit_progress(new_state),
             "trade": _ENGINE.get_trade_progress(new_state),
+            "weather": _ENGINE.get_weather_state(new_state),
         }
         await _send_response(
             send,
@@ -2504,6 +2675,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "codex": _ENGINE.get_codex_progress(state),
             "transit": _ENGINE.get_transit_progress(state),
             "trade": _ENGINE.get_trade_progress(state),
+            "weather": _ENGINE.get_weather_state(state),
         }
         await _send_response(
             send,
@@ -2575,6 +2747,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "codex": _ENGINE.get_codex_progress(state),
             "transit": _ENGINE.get_transit_progress(state),
             "trade": _ENGINE.get_trade_progress(state),
+            "weather": _ENGINE.get_weather_state(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

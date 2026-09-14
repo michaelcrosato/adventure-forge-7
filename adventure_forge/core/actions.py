@@ -21,6 +21,7 @@ from adventure_forge.core.calamities import get_active_calamity
 from adventure_forge.core.codex import get_codex_entries_for_scene
 from adventure_forge.core.transit import get_transit_routes_for_scene
 from adventure_forge.core.trade import get_trade_affordances_for_scene
+from adventure_forge.core.weather import get_weather_affordance_for_scene
 
 
 @dataclass(frozen=True)
@@ -975,5 +976,19 @@ def synthesize_affordances(
             if trade_act.id not in seen_ids and trade_act.is_legal(character, world_flags):
                 legal_actions.append(trade_act)
                 seen_ids.add(trade_act.id)
+
+    # 10. Continental Weather Dynamics & Provincial Micro-Climates (Milestone 22)
+    if effective_scene_id:
+        turn_count = int(world_flags.get("turn_count", 0))
+        weather_act = get_weather_affordance_for_scene(
+            effective_scene_id,
+            str(effective_region or "stress_market"),
+            turn_count,
+            character,
+            world_flags,
+        )
+        if weather_act and weather_act.id not in seen_ids:
+            legal_actions.append(weather_act)
+            seen_ids.add(weather_act.id)
 
     return legal_actions
