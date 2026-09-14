@@ -111,6 +111,42 @@ def render_continental_map(state: GameState) -> None:
     print("\n" + "=" * 65 + "\n")
 
 
+def render_codex_log(codex_info: Dict[str, Any]) -> None:
+    """Display ancient lore codex inscriptions and provincial masteries."""
+    disc_count = codex_info.get("discovered_count", 0)
+    total_count = codex_info.get("total_entries", 15)
+    print("\n" + "=" * 65)
+    print(f" ANCIENT CODEX & RELIC ARCHIVES ({disc_count} / {total_count} DISCOVERED)")
+    print("=" * 65)
+
+    prog = codex_info.get("province_progress", {})
+    if prog:
+        print("\n [PROVINCIAL DISCOVERY]")
+        for p_key, p_data in prog.items():
+            status = "[MASTERED]" if p_data.get("mastery_unlocked") else f"{p_data.get('discovered', 0)} / {p_data.get('total', 3)}"
+            print(f"   • {p_data.get('title', p_key):24s}: {status}")
+
+    entries = codex_info.get("entries", [])
+    unlocked = [e for e in entries if e.get("unlocked")]
+    if unlocked:
+        print("\n [DISCOVERED INSCRIPTIONS]")
+        for e in unlocked:
+            print(f"   • [{e['province']}] {e['title']} ({e['category']})")
+            print(f"     Location : {e['scene_id']}")
+            print(f"     Lore     : \"{e.get('lore_text', '')}\"")
+    else:
+        print("\n [DISCOVERED INSCRIPTIONS]")
+        print("   No ancient inscriptions deciphered yet. Search provincial sanctums.")
+
+    masteries = codex_info.get("masteries_unlocked", [])
+    if masteries:
+        print("\n [PROVINCIAL MASTERIES]")
+        for m in masteries:
+            print(f"   • {m['title']}: {m['description']}")
+
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -187,6 +223,7 @@ def render_ui(
         nav_hints.append("'page <num>' to jump")
     nav_hints.append("'sheet' for stats")
     nav_hints.append("'quest' for log")
+    nav_hints.append("'codex' for lore")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -316,6 +353,11 @@ def main():
             continue
         elif choice in ("quest", "quests", "log"):
             render_quest_log(quest_info)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("codex", "relics", "lore", "x"):
+            codex_info = engine.get_codex_progress(state)
+            render_codex_log(codex_info)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("map", "m", "atlas"):

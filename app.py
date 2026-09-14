@@ -25,6 +25,7 @@ from adventure_forge.content.quests import (
     get_provincial_subquests,
 )
 from adventure_forge.core.character import CHARACTER_PRESETS, get_preset
+from adventure_forge.core.codex import CODEX_ENTRIES, PROVINCIAL_MASTERIES
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -332,6 +333,7 @@ a:hover { text-decoration: underline; }
 .cat-combat { background: rgba(248,81,73,0.2); color: var(--red); }
 .cat-tactical { background: rgba(187,128,255,0.2); color: #d2a8ff; border: 1px solid rgba(187,128,255,0.35); }
 .cat-crafting { background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid rgba(56,189,248,0.35); }
+.cat-codex { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.35); }
 .cat-systemic { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.35); }
 .cat-social { background: rgba(236,72,153,0.2); color: #ec4899; border: 1px solid rgba(236,72,153,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
@@ -633,6 +635,7 @@ footer {
         <button class="btn btn-secondary" id="undo-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="undoTurn()" disabled title="Undo last turn (Key: U)">↩ Undo (<span id="undo-count">0</span>)</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSheetModal()" title="View 7-Axis Character Sheet (Key: C)">📊 Sheet</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleQuestModal()" title="View Quest Journal (Key: Q)">📜 Quests</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCodexModal()" title="View Ancient Lore Codex (Key: X)">📖 Codex</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -715,6 +718,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleMapModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-map-content"></div>
+      </div>
+    </div>
+
+    <!-- ANCIENT CODEX & RELICS MODAL -->
+    <div id="codex-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleCodexModal()">
+      <div class="modal-card" style="max-width: 720px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">📖 Ancient Lore Codex & Relic Archives</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleCodexModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-codex-content"></div>
       </div>
     </div>
 
@@ -924,9 +938,11 @@ let activeCategoryFilter = "all";
 let actionSearchQuery = "";
 let currentObsActions = [];
 let currentQuestData = null;
+let currentCodexData = null;
 let lastObservation = null;
 let lastCharacter = null;
 let cachedQuestsMetadata = null;
+let cachedCodexMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -983,7 +999,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest);
+    renderGame(data.observation, data.character, data.quest, data.codex);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1014,7 +1030,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest);
+    renderGame(data.observation, data.character, data.quest, data.codex);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1040,7 +1056,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest);
+    renderGame(data.observation, data.character, data.quest, data.codex);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1121,11 +1137,12 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest) {
+function renderGame(obs, char, quest, codex) {
   currentQuestData = quest;
+  if (codex) currentCodexData = codex;
   lastObservation = obs;
   lastCharacter = char;
-  saveSessionToLocalStorage(obs, char, quest);
+  saveSessionToLocalStorage(obs, char, quest, codex);
 
   // HUD
   document.getElementById("char-name").textContent = char.name;
@@ -1371,7 +1388,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest);
+    renderGame(data.observation, data.character, data.quest, data.codex);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1383,7 +1400,7 @@ async function runImportedReplay() {
   }
 }
 
-function saveSessionToLocalStorage(obs, char, quest) {
+function saveSessionToLocalStorage(obs, char, quest, codex) {
   if (!gameState) return;
   try {
     const session = {
@@ -1394,6 +1411,7 @@ function saveSessionToLocalStorage(obs, char, quest) {
       obs: obs,
       char: char,
       quest: quest,
+      codex: codex || currentCodexData,
       timestamp: Date.now()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
@@ -1454,7 +1472,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest);
+    renderGame(data.observation, data.character, data.quest, data.codex);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1626,6 +1644,129 @@ function renderQuestModalContent() {
   }
 }
 
+async function fetchCodexDataIfNeeded() {
+  if (cachedCodexMetadata) return cachedCodexMetadata;
+  try {
+    const res = await fetch("/api/game/codex");
+    if (res.ok) {
+      cachedCodexMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Codex fetch failed:", e);
+  }
+  return cachedCodexMetadata;
+}
+
+async function toggleCodexModal() {
+  const modal = document.getElementById("codex-modal");
+  if (modal.style.display === "none") {
+    await fetchCodexDataIfNeeded();
+    renderCodexModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderCodexModalContent() {
+  const content = document.getElementById("modal-codex-content");
+  if (!content) return;
+  const meta = cachedCodexMetadata;
+  const prog = currentCodexData;
+  const flags = gameState ? (gameState.world_flags || {}) : {};
+
+  const discCount = prog ? prog.discovered_count : 0;
+  const totalCount = meta ? meta.total_entries : 15;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Ancient Inscriptions Discovered</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Decipher relics across provincial sanctums to master ancient history.</div>
+      </div>
+      <div style="font-size: 1.1rem; font-weight: 700; color: #c084fc;">${discCount} / ${totalCount}</div>
+    </div>
+  `;
+
+  if (prog && prog.masteries_unlocked && prog.masteries_unlocked.length > 0) {
+    html += `
+      <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #c084fc; text-transform: uppercase;">🏆 Masteries Achieved</div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.3rem;">
+          ${prog.masteries_unlocked.map(m => `
+            <div class="tag" style="background: rgba(168, 85, 247, 0.25); color: #e9d5ff; border: 1px solid rgba(168, 85, 247, 0.4); font-size: 0.8rem; padding: 0.2rem 0.5rem;">
+              ⭐ <strong>${m.title}</strong>: ${m.description}
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  const allEntries = (meta && meta.entries) || (prog && prog.entries) || [];
+  const provinces = [
+    { name: "The Reach", key: "reach" },
+    { name: "The Lowlands", key: "lowlands" },
+    { name: "The Scorchwaste", key: "scorchwaste" },
+    { name: "The High Court", key: "high_court" },
+    { name: "The Sunken Hollows", key: "sunken_hollows" }
+  ];
+
+  provinces.forEach(p => {
+    const provEntries = allEntries.filter(e => e.province_key === p.key);
+    const provProg = prog && prog.province_progress && prog.province_progress[p.key];
+    const provDisc = provProg ? provProg.discovered : provEntries.filter(e => flags[e.reward_flag] === true).length;
+    const isMastered = provProg ? provProg.mastery_unlocked : provDisc >= 3;
+
+    html += `
+      <div style="margin-bottom: 1rem; background: var(--bg-card); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-weight: 700; color: #e5e7eb; font-size: 0.9rem;">${p.name}</span>
+          <span style="font-size: 0.8rem; font-weight: 600; color: ${isMastered ? '#c084fc' : 'var(--text-muted)'};">
+            ${isMastered ? '🏆 MASTERED (' + provDisc + '/3)' : provDisc + '/3 Discovered'}
+          </span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+          ${provEntries.map(e => {
+            const isUnlocked = flags[e.reward_flag] === true || (prog && prog.discovered_ids && prog.discovered_ids.includes(e.id));
+            if (isUnlocked) {
+              const liveEntry = (prog && prog.entries && prog.entries.find(x => x.id === e.id)) || e;
+              return `
+                <div style="background: rgba(168, 85, 247, 0.08); border-left: 3px solid #c084fc; padding: 0.5rem 0.75rem; border-radius: 0 4px 4px 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong style="color: #fff; font-size: 0.85rem;">${liveEntry.title}</strong>
+                    <span class="tag" style="background: rgba(168,85,247,0.2); color: #c084fc; font-size: 0.7rem;">${liveEntry.category}</span>
+                  </div>
+                  <div style="font-size: 0.8rem; color: #d1d5db; margin-top: 0.25rem; font-style: italic;">
+                    "${liveEntry.lore_text || liveEntry.discovery_text || 'Ancient knowledge inscribed in stone.'}"
+                  </div>
+                  <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    Site: <code>${liveEntry.scene_id}</code> &bull; Action: <em>${liveEntry.action_label}</em>
+                  </div>
+                </div>
+              `;
+            } else {
+              return `
+                <div style="background: rgba(255, 255, 255, 0.02); border-left: 3px solid rgba(255, 255, 255, 0.1); padding: 0.4rem 0.75rem; border-radius: 0 4px 4px 0; opacity: 0.65;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">🔒 Undeciphered Inscription</span>
+                    <span class="tag" style="background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.7rem;">${e.category}</span>
+                  </div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">
+                    Located in <code>${e.scene_id}</code>. Requires specialized skill, trait, or gear.
+                  </div>
+                </div>
+              `;
+            }
+          }).join("")}
+        </div>
+      </div>
+    `;
+  });
+
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -1723,6 +1864,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("sheet-modal").style.display = "none";
     document.getElementById("replay-modal").style.display = "none";
     document.getElementById("quest-modal").style.display = "none";
+    document.getElementById("codex-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -1736,6 +1878,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "q") {
     toggleQuestModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "x") {
+    toggleCodexModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -1782,6 +1928,15 @@ _QUESTS_RESPONSE_BYTES = json.dumps(
 ).encode("utf-8")
 _HAZARDS_RESPONSE_BYTES = json.dumps(
     {"hazards": {k: v.to_dict() for k, v in HAZARD_COMBOS.items()}},
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_CODEX_RESPONSE_BYTES = json.dumps(
+    {
+        "total_entries": len(CODEX_ENTRIES),
+        "masteries": PROVINCIAL_MASTERIES,
+        "entries": [entry.to_dict(unlocked=False) for entry in CODEX_ENTRIES.values()],
+    },
     sort_keys=True,
     separators=(",", ":"),
 ).encode("utf-8")
@@ -1936,6 +2091,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/codex
+    if path == "/api/game/codex":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_CODEX_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -1976,6 +2151,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "character": state.character.to_dict(),
             "state": state.to_dict(),
             "quest": _ENGINE.get_quest_progress(state),
+            "codex": _ENGINE.get_codex_progress(state),
         }
         await _send_response(
             send,
@@ -2037,6 +2213,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "character": new_state.character.to_dict(),
             "state": new_state.to_dict(),
             "quest": _ENGINE.get_quest_progress(new_state),
+            "codex": _ENGINE.get_codex_progress(new_state),
         }
         await _send_response(
             send,
@@ -2097,6 +2274,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "character": state.character.to_dict(),
             "state": state.to_dict(),
             "quest": _ENGINE.get_quest_progress(state),
+            "codex": _ENGINE.get_codex_progress(state),
         }
         await _send_response(
             send,
@@ -2165,6 +2343,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "character": state.character.to_dict(),
             "state": state.to_dict(),
             "quest": _ENGINE.get_quest_progress(state),
+            "codex": _ENGINE.get_codex_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

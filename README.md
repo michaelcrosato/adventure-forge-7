@@ -100,6 +100,7 @@ AdventureForge deploys seamlessly to Vercel with zero configuration:
 - **`GET /api/game/presets`**: Archetype catalogue and starting scene metadata.
 - **`GET /api/game/quests`**: Continental campaign, 5 provincial subquests, and 5 faction intrigue quest lines.
 - **`GET /api/game/hazards`**: Deterministic hazard combo definitions and status reactions.
+- **`GET /api/game/codex`**: Ancient lore codex catalogue and provincial mastery specifications.
 - **`POST /api/mcp` & `/mcp`**: JSON-RPC 2.0 Model Context Protocol endpoint for AI coding agents.
 
 ### Web UI Suite & Interactive Features
@@ -114,11 +115,12 @@ The browser player at `/` provides an immersive, action-first interface:
 - **Tactical Combat Stances & Systemic Exploits (`[TACTICAL]`):** Dynamic stances (Aggressive, Guarded, Elusive, Focused) gated across 7-axis attributes, skills, traits, and flaws. Allows stance shifting, posture exploits (Brutal Strike, Brace Impact, Feint Maneuver, Spot Weakness), and stance drops with live HUD stance badges.
 - **Master Field Crafting & Alchemical Synthesis (`[CRAFTING]`):** Deterministic recipe synthesis (lockpicks, torches, crowbar levers, filter masks, detox salves, waterproof pitch seals, climbing ropes, desert cowls, acid vials, and fire strikers) dynamically synthesized when holding required salvage, instantly unlocking downstream world affordances.
 - **Continental Dynamic Event & World Calamities (`[SYSTEMIC]` / `[SOCIAL]`):** Turn-cyclical provincial incursions (Crag Tremor, Siphon Surge, Glass Tempest, Inquisitor Lockdown, Sluice Breach) challenging players with environmental threats and yielding dynamic mitigations that award crafting salvage and unlock safe passage.
-- **Hotkeys:** `1`–`9` (action selection), `Q` (quest journal), `M` (continental map), `C` (character sheet), `U` (undo), `Escape` (close modals).
+- **Continental Ancient Lore Codex & Relic Deciphering Engine (`[CODEX]`, Key: `X`):** 15 ancient lore codices (3 per province across 5 provinces) situated at historical sanctums and shrines. Deciphering relics leverages 7-axis traits, skills, and tools to unlock rich Hemingway lore excerpts, and mastering all 3 relics in a province awards prestigious provincial lore masteries (Reach Archivist, Lowlands Chronicler, Dune Antiquarian, Court Historian, Abyssal Scholar).
+- **Hotkeys:** `1`–`9` (action selection), `Q` (quest journal), `X` (ancient codex), `M` (continental map), `C` (character sheet), `U` (undo), `Escape` (close modals).
 
 ### CLI Player Features & Deterministic Replay
 ```bash
-# Interactive play with 7-axis sheet ('sheet'), quest log ('quest'), and undo ('u')
+# Interactive play with 7-axis sheet ('sheet'), quest log ('quest'), codex ('codex'), and undo ('u')
 python3 -m adventure_forge.player.cli [preset]
 
 # Replay and verify an action trace bit-for-bit

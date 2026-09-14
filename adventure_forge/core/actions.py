@@ -18,6 +18,7 @@ from adventure_forge.core.stances import (
 )
 from adventure_forge.core.crafting import CRAFTING_RECIPES
 from adventure_forge.core.calamities import get_active_calamity
+from adventure_forge.core.codex import get_codex_entries_for_scene
 
 
 @dataclass(frozen=True)
@@ -74,6 +75,7 @@ def synthesize_affordances(
     character: CharacterSheet,
     world_flags: Dict[str, Any],
     region_id: Optional[str] = None,
+    scene_id: Optional[str] = None,
 ) -> List[Action]:
     """Synthesize all available actions for a scene according to the affordance equation.
     
@@ -927,5 +929,23 @@ def synthesize_affordances(
                     )
                     legal_actions.append(calamity_act)
                     seen_ids.add(mit.action_id)
+
+    # 7. Ancient Lore Codex & Relic Inscription Affordances (Milestone 19)
+    effective_scene_id = scene_id or str(world_flags.get("current_scene", ""))
+    if effective_scene_id:
+        codex_entries = get_codex_entries_for_scene(effective_scene_id)
+        for entry in codex_entries:
+            if entry.action_id not in seen_ids and entry.is_available(character, world_flags):
+                codex_act = Action(
+                    id=entry.action_id,
+                    label=entry.action_label,
+                    category="codex",
+                    effects=entry.build_effects(world_flags),
+                    result_text=entry.discovery_text,
+                    risk="low",
+                    stamina_cost=entry.stamina_cost,
+                )
+                legal_actions.append(codex_act)
+                seen_ids.add(entry.action_id)
 
     return legal_actions

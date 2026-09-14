@@ -19,6 +19,7 @@ from adventure_forge.content.quests import (
     get_continental_main_quest,
     get_faction_intrigue_quests,
 )
+from adventure_forge.core.codex import evaluate_codex_progress
 
 
 @dataclass
@@ -81,13 +82,14 @@ class AdventureEngine:
         scene = self.get_scene(state.current_scene)
         if not scene:
             return []
-        flags = {**state.world_flags, "turn_count": state.turn_count} if "turn_count" not in state.world_flags else state.world_flags
+        flags = {**state.world_flags, "turn_count": state.turn_count, "current_scene": scene.id} if "turn_count" not in state.world_flags else {**state.world_flags, "current_scene": scene.id}
         actions = synthesize_affordances(
             base_actions=scene.base_actions,
             scene_entities=scene.entities,
             character=state.character,
             world_flags=flags,
             region_id=scene.region or state.current_region,
+            scene_id=scene.id,
         )
         object.__setattr__(state, "_cached_legal_actions", actions)
         return actions
@@ -102,6 +104,10 @@ class AdventureEngine:
             for qid, q in get_faction_intrigue_quests().items()
         }
         return progress
+
+    def get_codex_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current ancient lore codex progress for active state."""
+        return evaluate_codex_progress(state.world_flags)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""
