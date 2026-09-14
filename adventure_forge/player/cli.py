@@ -13,6 +13,7 @@ from adventure_forge.core.state import GameState
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.rng import DeterministicRNG
 from adventure_forge.content.loader import build_world_registry
+from adventure_forge.core.trade import COMMODITIES, TRADE_HUBS
 
 
 def render_character_sheet(state: GameState) -> None:
@@ -163,6 +164,40 @@ def render_codex_log(codex_info: Dict[str, Any]) -> None:
     print("=" * 65 + "\n")
 
 
+def render_trade_market(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental trade commodities, cargo held, and merchant progress."""
+    prog = engine.get_trade_progress(state)
+    held = prog.get("commodities_held", [])
+    trades = prog.get("completed_trades", 0)
+    arbitrage = prog.get("arbitrage_completed", 0)
+    hubs = prog.get("hubs_visited", [])
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL COMMODITY EXCHANGE ({trades} Trades, {arbitrage} Arbitrage)")
+    print("=" * 65)
+
+    print("\n [CARGO IN INVENTORY]")
+    if held:
+        for cid in held:
+            comm = COMMODITIES.get(cid)
+            name = comm.name if comm else cid
+            print(f"   • {name} ({cid})")
+    else:
+        print("   No trade commodities currently held.")
+
+    print("\n [PROVINCIAL TRADING HUBS VISITED]")
+    for hub_id, hub_data in TRADE_HUBS.items():
+        status = "[TRADED]" if hub_id in hubs else "[UNVISITED]"
+        print(f"   • {hub_data['hub_name']:28s}: {status}")
+
+    print("\n [MERCHANT RECOGNITION]")
+    consortium = "[RECOGNIZED]" if prog.get("is_consortium_recognized") else "[LOCKED] (Trade at 3+ hubs)"
+    master = "[ACHIEVED]" if prog.get("is_master_trader") else "[LOCKED] (Trade all 5 commodities + 2 arbitrage)"
+    print(f"   • Merchant Consortium Status : {consortium}")
+    print(f"   • Master Trader Milestone    : {master}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -240,6 +275,7 @@ def render_ui(
     nav_hints.append("'sheet' for stats")
     nav_hints.append("'quest' for log")
     nav_hints.append("'codex' for lore")
+    nav_hints.append("'trade' for market")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -378,6 +414,10 @@ def main():
             continue
         elif choice in ("map", "m", "atlas"):
             render_continental_map(state)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("trade", "t"):
+            render_trade_market(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

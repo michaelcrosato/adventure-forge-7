@@ -21,6 +21,7 @@ from adventure_forge.content.quests import (
 )
 from adventure_forge.core.codex import evaluate_codex_progress
 from adventure_forge.core.transit import evaluate_transit_progress
+from adventure_forge.core.trade import evaluate_trade_progress
 
 
 @dataclass
@@ -113,6 +114,10 @@ class AdventureEngine:
     def get_transit_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current continental transit route progress for active state."""
         return evaluate_transit_progress(state.world_flags)
+
+    def get_trade_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current continental trade and commodity progress for active state."""
+        return evaluate_trade_progress(state.world_flags, state.character.inventory)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

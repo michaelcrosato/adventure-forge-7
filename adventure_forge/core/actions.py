@@ -20,6 +20,7 @@ from adventure_forge.core.crafting import CRAFTING_RECIPES
 from adventure_forge.core.calamities import get_active_calamity
 from adventure_forge.core.codex import get_codex_entries_for_scene
 from adventure_forge.core.transit import get_transit_routes_for_scene
+from adventure_forge.core.trade import get_trade_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -966,5 +967,13 @@ def synthesize_affordances(
                 )
                 legal_actions.append(transit_act)
                 seen_ids.add(route.action_id)
+
+    # 9. Continental Trade Economy & Regional Commodity Exchange (Milestone 21)
+    if effective_scene_id:
+        trade_actions = get_trade_affordances_for_scene(effective_scene_id, character, world_flags)
+        for trade_act in trade_actions:
+            if trade_act.id not in seen_ids and trade_act.is_legal(character, world_flags):
+                legal_actions.append(trade_act)
+                seen_ids.add(trade_act.id)
 
     return legal_actions

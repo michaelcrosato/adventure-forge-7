@@ -27,6 +27,7 @@ from adventure_forge.content.quests import (
 from adventure_forge.core.character import CHARACTER_PRESETS, get_preset
 from adventure_forge.core.codex import CODEX_ENTRIES, PROVINCIAL_MASTERIES
 from adventure_forge.core.transit import CHARTERED_ROUTES
+from adventure_forge.core.trade import COMMODITIES, TRADE_HUBS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -335,6 +336,8 @@ a:hover { text-decoration: underline; }
 .cat-tactical { background: rgba(187,128,255,0.2); color: #d2a8ff; border: 1px solid rgba(187,128,255,0.35); }
 .cat-crafting { background: rgba(56,189,248,0.2); color: #38bdf8; border: 1px solid rgba(56,189,248,0.35); }
 .cat-codex { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.35); }
+.cat-transit { background: rgba(45,212,191,0.2); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.35); }
+.cat-trade { background: rgba(234,179,8,0.2); color: #facc15; border: 1px solid rgba(234,179,8,0.35); }
 .cat-systemic { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.35); }
 .cat-social { background: rgba(236,72,153,0.2); color: #ec4899; border: 1px solid rgba(236,72,153,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
@@ -637,6 +640,7 @@ footer {
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSheetModal()" title="View 7-Axis Character Sheet (Key: C)">📊 Sheet</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleQuestModal()" title="View Quest Journal (Key: Q)">📜 Quests</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCodexModal()" title="View Ancient Lore Codex (Key: X)">📖 Codex</button>
+        <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleTradeModal()" title="View Commodity Exchange (Key: T)">⚖️ Trade</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -730,6 +734,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleCodexModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-codex-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL COMMODITY EXCHANGE MODAL -->
+    <div id="trade-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleTradeModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">⚖️ Continental Commodity Exchange & Trade Registry</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleTradeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-trade-content"></div>
       </div>
     </div>
 
@@ -940,10 +955,12 @@ let actionSearchQuery = "";
 let currentObsActions = [];
 let currentQuestData = null;
 let currentCodexData = null;
+let currentTradeData = null;
 let lastObservation = null;
 let lastCharacter = null;
 let cachedQuestsMetadata = null;
 let cachedCodexMetadata = null;
+let cachedTradeMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1000,7 +1017,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1031,7 +1048,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1057,7 +1074,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1138,9 +1155,10 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex) {
+function renderGame(obs, char, quest, codex, transit, trade) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
+  if (trade) currentTradeData = trade;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1768,6 +1786,118 @@ function renderCodexModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchTradeDataIfNeeded() {
+  if (cachedTradeMetadata) return cachedTradeMetadata;
+  try {
+    const res = await fetch("/api/game/trade");
+    if (res.ok) {
+      cachedTradeMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Trade fetch failed:", e);
+  }
+  return cachedTradeMetadata;
+}
+
+async function toggleTradeModal() {
+  const modal = document.getElementById("trade-modal");
+  if (modal.style.display === "none") {
+    await fetchTradeDataIfNeeded();
+    renderTradeModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderTradeModalContent() {
+  const content = document.getElementById("modal-trade-content");
+  if (!content) return;
+  const meta = cachedTradeMetadata;
+  const prog = currentTradeData;
+  const flags = gameState ? (gameState.world_flags || {}) : {};
+  const inv = (lastCharacter && lastCharacter.inventory) || [];
+
+  const tradesCount = prog ? prog.completed_trades : (flags.completed_trades || 0);
+  const arbCount = prog ? prog.arbitrage_completed : (flags.arbitrage_completed || 0);
+  const hubsCount = prog ? prog.hubs_visited_count : 0;
+  const isConsortium = prog ? prog.is_consortium_recognized : false;
+  const isMaster = prog ? prog.is_master_trader : false;
+
+  const commodities = (meta && meta.commodities) || [];
+  const hubs = (meta && meta.hubs) || {};
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Commodity Exchange</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Buy provincial goods at origin and sell at distant import hubs for profit.</div>
+      </div>
+      <div style="display: flex; gap: 0.6rem; align-items: center;">
+        <span class="tag" style="background: rgba(234,179,8,0.2); color: #facc15; font-weight: 600; font-size: 0.8rem;">Trades: ${tradesCount}</span>
+        <span class="tag" style="background: rgba(63,185,80,0.2); color: #3fb950; font-weight: 600; font-size: 0.8rem;">Arbitrage: ${arbCount}</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+      <div style="background: var(--bg-card); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.6rem 0.8rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Merchant Consortium</div>
+        <div style="margin-top: 0.2rem; font-size: 0.9rem; font-weight: 600; color: ${isConsortium ? '#3fb950' : 'var(--gold)'};">
+          ${isConsortium ? '⭐ RECOGNIZED VENDOR' : 'LOCKED (Trade at 3+ Hubs: ' + hubsCount + '/3)'}
+        </div>
+      </div>
+      <div style="background: var(--bg-card); border: 1px solid var(--panel-border); border-radius: 6px; padding: 0.6rem 0.8rem;">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Master Trader Milestone</div>
+        <div style="margin-top: 0.2rem; font-size: 0.9rem; font-weight: 600; color: ${isMaster ? '#c084fc' : 'var(--text-muted)'};">
+          ${isMaster ? '👑 MASTER CONTINENTAL TRADER' : 'LOCKED (All 5 Goods + 2 Arbitrage)'}
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <div style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Provincial Commodity Manifest</div>
+      <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+        ${commodities.map(c => {
+          const isHeld = inv.includes(c.id);
+          const wasTraded = flags[`traded_${c.id}`] || flags[`sold_${c.id}`];
+          const bonusDestinations = Object.entries(c.import_bonuses || {}).map(([hubKey, bonus]) => {
+            const h = hubs[hubKey];
+            const hName = h ? h.hub_name : hubKey;
+            return `<span class="tag" style="background: rgba(63,185,80,0.15); color: #3fb950; font-size: 0.7rem;">${hName} (+${bonus}🪙)</span>`;
+          }).join(" ");
+
+          return `
+            <div style="background: var(--bg-card); border: 1px solid ${isHeld ? 'rgba(234,179,8,0.5)' : 'var(--panel-border)'}; border-radius: 6px; padding: 0.6rem 0.8rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <strong style="color: #fff; font-size: 0.9rem;">${c.name}</strong>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.4rem;">Origin: ${c.origin_province}</span>
+                </div>
+                <div>
+                  ${isHeld ? '<span class="tag" style="background: rgba(234,179,8,0.25); color: #facc15; font-weight: 700; font-size: 0.75rem;">IN CARGO</span>' : (wasTraded ? '<span class="tag" style="background: rgba(88,166,255,0.2); color: var(--accent); font-size: 0.75rem;">TRADED</span>' : '')}
+                </div>
+              </div>
+              <div style="font-size: 0.8rem; color: #d1d5db; margin: 0.25rem 0;">${c.description}</div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem; font-size: 0.75rem; flex-wrap: wrap; gap: 0.3rem;">
+                <div>
+                  <span style="color: var(--text-muted);">Base Buy:</span> <span style="color: var(--gold); font-weight: 600;">${c.base_buy_price} Silver</span>
+                  <span style="color: var(--text-muted); margin-left: 0.4rem;">(or Barter: <code>${c.barter_item}</code>)</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                  <span style="color: var(--text-muted);">Import Demand:</span>
+                  ${bonusDestinations}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -1876,6 +2006,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("replay-modal").style.display = "none";
     document.getElementById("quest-modal").style.display = "none";
     document.getElementById("codex-modal").style.display = "none";
+    document.getElementById("trade-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -1893,6 +2024,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "x") {
     toggleCodexModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "t") {
+    toggleTradeModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -1955,6 +2090,35 @@ _TRANSIT_RESPONSE_BYTES = json.dumps(
     {
         "total_routes": len(CHARTERED_ROUTES),
         "routes": [r.to_dict(traveled=False) for r in CHARTERED_ROUTES],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_TRADE_RESPONSE_BYTES = json.dumps(
+    {
+        "total_commodities": len(COMMODITIES),
+        "commodities": [
+            {
+                "id": c.id,
+                "name": c.name,
+                "origin_province": c.origin_province,
+                "origin_scene": c.origin_scene,
+                "description": c.description,
+                "base_buy_price": c.base_buy_price,
+                "base_sell_price": c.base_sell_price,
+                "import_bonuses": c.import_bonuses,
+                "barter_item": c.barter_item,
+            }
+            for c in COMMODITIES.values()
+        ],
+        "hubs": {
+            k: {
+                "hub_name": v["hub_name"],
+                "factor_title": v["factor_title"],
+                "available_commodities": v["available_commodities"],
+            }
+            for k, v in TRADE_HUBS.items()
+        },
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -2150,6 +2314,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/trade
+    if path == "/api/game/trade":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_TRADE_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -2192,6 +2376,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "quest": _ENGINE.get_quest_progress(state),
             "codex": _ENGINE.get_codex_progress(state),
             "transit": _ENGINE.get_transit_progress(state),
+            "trade": _ENGINE.get_trade_progress(state),
         }
         await _send_response(
             send,
@@ -2255,6 +2440,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "quest": _ENGINE.get_quest_progress(new_state),
             "codex": _ENGINE.get_codex_progress(new_state),
             "transit": _ENGINE.get_transit_progress(new_state),
+            "trade": _ENGINE.get_trade_progress(new_state),
         }
         await _send_response(
             send,
@@ -2317,6 +2503,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "quest": _ENGINE.get_quest_progress(state),
             "codex": _ENGINE.get_codex_progress(state),
             "transit": _ENGINE.get_transit_progress(state),
+            "trade": _ENGINE.get_trade_progress(state),
         }
         await _send_response(
             send,
@@ -2387,6 +2574,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "quest": _ENGINE.get_quest_progress(state),
             "codex": _ENGINE.get_codex_progress(state),
             "transit": _ENGINE.get_transit_progress(state),
+            "trade": _ENGINE.get_trade_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

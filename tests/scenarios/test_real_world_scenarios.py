@@ -218,18 +218,19 @@ def test_scenario_4_unbounded_bazaar_economic_trade(capsys):
 
     obs = engine.observe(state)
     assert len(obs.legal_actions) >= 100
+    total_pages = max(1, (len(obs.legal_actions) + 14) // 15)
 
     # Render page 1
     render_ui(obs, page=0, page_size=15)
     captured1 = capsys.readouterr().out
-    assert "Page 1 of 8" in captured1
+    assert f"Page 1 of {total_pages}" in captured1
     assert "Showing 1-15" in captured1
     assert "'n' for next page" in captured1
 
     # Render page 2
     render_ui(obs, page=1, page_size=15)
     captured2 = capsys.readouterr().out
-    assert "Page 2 of 8" in captured2
+    assert f"Page 2 of {total_pages}" in captured2
     assert "Showing 16-30" in captured2
     assert "'p' for prev page" in captured2
 
