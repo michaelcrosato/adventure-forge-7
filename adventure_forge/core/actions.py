@@ -12,6 +12,10 @@ from adventure_forge.core.hazards import (
     REGIONAL_ATMOSPHERES,
     REGION_TO_ATMOSPHERE,
 )
+from adventure_forge.core.stances import (
+    TACTICAL_STANCES,
+    ALL_STANCE_MARKERS,
+)
 
 
 @dataclass(frozen=True)
@@ -808,5 +812,82 @@ def synthesize_affordances(
                 if slip_act.is_legal(character, world_flags):
                     legal_actions.append(slip_act)
                     seen_ids.add(act_id)
+
+    # 4. Tactical Combat Stances & Systemic Exploits (Milestone 16)
+    should_synthesize_stances = (
+        any(character.has_marker(m) for m in ALL_STANCE_MARKERS)
+        or bool(world_flags.get("stances_enabled"))
+        or bool(world_flags.get("tactical_mode"))
+        or bool(world_flags.get("in_combat"))
+        or (
+            effective_region is not None
+            and str(effective_region) != "stress_market"
+            and (len(base_actions) > 0 or len(scene_entities) > 0)
+        )
+    )
+
+    if should_synthesize_stances:
+        # Identify active stance marker
+        active_stance_id: Optional[str] = None
+        for s_id, stance in TACTICAL_STANCES.items():
+            if character.has_marker(stance.marker):
+                active_stance_id = s_id
+                break
+
+        # Active stance exploit and drop stance affordance
+        if active_stance_id and active_stance_id in TACTICAL_STANCES:
+            active_stance = TACTICAL_STANCES[active_stance_id]
+            if active_stance.exploit_action_id not in seen_ids:
+                exploit_act = Action(
+                    id=active_stance.exploit_action_id,
+                    label=active_stance.exploit_label,
+                    category=active_stance.exploit_category,
+                    effects=list(active_stance.exploit_effects),
+                    result_text=active_stance.exploit_result_text,
+                    risk="low",
+                    stamina_cost=active_stance.exploit_stamina_cost,
+                )
+                if exploit_act.is_legal(character, world_flags):
+                    legal_actions.append(exploit_act)
+                    seen_ids.add(active_stance.exploit_action_id)
+
+            neutral_act_id = "stance_neutral"
+            if neutral_act_id not in seen_ids:
+                drop_act = Action(
+                    id=neutral_act_id,
+                    label="Drop Stance",
+                    category="tactical",
+                    effects=[
+                        {"remove_marker": "stance_aggressive"},
+                        {"remove_marker": "stance_defensive"},
+                        {"remove_marker": "stance_elusive"},
+                        {"remove_marker": "stance_focused"},
+                        {"set_flag": {"flag": "active_stance", "value": ""}},
+                        {"log_event": "You dropped your tactical stance."},
+                    ],
+                    result_text="You relax your muscles and return to a neutral posture.",
+                    risk="low",
+                    stamina_cost=0,
+                )
+                if drop_act.is_legal(character, world_flags):
+                    legal_actions.append(drop_act)
+                    seen_ids.add(neutral_act_id)
+
+        # Shift actions for stances not currently active
+        for s_id, stance in TACTICAL_STANCES.items():
+            if s_id != active_stance_id and stance.is_available(character, world_flags):
+                if stance.shift_action_id not in seen_ids:
+                    shift_act = Action(
+                        id=stance.shift_action_id,
+                        label=stance.shift_label,
+                        category=stance.category,
+                        effects=list(stance.shift_effects),
+                        result_text=stance.shift_result_text,
+                        risk="low",
+                        stamina_cost=stance.stamina_cost,
+                    )
+                    if shift_act.is_legal(character, world_flags):
+                        legal_actions.append(shift_act)
+                        seen_ids.add(stance.shift_action_id)
 
     return legal_actions

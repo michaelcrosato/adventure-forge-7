@@ -75,9 +75,10 @@ def apply_effects(
                     events.append(f"Gained trait: {trait}")
             elif op == "remove_trait":
                 trait = str(operand)
-                t = [x for x in new_char.traits if x.lower() != trait.lower()]
-                new_char = new_char.modify(traits=t)
-                events.append(f"Lost trait: {trait}")
+                if new_char.has_trait(trait):
+                    t = [x for x in new_char.traits if x.lower() != trait.lower()]
+                    new_char = new_char.modify(traits=t)
+                    events.append(f"Lost trait: {trait}")
             elif op == "add_marker":
                 marker = str(operand)
                 if not new_char.has_marker(marker):
@@ -86,9 +87,10 @@ def apply_effects(
                     events.append(f"Gained marker: {marker}")
             elif op == "remove_marker":
                 marker = str(operand)
-                m = [x for x in new_char.markers if x.lower() != marker.lower()]
-                new_char = new_char.modify(markers=m)
-                events.append(f"Lost marker: {marker}")
+                if new_char.has_marker(marker):
+                    m = [x for x in new_char.markers if x.lower() != marker.lower()]
+                    new_char = new_char.modify(markers=m)
+                    events.append(f"Lost marker: {marker}")
             elif op == "change_scene":
                 next_scene = str(operand)
             elif op == "log_event":

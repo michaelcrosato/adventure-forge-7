@@ -74,6 +74,7 @@ Every feature from the Survey phase appears here with its assigned milestone.
 | M13 | 5-Province Faction Intrigue & Narrative DAGs | Shipped Sky-Pact of the Crags, Tripartite Throne, Water Wars, Abyssal Schism, and Sluice War arcs | M12 | COMPLETE |
 | M14 | Player Surfaces, Replay Verification & Web UI Enhancements | Added undo, category filters, 7-axis sheet modal, and deterministic replay to web app and CLI; eliminated remote MCP browser popups | M13 | COMPLETE |
 | M15 | Immersive Web UI Suite & Session Persistence | Shipped interactive 3-tab Quest Journal (Key: Q), Continental Province World Map Atlas (Key: M), LocalStorage auto-save/resume, real-time action search, and health/stamina danger feedback | M14 | COMPLETE |
+| M16 | Tactical Combat Stances & Systemic Exploits | Shipped 4 tactical stances (Aggressive, Guarded, Elusive, Focused) gated by 7-axis attributes/skills/traits/flaws, dynamic stance shifting & exploit synthesis, HUD stance badge, and 100% deterministic replay | M15 | COMPLETE |
 
 ## Interface Contracts
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`

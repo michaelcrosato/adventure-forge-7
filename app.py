@@ -330,6 +330,7 @@ a:hover { text-decoration: underline; }
 .cat-movement { background: rgba(63,185,80,0.2); color: var(--green); }
 .cat-interaction { background: rgba(88,166,255,0.2); color: var(--accent); }
 .cat-combat { background: rgba(248,81,73,0.2); color: var(--red); }
+.cat-tactical { background: rgba(187,128,255,0.2); color: #d2a8ff; border: 1px solid rgba(187,128,255,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
 .cat-general { background: rgba(110,118,129,0.2); color: var(--text-muted); }
 .badge-cost { color: var(--gold); }
@@ -1189,6 +1190,11 @@ function renderGame(obs, char, quest) {
     markers.forEach(m => {
       let bg = "rgba(168, 85, 247, 0.25)";
       let color = "#c084fc";
+      if (m.startsWith("stance_")) {
+        const stanceName = m.replace("stance_", "").toUpperCase();
+        statusBadges.push(`<span class="tag" style="background: rgba(187, 128, 255, 0.35); color: #e2baff; font-weight: 700; border: 1px solid #c084fc;">🥋 STANCE: ${stanceName}</span>`);
+        return;
+      }
       if (m.includes("conflagration") || m.includes("fire")) { bg = "rgba(249, 115, 22, 0.25)"; color = "#fb923c"; }
       else if (m.includes("stun") || m.includes("shock")) { bg = "rgba(234, 179, 8, 0.25)"; color = "#facc15"; }
       else if (m.includes("water") || m.includes("wet")) { bg = "rgba(56, 189, 248, 0.25)"; color = "#38bdf8"; }

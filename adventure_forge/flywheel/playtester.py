@@ -315,7 +315,11 @@ class BlindPlaytester:
 
         if preferred:
             unvisited_pref = [a for a in preferred if a.get("id") not in self.visited_actions]
-            pool = unvisited_pref if unvisited_pref else preferred
+            if unvisited_pref:
+                pool = unvisited_pref
+            else:
+                unvisited_all = [a for a in actions if a.get("id") not in self.visited_actions]
+                pool = unvisited_all if unvisited_all else preferred
         else:
             unvisited_all = [a for a in actions if a.get("id") not in self.visited_actions]
             pool = unvisited_all if unvisited_all else actions

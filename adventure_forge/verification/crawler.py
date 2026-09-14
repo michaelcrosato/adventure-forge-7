@@ -67,8 +67,13 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
 
         for act in legal_actions:
             act_id = act["id"]
-            # Skip infinite barter loops in stress market during reachability crawl
-            if act_id.startswith("barter_") or act_id.startswith("inspect_"):
+            # Skip infinite barter loops and in-place stance shifts during reachability crawl
+            if (
+                act_id.startswith("barter_")
+                or act_id.startswith("inspect_")
+                or act_id.startswith("stance_")
+                or act_id.startswith("tactical_")
+            ):
                 continue
 
             actions_stepped += 1
