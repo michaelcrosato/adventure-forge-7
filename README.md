@@ -113,6 +113,7 @@ The browser player at `/` provides an immersive, action-first interface:
 - **Deterministic Replay Verification (`📜 Replay`):** Export or paste JSON traces to verify bit-for-bit SHA-256 state matching in engine.
 - **Tactical Combat Stances & Systemic Exploits (`[TACTICAL]`):** Dynamic stances (Aggressive, Guarded, Elusive, Focused) gated across 7-axis attributes, skills, traits, and flaws. Allows stance shifting, posture exploits (Brutal Strike, Brace Impact, Feint Maneuver, Spot Weakness), and stance drops with live HUD stance badges.
 - **Master Field Crafting & Alchemical Synthesis (`[CRAFTING]`):** Deterministic recipe synthesis (lockpicks, torches, crowbar levers, filter masks, detox salves, waterproof pitch seals, climbing ropes, desert cowls, acid vials, and fire strikers) dynamically synthesized when holding required salvage, instantly unlocking downstream world affordances.
+- **Continental Dynamic Event & World Calamities (`[SYSTEMIC]` / `[SOCIAL]`):** Turn-cyclical provincial incursions (Crag Tremor, Siphon Surge, Glass Tempest, Inquisitor Lockdown, Sluice Breach) challenging players with environmental threats and yielding dynamic mitigations that award crafting salvage and unlock safe passage.
 - **Hotkeys:** `1`–`9` (action selection), `Q` (quest journal), `M` (continental map), `C` (character sheet), `U` (undo), `Escape` (close modals).
 
 ### CLI Player Features & Deterministic Replay

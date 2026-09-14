@@ -17,6 +17,7 @@ from adventure_forge.core.stances import (
     ALL_STANCE_MARKERS,
 )
 from adventure_forge.core.crafting import CRAFTING_RECIPES
+from adventure_forge.core.calamities import get_active_calamity
 
 
 @dataclass(frozen=True)
@@ -907,5 +908,24 @@ def synthesize_affordances(
                 if craft_act.is_legal(character, world_flags):
                     legal_actions.append(craft_act)
                     seen_ids.add(recipe.action_id)
+
+    # 6. Continental Dynamic Calamities & Incursion Events (Milestone 18)
+    if effective_region and str(effective_region) != "stress_market":
+        turn_count = int(world_flags.get("turn_count", 0))
+        active_calamity = get_active_calamity(turn_count, str(effective_region), world_flags)
+        if active_calamity:
+            for mit in active_calamity.mitigations:
+                if mit.action_id not in seen_ids and mit.is_legal(character, world_flags):
+                    calamity_act = Action(
+                        id=mit.action_id,
+                        label=mit.label,
+                        category=mit.category,
+                        effects=list(mit.effects),
+                        result_text=mit.result_text,
+                        risk=mit.risk,
+                        stamina_cost=mit.stamina_cost,
+                    )
+                    legal_actions.append(calamity_act)
+                    seen_ids.add(mit.action_id)
 
     return legal_actions

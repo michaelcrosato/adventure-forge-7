@@ -81,11 +81,12 @@ class AdventureEngine:
         scene = self.get_scene(state.current_scene)
         if not scene:
             return []
+        flags = {**state.world_flags, "turn_count": state.turn_count} if "turn_count" not in state.world_flags else state.world_flags
         actions = synthesize_affordances(
             base_actions=scene.base_actions,
             scene_entities=scene.entities,
             character=state.character,
-            world_flags=state.world_flags,
+            world_flags=flags,
             region_id=scene.region or state.current_region,
         )
         object.__setattr__(state, "_cached_legal_actions", actions)

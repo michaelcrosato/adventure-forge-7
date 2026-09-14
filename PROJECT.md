@@ -76,6 +76,7 @@ Every feature from the Survey phase appears here with its assigned milestone.
 | M15 | Immersive Web UI Suite & Session Persistence | Shipped interactive 3-tab Quest Journal (Key: Q), Continental Province World Map Atlas (Key: M), LocalStorage auto-save/resume, real-time action search, and health/stamina danger feedback | M14 | COMPLETE |
 | M16 | Tactical Combat Stances & Systemic Exploits | Shipped 4 tactical stances (Aggressive, Guarded, Elusive, Focused) gated by 7-axis attributes/skills/traits/flaws, dynamic stance shifting & exploit synthesis, HUD stance badge, and 100% deterministic replay | M15 | COMPLETE |
 | M17 | Master Field Crafting & Alchemical Synthesis | Shipped 10 field crafting recipes (tools, alchemical tonics, protective gear) with dynamic affordance synthesis, ingredient consumption, downstream systemic unlock, and bit-for-bit replay | M16 | COMPLETE |
+| M18 | Continental Dynamic Event & World Calamity System | Shipped 5 provincial incursion calamities (Crag Tremor, Siphon Surge, Glass Tempest, Inquisitor Lockdown, Sluice Breach) with cyclical activation, dynamic affordance mitigations, salvage rewards, and deterministic replay | M17 | COMPLETE |
 
 ## Interface Contracts
 ### `adventure_forge.linter.prose_linter` ↔ `adventure_forge.content`
