@@ -38,6 +38,7 @@ from adventure_forge.core.shrines import ANCIENT_SHRINES
 from adventure_forge.core.landmarks import SURVEY_LANDMARKS
 from adventure_forge.core.vaults import ANCIENT_VAULTS
 from adventure_forge.core.forge import ANCIENT_RUNEFORGES
+from adventure_forge.core.elixirs import ANCIENT_ALEMBICS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -665,6 +666,7 @@ footer {
         <button class="btn btn-secondary" id="landmarks-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleLandmarksModal()" title="View Survey Landmarks & Panoramas (Key: L)">🔭 Landmarks</button>
         <button class="btn btn-secondary" id="vaults-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleVaultsModal()" title="View Dungeon Vaults & Arcane Keystones (Key: V)">🗝️ Vaults</button>
         <button class="btn btn-secondary" id="forge-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleForgeModal()" title="View Continental Runeforges & Anvils (Key: F)">⚒️ Forge</button>
+        <button class="btn btn-secondary" id="elixirs-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleElixirsModal()" title="View Alchemical Laboratories & Elixirs (Key: E)">🧪 Elixirs</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -879,6 +881,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleForgeModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-forge-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL ALCHEMICAL LABORATORIES & MASTER APOTHECARY MODAL -->
+    <div id="elixirs-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleElixirsModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🧪 Continental Alchemical Laboratories & Ancient Alembics</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleElixirsModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-elixirs-content"></div>
       </div>
     </div>
 
@@ -1115,6 +1128,8 @@ let currentVaultsData = null;
 let cachedVaultsMetadata = null;
 let currentForgeData = null;
 let cachedForgeMetadata = null;
+let currentElixirsData = null;
+let cachedElixirsMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1171,7 +1186,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1202,7 +1217,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1228,7 +1243,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1309,7 +1324,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks, vaults, forge) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks, vaults, forge, elixirs) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1323,6 +1338,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (landmarks) currentLandmarksData = landmarks;
   if (vaults) currentVaultsData = vaults;
   if (forge) currentForgeData = forge;
+  if (elixirs) currentElixirsData = elixirs;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1407,6 +1423,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const frgBtn = document.getElementById("forge-btn");
   if (frgBtn && currentForgeData) {
     frgBtn.textContent = `⚒️ Forge (${currentForgeData.inscribed_count}/6)`;
+  }
+
+  const elxBtn = document.getElementById("elixirs-btn");
+  if (elxBtn && currentElixirsData) {
+    elxBtn.textContent = `🧪 Elixirs (${currentElixirsData.distilled_count}/6)`;
   }
 
   // Quest Tracker
@@ -1626,7 +1647,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1710,7 +1731,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -3390,6 +3411,134 @@ function renderForgeModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchElixirsDataIfNeeded() {
+  if (cachedElixirsMetadata) return cachedElixirsMetadata;
+  try {
+    const res = await fetch("/api/game/elixirs");
+    if (res.ok) {
+      cachedElixirsMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Elixirs fetch failed:", e);
+  }
+  return cachedElixirsMetadata;
+}
+
+async function toggleElixirsModal() {
+  const modal = document.getElementById("elixirs-modal");
+  if (modal.style.display === "none") {
+    await fetchElixirsDataIfNeeded();
+    renderElixirsModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderElixirsModalContent() {
+  const content = document.getElementById("modal-elixirs-content");
+  if (!content) return;
+  const meta = cachedElixirsMetadata;
+  const eData = currentElixirsData;
+  const distilledCount = (eData && eData.distilled_count) || 0;
+  const totalLabs = (eData && eData.total_labs) || 6;
+  const apothecaryRank = (eData && eData.apothecary_rank) || "Novice Herbalist";
+  const activeElixirs = (eData && eData.active_elixirs_count) || 0;
+  const activeMasteries = (eData && eData.active_masteries_count) || 0;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Alchemical Laboratories & Ancient Alembics</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Distill ancient provincial alembics, brew potent elixirs, and attain Continental Arch-Apothecary rank.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(16, 185, 129, 0.25); color: #34d399; font-weight: 700; font-size: 0.85rem;">
+          🧪 ${apothecaryRank}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${distilledCount} / ${totalLabs} Distilled &bull; ${activeElixirs} Elixirs Brewed
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (activeMasteries > 0) {
+    html += `
+      <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <span style="color: #34d399; font-weight: 700;">🌿 Pharmacopeia Masteries:</span>
+        <span style="color: #fff; margin-left: 0.4rem;">${activeMasteries} Regional Alchemical Masteries Active</span>
+      </div>
+    `;
+  }
+
+  const pct = Math.round((distilledCount / totalLabs) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Apothecary Ranks: 1 Brewer &bull; 2 Craftsman &bull; 3 Alchemist &bull; 4 Toxicologist &bull; 5 Pharmacist &bull; 6 Arch-Apothecary</span>
+        <span style="font-weight: 600; color: #34d399;">${pct}% Alembics Distilled</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.08); border-radius: 999px; height: 8px; overflow: hidden;">
+        <div style="background: #10b981; height: 100%; width: ${pct}%; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  const labs = (eData && eData.labs) || (meta && meta.labs) || [];
+  html += `<div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">`;
+
+  for (const lab of labs) {
+    const isDistilled = lab.is_distilled;
+    const hasElixir = lab.has_elixir;
+    const isImbibed = lab.is_imbibed;
+    const hasMastery = lab.has_mastery;
+
+    let borderStyle = isDistilled
+      ? "border: 1px solid rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.07);"
+      : "border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);";
+
+    let badge = isDistilled
+      ? '<span class="tag" style="background: rgba(16, 185, 129, 0.3); color: #34d399; font-weight: 700; font-size: 0.75rem;">DISTILLED</span>'
+      : '<span class="tag" style="background: rgba(255,255,255,0.07); color: var(--text-muted); font-size: 0.75rem;">DORMANT</span>';
+
+    if (isImbibed) {
+      badge += ' <span class="tag" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; font-weight: 600; font-size: 0.75rem; margin-left: 0.3rem;">IMBIBED</span>';
+    }
+
+    if (hasMastery) {
+      badge += ' <span class="tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 600; font-size: 0.75rem; margin-left: 0.3rem;">PHARMACOPEIA MASTERY</span>';
+    }
+
+    html += `
+      <div style="${borderStyle} border-radius: 8px; padding: 0.85rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">
+            ${lab.icon} ${lab.name}
+            <span style="font-size: 0.8rem; color: #34d399; margin-left: 0.4rem; font-weight: 600;">(${lab.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${lab.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Cellar:</span> <code style="color: #cbd5e1;">${lab.lab_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Elixir:</span> <span style="color: #34d399; font-weight: 600;">${lab.elixir_name}</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Lab Tool:</span>
+            <span class="tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 600; font-size: 0.7rem;">${lab.required_tool}</span>
+            <span style="color: #34d399; margin-left: 0.3rem;">Marker: ${lab.elixir_marker}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -3509,6 +3658,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("landmarks-modal").style.display = "none";
     document.getElementById("vaults-modal").style.display = "none";
     document.getElementById("forge-modal").style.display = "none";
+    document.getElementById("elixirs-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -3570,6 +3720,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "f") {
     toggleForgeModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "e") {
+    toggleElixirsModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -3745,6 +3899,14 @@ _FORGE_RESPONSE_BYTES = json.dumps(
     {
         "total_forges": len(ANCIENT_RUNEFORGES),
         "forges": [f.to_dict() for f in ANCIENT_RUNEFORGES.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_ELIXIRS_RESPONSE_BYTES = json.dumps(
+    {
+        "total_labs": len(ANCIENT_ALEMBICS),
+        "labs": [lab.to_dict() for lab in ANCIENT_ALEMBICS.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -4160,6 +4322,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/elixirs
+    if path == "/api/game/elixirs":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_ELIXIRS_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -4213,6 +4395,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "landmarks": _ENGINE.get_landmarks_progress(state),
             "vaults": _ENGINE.get_vaults_progress(state),
             "forge": _ENGINE.get_forge_progress(state),
+            "elixirs": _ENGINE.get_elixirs_progress(state),
         }
         await _send_response(
             send,
@@ -4287,6 +4470,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "landmarks": _ENGINE.get_landmarks_progress(new_state),
             "vaults": _ENGINE.get_vaults_progress(new_state),
             "forge": _ENGINE.get_forge_progress(new_state),
+            "elixirs": _ENGINE.get_elixirs_progress(new_state),
         }
         await _send_response(
             send,
@@ -4360,6 +4544,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "landmarks": _ENGINE.get_landmarks_progress(state),
             "vaults": _ENGINE.get_vaults_progress(state),
             "forge": _ENGINE.get_forge_progress(state),
+            "elixirs": _ENGINE.get_elixirs_progress(state),
         }
         await _send_response(
             send,
@@ -4441,6 +4626,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "landmarks": _ENGINE.get_landmarks_progress(state),
             "vaults": _ENGINE.get_vaults_progress(state),
             "forge": _ENGINE.get_forge_progress(state),
+            "elixirs": _ENGINE.get_elixirs_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

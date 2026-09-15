@@ -31,6 +31,7 @@ from adventure_forge.core.shrines import get_shrine_affordances_for_scene
 from adventure_forge.core.landmarks import get_landmark_affordances_for_scene
 from adventure_forge.core.vaults import get_vault_affordances_for_scene
 from adventure_forge.core.forge import get_forge_affordances_for_scene
+from adventure_forge.core.elixirs import get_elixir_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1071,5 +1072,13 @@ def synthesize_affordances(
             if f_act.id not in seen_ids and f_act.is_legal(character, world_flags):
                 legal_actions.append(f_act)
                 seen_ids.add(f_act.id)
+
+    # 20. Continental Alchemical Laboratories, Distillation Alembics & Grand Master Apothecary System (Milestone 32)
+    if effective_scene_id:
+        elixir_actions = get_elixir_affordances_for_scene(effective_scene_id, character, world_flags)
+        for e_act in elixir_actions:
+            if e_act.id not in seen_ids and e_act.is_legal(character, world_flags):
+                legal_actions.append(e_act)
+                seen_ids.add(e_act.id)
 
     return legal_actions

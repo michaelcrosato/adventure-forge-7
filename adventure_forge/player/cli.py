@@ -464,6 +464,35 @@ def render_forge_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_elixirs_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental alchemical laboratories, distilled alembics, and apothecary rank."""
+    prog = engine.get_elixirs_progress(state)
+    distilled = prog.get("distilled_count", 0)
+    total = prog.get("total_labs", 6)
+    rank = prog.get("apothecary_rank", "Novice Herbalist")
+    active_elixirs = prog.get("active_elixirs_count", 0)
+    active_masteries = prog.get("active_masteries_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL ALCHEMICAL LABORATORIES ({distilled}/{total} Distilled | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Elixirs   : {active_elixirs} | Pharmacopeia Masteries: {active_masteries}")
+    print(f" Apothecary Status: {prog.get('rank_desc', '')}")
+    print("\n [ANCIENT DISTILLATION ALEMNICS & RETORTS]")
+    labs = prog.get("labs", [])
+    for lab in labs:
+        status_str = "[DISTILLED]" if lab.get("is_distilled") else "[DORMANT]"
+        elixir_str = " (ELIXIR HELD)" if lab.get("has_elixir") else ""
+        mast_str = " [PHARMACOPEIA MASTERY]" if lab.get("has_mastery") else ""
+        imbibe_str = " [IMBIBED]" if lab.get("is_imbibed") else ""
+        print(f"   • {lab.get('icon')} [{lab.get('province')}] {lab.get('name')}: {status_str}{elixir_str}{imbibe_str}{mast_str}")
+        print(f"     Cellar   : {lab.get('lab_scene')}")
+        print(f"     Elixir   : {lab.get('elixir_name')}")
+        print(f"     Domain   : {lab.get('domain')}")
+        print(f"     Tool     : {lab.get('required_tool')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -553,6 +582,7 @@ def render_ui(
     nav_hints.append("'landmarks' for panoramas")
     nav_hints.append("'vaults' for crypts")
     nav_hints.append("'forge' for runes")
+    nav_hints.append("'elixirs' for potions")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -735,6 +765,10 @@ def main():
             continue
         elif choice in ("forge", "forges", "runes", "rune", "anvil", "anvils", "f"):
             render_forge_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("elixirs", "elixir", "alchemy", "potions", "potion", "apothecary", "alembic", "alembics", "e"):
+            render_elixirs_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):
