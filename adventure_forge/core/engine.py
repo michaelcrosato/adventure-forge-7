@@ -28,6 +28,7 @@ from adventure_forge.core.companions import evaluate_companions_progress
 from adventure_forge.core.bestiary import evaluate_bestiary_progress
 from adventure_forge.core.survival import evaluate_survival_progress
 from adventure_forge.core.heraldry import evaluate_orders_progress
+from adventure_forge.core.shrines import evaluate_shrines_progress
 
 
 @dataclass
@@ -153,6 +154,10 @@ class AdventureEngine:
     def get_orders_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current faction pledges, war banners held, and grand marshal rank."""
         return evaluate_orders_progress(state.world_flags, state.character.inventory, state.character.markers)
+
+    def get_shrines_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current shrine consecrations, titan blessings, active auras, and pilgrim rank."""
+        return evaluate_shrines_progress(state.world_flags, state.character.inventory, state.character.markers, state.current_scene)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

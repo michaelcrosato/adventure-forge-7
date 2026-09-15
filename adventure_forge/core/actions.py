@@ -27,6 +27,7 @@ from adventure_forge.core.companions import get_companion_affordances_for_scene
 from adventure_forge.core.bestiary import get_bestiary_affordances_for_scene
 from adventure_forge.core.survival import get_survival_affordances_for_scene
 from adventure_forge.core.heraldry import get_heraldry_affordances_for_scene
+from adventure_forge.core.shrines import get_shrine_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1035,5 +1036,13 @@ def synthesize_affordances(
             if h_act.id not in seen_ids and h_act.is_legal(character, world_flags):
                 legal_actions.append(h_act)
                 seen_ids.add(h_act.id)
+
+    # 16. Continental Ancient Shrines, Relic Offerings & Divine Blessings (Milestone 28)
+    if effective_scene_id:
+        shrine_actions = get_shrine_affordances_for_scene(effective_scene_id, character, world_flags)
+        for sh_act in shrine_actions:
+            if sh_act.id not in seen_ids and sh_act.is_legal(character, world_flags):
+                legal_actions.append(sh_act)
+                seen_ids.add(sh_act.id)
 
     return legal_actions

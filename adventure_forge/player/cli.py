@@ -352,6 +352,34 @@ def render_orders_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_shrines_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental ancient shrines, consecrated altars, and divine blessings."""
+    prog = engine.get_shrines_progress(state)
+    consecrated = prog.get("consecrated_count", 0)
+    total = prog.get("total_shrines", 6)
+    rank = prog.get("pilgrim_rank", "Unanointed Wanderer")
+    active_blessings = prog.get("active_blessings_count", 0)
+    active_auras = prog.get("active_auras_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL SHRINES & TITAN BLESSINGS ({consecrated}/{total} Consecrated | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Blessings: {active_blessings} | Active Invocations: {active_auras}")
+    print(f" Pilgrim Status  : {prog.get('rank_desc', '')}")
+    print("\n [ANCIENT SHRINES & ALTARS]")
+    shrines = prog.get("shrines", [])
+    for s in shrines:
+        status_str = "[CONSECRATED]" if s.get("is_consecrated") else "[UNCONSECRATED]"
+        bless_str = " (BLESSING HELD)" if s.get("has_blessing") else ""
+        inv_str = " [AURA ACTIVE]" if s.get("is_aura_active") else (" [INVOKED]" if s.get("is_invoked") else "")
+        print(f"   • {s.get('icon')} [{s.get('province')}] {s.get('name')}: {status_str}{bless_str}{inv_str}")
+        print(f"     Deity    : {s.get('deity')}")
+        print(f"     Domain   : {s.get('domain')}")
+        print(f"     Sanctum  : {s.get('sanctum_scene')}")
+        print(f"     Blessing : {s.get('blessing_name')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -437,6 +465,7 @@ def render_ui(
     nav_hints.append("'hunt' for bestiary")
     nav_hints.append("'camp' for survival")
     nav_hints.append("'orders' for banners")
+    nav_hints.append("'shrines' for blessings")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -603,6 +632,10 @@ def main():
             continue
         elif choice in ("orders", "order", "banners", "banner", "heraldry", "o"):
             render_orders_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("shrines", "shrine", "blessings", "blessing", "altars", "altar", "g"):
+            render_shrines_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

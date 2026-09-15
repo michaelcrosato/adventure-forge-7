@@ -34,6 +34,7 @@ from adventure_forge.core.companions import COMPANIONS
 from adventure_forge.core.bestiary import APEX_BEASTS
 from adventure_forge.core.survival import FORAGING_SPOTS, COOKING_RECIPES
 from adventure_forge.core.heraldry import FACTION_ORDERS
+from adventure_forge.core.shrines import ANCIENT_SHRINES
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -657,6 +658,7 @@ footer {
         <button class="btn btn-secondary" id="bestiary-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleBestiaryModal()" title="View Continental Bestiary & Apex Trophies (Key: H)">🦁 Bestiary</button>
         <button class="btn btn-secondary" id="survival-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSurvivalModal()" title="View Survival Camp & Foraging (Key: K)">🏕️ Camp</button>
         <button class="btn btn-secondary" id="orders-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleOrdersModal()" title="View Continental Orders & War Banners (Key: O)">🛡️ Orders</button>
+        <button class="btn btn-secondary" id="shrines-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleShrinesModal()" title="View Ancient Shrines & Titan Blessings (Key: G)">🏛️ Shrines</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -827,6 +829,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleOrdersModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-orders-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL SHRINES & TITAN BLESSINGS MODAL -->
+    <div id="shrines-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleShrinesModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🏛️ Continental Ancient Shrines & Titan Blessings</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleShrinesModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-shrines-content"></div>
       </div>
     </div>
 
@@ -1055,6 +1068,8 @@ let currentSurvivalData = null;
 let cachedSurvivalMetadata = null;
 let currentOrdersData = null;
 let cachedOrdersMetadata = null;
+let currentShrinesData = null;
+let cachedShrinesMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1111,7 +1126,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1142,7 +1157,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1168,7 +1183,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1249,7 +1264,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1259,6 +1274,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (bestiary) currentBestiaryData = bestiary;
   if (survival) currentSurvivalData = survival;
   if (orders) currentOrdersData = orders;
+  if (shrines) currentShrinesData = shrines;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1323,6 +1339,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const ordBtn = document.getElementById("orders-btn");
   if (ordBtn && currentOrdersData) {
     ordBtn.textContent = `🛡️ Orders (${currentOrdersData.banners_held}/5 Banners)`;
+  }
+
+  const shrBtn = document.getElementById("shrines-btn");
+  if (shrBtn && currentShrinesData) {
+    shrBtn.textContent = `🏛️ Shrines (${currentShrinesData.consecrated_count}/6)`;
   }
 
   // Quest Tracker
@@ -1542,7 +1563,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1626,7 +1647,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -2782,6 +2803,140 @@ function renderOrdersModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchShrinesDataIfNeeded() {
+  if (cachedShrinesMetadata) return cachedShrinesMetadata;
+  try {
+    const res = await fetch("/api/game/shrines");
+    if (res.ok) {
+      cachedShrinesMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Shrines fetch failed:", e);
+  }
+  return cachedShrinesMetadata;
+}
+
+async function toggleShrinesModal() {
+  const modal = document.getElementById("shrines-modal");
+  if (modal.style.display === "none") {
+    await fetchShrinesDataIfNeeded();
+    renderShrinesModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderShrinesModalContent() {
+  const content = document.getElementById("modal-shrines-content");
+  if (!content) return;
+  const meta = cachedShrinesMetadata;
+  const sData = currentShrinesData;
+  const consecratedCount = (sData && sData.consecrated_count) || 0;
+  const totalShrines = (sData && sData.total_shrines) || 6;
+  const pilgrimRank = (sData && sData.pilgrim_rank) || "Unanointed Wanderer";
+  const activeBlessings = (sData && sData.active_blessings_count) || 0;
+  const activeAuras = (sData && sData.active_auras_count) || 0;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Ancient Shrines & Titan Blessings</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Consecrate sacred elemental altars, receive titan blessings, and invoke celestial favors across the continent.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; font-weight: 700; font-size: 0.85rem;">
+          ✨ ${pilgrimRank}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${consecratedCount} / ${totalShrines} Consecrated &bull; ${activeBlessings} Blessings Held
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (activeAuras > 0) {
+    html += `
+      <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <span style="color: #fbbf24; font-weight: 700;">🌟 Active Titan Invocations:</span>
+        <span style="color: #fff; margin-left: 0.4rem;">${activeAuras} Celestial Aura(s) Empowering Character</span>
+      </div>
+    `;
+  }
+
+  const pct = Math.round((consecratedCount / totalShrines) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Pilgrim Ranks: 1 Pilgrim &bull; 2 Devotee &bull; 3 Hierophant &bull; 4 Exarch &bull; 5 Hierarch &bull; 6 Avatar</span>
+        <span style="font-weight: 600; color: #fbbf24;">${pct}% Pantheon Consecrated</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+        <div style="height: 100%; width: ${pct}%; background: linear-gradient(90deg, #f59e0b, #10b981); transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem;">`;
+
+  const shrinesList = (sData && sData.shrines) || (meta && meta.shrines) || [];
+
+  for (const s of shrinesList) {
+    const isConsecrated = s.is_consecrated || false;
+    const hasBlessing = s.has_blessing || false;
+    const isInvoked = s.is_invoked || false;
+    const isAuraActive = s.is_aura_active || false;
+
+    let badge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">UNCONSECRATED</span>';
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+
+    if (isAuraActive) {
+      badge = '<span class="tag" style="background: rgba(245, 158, 11, 0.3); color: #fde68a; font-weight: 700; font-size: 0.7rem; border: 1px solid #f59e0b;">🌟 AURA ACTIVE</span>';
+      cardBorder = "rgba(245, 158, 11, 0.5)";
+      bgStyle = "rgba(245, 158, 11, 0.05)";
+    } else if (isInvoked) {
+      badge = '<span class="tag" style="background: rgba(148, 163, 184, 0.2); color: #cbd5e1; font-weight: 600; font-size: 0.7rem;">⚡ INVOKED (RENEW AT SHRINE)</span>';
+      cardBorder = "rgba(148, 163, 184, 0.3)";
+    } else if (hasBlessing) {
+      badge = '<span class="tag" style="background: rgba(34, 197, 94, 0.25); color: #4ade80; font-weight: 700; font-size: 0.7rem;">✨ BLESSING READY</span>';
+      cardBorder = "rgba(34, 197, 94, 0.4)";
+    } else if (isConsecrated) {
+      badge = '<span class="tag" style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; font-weight: 700; font-size: 0.7rem;">CONSECRATED</span>';
+      cardBorder = "rgba(56, 189, 248, 0.35)";
+    }
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <span style="font-size: 1.1rem; margin-right: 0.3rem;">${s.icon}</span>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${s.name}</span>
+            <span style="font-size: 0.8rem; color: #fbbf24; margin-left: 0.4rem; font-weight: 600;">(${s.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${s.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Deity:</span> <span style="color: #fff; font-weight: 600;">${s.deity}</span>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Sanctum:</span> <code style="color: #cbd5e1;">${s.sanctum_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Domain:</span> <span style="color: #38bdf8;">${s.domain}</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Blessing:</span>
+            <span class="tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 600; font-size: 0.7rem;">${s.blessing_name}</span>
+            <span style="color: #34d399; margin-left: 0.3rem;">Aura: ${s.aura_marker}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -2897,6 +3052,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("bestiary-modal").style.display = "none";
     document.getElementById("survival-modal").style.display = "none";
     document.getElementById("orders-modal").style.display = "none";
+    document.getElementById("shrines-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -2942,6 +3098,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "o") {
     toggleOrdersModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "g") {
+    toggleShrinesModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -3085,6 +3245,14 @@ _ORDERS_RESPONSE_BYTES = json.dumps(
     {
         "total_orders": len(FACTION_ORDERS),
         "orders": [o.to_dict() for o in FACTION_ORDERS.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_SHRINES_RESPONSE_BYTES = json.dumps(
+    {
+        "total_shrines": len(ANCIENT_SHRINES),
+        "shrines": [s.to_dict() for s in ANCIENT_SHRINES.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -3420,6 +3588,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/shrines
+    if path == "/api/game/shrines":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_SHRINES_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -3469,6 +3657,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bestiary": _ENGINE.get_bestiary_progress(state),
             "survival": _ENGINE.get_survival_progress(state),
             "orders": _ENGINE.get_orders_progress(state),
+            "shrines": _ENGINE.get_shrines_progress(state),
         }
         await _send_response(
             send,
@@ -3539,6 +3728,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bestiary": _ENGINE.get_bestiary_progress(new_state),
             "survival": _ENGINE.get_survival_progress(new_state),
             "orders": _ENGINE.get_orders_progress(new_state),
+            "shrines": _ENGINE.get_shrines_progress(new_state),
         }
         await _send_response(
             send,
@@ -3608,6 +3798,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bestiary": _ENGINE.get_bestiary_progress(state),
             "survival": _ENGINE.get_survival_progress(state),
             "orders": _ENGINE.get_orders_progress(state),
+            "shrines": _ENGINE.get_shrines_progress(state),
         }
         await _send_response(
             send,
@@ -3685,6 +3876,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bestiary": _ENGINE.get_bestiary_progress(state),
             "survival": _ENGINE.get_survival_progress(state),
             "orders": _ENGINE.get_orders_progress(state),
+            "shrines": _ENGINE.get_shrines_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }
