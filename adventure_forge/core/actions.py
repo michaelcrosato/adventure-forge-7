@@ -22,6 +22,7 @@ from adventure_forge.core.codex import get_codex_entries_for_scene
 from adventure_forge.core.transit import get_transit_routes_for_scene
 from adventure_forge.core.trade import get_trade_affordances_for_scene
 from adventure_forge.core.weather import get_weather_affordance_for_scene
+from adventure_forge.core.bounties import get_bounty_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -990,5 +991,13 @@ def synthesize_affordances(
         if weather_act and weather_act.id not in seen_ids:
             legal_actions.append(weather_act)
             seen_ids.add(weather_act.id)
+
+    # 11. Continental Mercenary Contract Board & Faction Bounties (Milestone 23)
+    if effective_scene_id:
+        bounty_actions = get_bounty_affordances_for_scene(effective_scene_id, character, world_flags)
+        for bounty_act in bounty_actions:
+            if bounty_act.id not in seen_ids and bounty_act.is_legal(character, world_flags):
+                legal_actions.append(bounty_act)
+                seen_ids.add(bounty_act.id)
 
     return legal_actions

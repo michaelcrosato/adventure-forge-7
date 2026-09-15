@@ -218,6 +218,31 @@ def render_weather_forecast(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_bounty_board(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental mercenary contract board and hunter progress."""
+    prog = engine.get_bounty_progress(state)
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL MERCENARY CONTRACT BOARD ({prog['rank_title']})")
+    print("=" * 65)
+    print(f"\n Progress: {prog['completed_count']}/{prog['total_contracts']} Contracts Cleared | Active Hunts: {prog['accepted_count'] + prog['hunted_count']}")
+
+    contracts = prog.get("contracts", {})
+    for cid, c in contracts.items():
+        if c["is_completed"]:
+            status_tag = "[CLAIMED ✓]"
+        elif c["is_hunted"]:
+            status_tag = "[HUNTED - READY]"
+        elif c["is_accepted"]:
+            status_tag = "[ACTIVE HUNT]"
+        else:
+            status_tag = "[OPEN CONTRACT]"
+        print(f"\n {status_tag} {c['name']} ({c['province']})")
+        print(f"   Target: {c['target_scene']} | Hub: {c['hub_scene']}")
+        print(f"   Reward: {c['reward_silver']} Silver + {c['reward_item']} (+{c['reputation_value']} {c['reputation_faction']})")
+        print(f"   \"{c['description']}\"")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -444,6 +469,10 @@ def main():
             continue
         elif choice in ("weather", "w"):
             render_weather_forecast(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("bounties", "bounty", "b"):
+            render_bounty_board(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

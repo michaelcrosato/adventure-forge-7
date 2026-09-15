@@ -29,6 +29,7 @@ from adventure_forge.core.codex import CODEX_ENTRIES, PROVINCIAL_MASTERIES
 from adventure_forge.core.transit import CHARTERED_ROUTES
 from adventure_forge.core.trade import COMMODITIES, TRADE_HUBS
 from adventure_forge.core.weather import WEATHER_CONDITIONS, get_all_provincial_weather
+from adventure_forge.core.bounties import BOUNTY_CONTRACTS, BOUNTY_HUBS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -340,6 +341,7 @@ a:hover { text-decoration: underline; }
 .cat-transit { background: rgba(45,212,191,0.2); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.35); }
 .cat-trade { background: rgba(234,179,8,0.2); color: #facc15; border: 1px solid rgba(234,179,8,0.35); }
 .cat-weather { background: rgba(56,189,248,0.25); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4); }
+.cat-bounty { background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
 .cat-systemic { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.35); }
 .cat-social { background: rgba(236,72,153,0.2); color: #ec4899; border: 1px solid rgba(236,72,153,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
@@ -644,6 +646,7 @@ footer {
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCodexModal()" title="View Ancient Lore Codex (Key: X)">📖 Codex</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleTradeModal()" title="View Commodity Exchange (Key: T)">⚖️ Trade</button>
         <button class="btn btn-secondary" id="weather-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleWeatherModal()" title="View Continental Weather Forecast (Key: W)">⛅ Weather</button>
+        <button class="btn btn-secondary" id="bounty-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleBountyModal()" title="View Mercenary Contract Board (Key: B)">🎯 Bounties</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -759,6 +762,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleWeatherModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-weather-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL MERCENARY CONTRACT BOARD MODAL -->
+    <div id="bounty-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleBountyModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🎯 Continental Mercenary Contract Board</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleBountyModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-bounty-content"></div>
       </div>
     </div>
 
@@ -977,6 +991,8 @@ let cachedCodexMetadata = null;
 let cachedTradeMetadata = null;
 let currentWeatherData = null;
 let cachedWeatherMetadata = null;
+let currentBountyData = null;
+let cachedBountyMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1033,7 +1049,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1064,7 +1080,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1090,7 +1106,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1171,11 +1187,12 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
   if (weather) currentWeatherData = weather;
+  if (bounty) currentBountyData = bounty;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1210,6 +1227,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather) {
   const weatherBtn = document.getElementById("weather-btn");
   if (weatherBtn && currentWeatherData) {
     weatherBtn.textContent = `⛅ ${currentWeatherData.name}`;
+  }
+
+  const bountyBtn = document.getElementById("bounty-btn");
+  if (bountyBtn && currentBountyData) {
+    bountyBtn.textContent = `🎯 Bounties (${currentBountyData.completed_count}/10)`;
   }
 
   // Quest Tracker
@@ -1429,7 +1451,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1513,7 +1535,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -2033,6 +2055,133 @@ function renderWeatherModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchBountyDataIfNeeded() {
+  if (cachedBountyMetadata) return cachedBountyMetadata;
+  try {
+    const res = await fetch("/api/game/bounties");
+    if (res.ok) {
+      cachedBountyMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Bounty fetch failed:", e);
+  }
+  return cachedBountyMetadata;
+}
+
+async function toggleBountyModal() {
+  const modal = document.getElementById("bounty-modal");
+  if (modal.style.display === "none") {
+    await fetchBountyDataIfNeeded();
+    renderBountyModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderBountyModalContent() {
+  const content = document.getElementById("modal-bounty-content");
+  if (!content) return;
+  const meta = cachedBountyMetadata;
+  const b = currentBountyData;
+  const completedCount = (b && b.completed_count) || 0;
+  const totalContracts = (b && b.total_contracts) || 10;
+  const rankTitle = (b && b.rank_title) || "Novice Drifter";
+  const acceptedCount = (b && b.accepted_count) || 0;
+  const huntedCount = (b && b.hunted_count) || 0;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Mercenary Contract Board</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Accept notices at regional gates or Central Bazaar. Track and claim rewards.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(239, 68, 68, 0.2); color: #f87171; font-weight: 700; font-size: 0.85rem;">
+          ${rankTitle}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${completedCount} / ${totalContracts} Completed &bull; ${huntedCount} Ready &bull; ${acceptedCount} Active
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Milestone Progress Bar
+  const pct = Math.round((completedCount / totalContracts) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Rank Milestones: 🗡️ 2 Hunter &bull; ⭐ 5 Lawkeeper &bull; 👑 10 Master</span>
+        <span style="font-weight: 600; color: #f87171;">${pct}% Cleared</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+        <div style="height: 100%; width: ${pct}%; background: linear-gradient(90deg, #ef4444, #f59e0b); transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  // Contracts list
+  html += `
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+  `;
+
+  const contractsMap = (b && b.contracts) || {};
+  const allList = (meta && meta.contracts) || [];
+
+  for (const c of allList) {
+    const statusObj = contractsMap[c.id] || {};
+    const isCompleted = statusObj.is_completed || false;
+    const isHunted = statusObj.is_hunted || false;
+    const isAccepted = statusObj.is_accepted || false;
+
+    let badge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">AVAILABLE AT BOARD</span>';
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+
+    if (isCompleted) {
+      badge = '<span class="tag" style="background: rgba(63,185,80,0.25); color: #3fb950; font-weight: 700; font-size: 0.7rem;">✓ BOUNTY CLAIMED</span>';
+      cardBorder = "rgba(63,185,80,0.4)";
+    } else if (isHunted) {
+      badge = '<span class="tag" style="background: rgba(234,179,8,0.25); color: #facc15; font-weight: 700; font-size: 0.7rem;">🎯 TARGET DEFEATED — CLAIM REWARD</span>';
+      cardBorder = "rgba(234,179,8,0.5)";
+      bgStyle = "rgba(234,179,8,0.03)";
+    } else if (isAccepted) {
+      badge = '<span class="tag" style="background: rgba(56,189,248,0.25); color: #38bdf8; font-weight: 700; font-size: 0.7rem;">⚔️ HUNT IN PROGRESS</span>';
+      cardBorder = "rgba(56,189,248,0.4)";
+    }
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${c.name}</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.4rem;">&bull; ${c.province}</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${c.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Target Scene:</span> <code style="color: #7dd3fc;">${c.target_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.6rem;">Hub:</span> <code style="color: #cbd5e1;">${c.hub_scene}</code>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Bounty:</span>
+            <span style="color: var(--gold); font-weight: 700;">${c.reward_silver} Silver</span>
+            <span style="color: var(--text-muted); margin-left: 0.3rem;">+</span>
+            <span class="tag" style="background: rgba(88,166,255,0.15); color: #58a6ff; font-size: 0.7rem;">${c.reward_item}</span>
+            <span class="tag" style="background: rgba(239,68,68,0.15); color: #f87171; font-size: 0.7rem;">+${c.reputation_value} ${c.reputation_faction}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -2143,6 +2292,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("codex-modal").style.display = "none";
     document.getElementById("trade-modal").style.display = "none";
     document.getElementById("weather-modal").style.display = "none";
+    document.getElementById("bounty-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -2168,6 +2318,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "w") {
     toggleWeatherModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "b") {
+    toggleBountyModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -2268,6 +2422,15 @@ _WEATHER_RESPONSE_BYTES = json.dumps(
         "total_conditions": len(WEATHER_CONDITIONS),
         "conditions": [w.to_dict() for w in WEATHER_CONDITIONS.values()],
         "forecast": get_all_provincial_weather(0),
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_BOUNTY_RESPONSE_BYTES = json.dumps(
+    {
+        "total_contracts": len(BOUNTY_CONTRACTS),
+        "contracts": [c.to_dict() for c in BOUNTY_CONTRACTS.values()],
+        "hubs": BOUNTY_HUBS,
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -2503,6 +2666,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/bounties
+    if path == "/api/game/bounties":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_BOUNTY_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -2547,6 +2730,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "transit": _ENGINE.get_transit_progress(state),
             "trade": _ENGINE.get_trade_progress(state),
             "weather": _ENGINE.get_weather_state(state),
+            "bounty": _ENGINE.get_bounty_progress(state),
         }
         await _send_response(
             send,
@@ -2612,6 +2796,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "transit": _ENGINE.get_transit_progress(new_state),
             "trade": _ENGINE.get_trade_progress(new_state),
             "weather": _ENGINE.get_weather_state(new_state),
+            "bounty": _ENGINE.get_bounty_progress(new_state),
         }
         await _send_response(
             send,
@@ -2676,6 +2861,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "transit": _ENGINE.get_transit_progress(state),
             "trade": _ENGINE.get_trade_progress(state),
             "weather": _ENGINE.get_weather_state(state),
+            "bounty": _ENGINE.get_bounty_progress(state),
         }
         await _send_response(
             send,
@@ -2748,6 +2934,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "transit": _ENGINE.get_transit_progress(state),
             "trade": _ENGINE.get_trade_progress(state),
             "weather": _ENGINE.get_weather_state(state),
+            "bounty": _ENGINE.get_bounty_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }
