@@ -324,6 +324,34 @@ def render_survival_camp(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_orders_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display provincial faction renown orders, pledged fealties, and war banners."""
+    prog = engine.get_orders_progress(state)
+    pledged = prog.get("pledged_count", 0)
+    total = prog.get("total_orders", 5)
+    banners = prog.get("banners_held", 0)
+    rank = prog.get("rank_title", "Unsworn Wayfarer")
+    active_marker = prog.get("active_banner_marker")
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL HERALDRY & RENOWN ORDERS ({banners}/{total} Banners | Rank: {rank})")
+    print("=" * 65)
+    print(f" Orders Sworn: {pledged} / {total}")
+    if active_marker:
+        print(f" Active War Banner Aura: {active_marker}")
+    print("\n [PROVINCIAL FACTION ORDERS]")
+    orders = prog.get("orders", {})
+    for oid, o in orders.items():
+        pledge_status = "[PLEDGED]" if o.get("is_pledged") else "[UNSWORN]"
+        banner_status = "[HELD IN PACK]" if o.get("has_banner") else "[NO BANNER]"
+        raised_str = " (RAISED)" if o.get("is_raised") else ""
+        print(f"   • {o.get('crest_icon')} [{o.get('province')}] {o.get('name')}: {pledge_status} | {banner_status}{raised_str}")
+        print(f"     Sanctum : {o.get('sanctum_scene')}")
+        print(f"     Banner  : {o.get('banner_name')}")
+        print(f"     Perk    : {o.get('granted_marker')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -408,6 +436,7 @@ def render_ui(
     nav_hints.append("'party' for companions")
     nav_hints.append("'hunt' for bestiary")
     nav_hints.append("'camp' for survival")
+    nav_hints.append("'orders' for banners")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -570,6 +599,10 @@ def main():
             continue
         elif choice in ("camp", "camping", "cook", "cooking", "rations", "survival", "k"):
             render_survival_camp(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("orders", "order", "banners", "banner", "heraldry", "o"):
+            render_orders_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

@@ -33,6 +33,7 @@ from adventure_forge.core.bounties import BOUNTY_CONTRACTS, BOUNTY_HUBS
 from adventure_forge.core.companions import COMPANIONS
 from adventure_forge.core.bestiary import APEX_BEASTS
 from adventure_forge.core.survival import FORAGING_SPOTS, COOKING_RECIPES
+from adventure_forge.core.heraldry import FACTION_ORDERS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -655,6 +656,7 @@ footer {
         <button class="btn btn-secondary" id="companion-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCompanionModal()" title="View Continental Warband Fellowship (Key: P)">👥 Party</button>
         <button class="btn btn-secondary" id="bestiary-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleBestiaryModal()" title="View Continental Bestiary & Apex Trophies (Key: H)">🦁 Bestiary</button>
         <button class="btn btn-secondary" id="survival-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSurvivalModal()" title="View Survival Camp & Foraging (Key: K)">🏕️ Camp</button>
+        <button class="btn btn-secondary" id="orders-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleOrdersModal()" title="View Continental Orders & War Banners (Key: O)">🛡️ Orders</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -814,6 +816,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleSurvivalModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-survival-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL HERALDRY & ORDERS MODAL -->
+    <div id="orders-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleOrdersModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🛡️ Provincial Faction Heraldry & War Banners</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleOrdersModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-orders-content"></div>
       </div>
     </div>
 
@@ -1040,6 +1053,8 @@ let currentBestiaryData = null;
 let cachedBestiaryMetadata = null;
 let currentSurvivalData = null;
 let cachedSurvivalMetadata = null;
+let currentOrdersData = null;
+let cachedOrdersMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1096,7 +1111,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1127,7 +1142,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1153,7 +1168,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1234,7 +1249,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1243,6 +1258,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (companion) currentCompanionData = companion;
   if (bestiary) currentBestiaryData = bestiary;
   if (survival) currentSurvivalData = survival;
+  if (orders) currentOrdersData = orders;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1302,6 +1318,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const survBtn = document.getElementById("survival-btn");
   if (survBtn && currentSurvivalData) {
     survBtn.textContent = `🏕️ Camp (${currentSurvivalData.meals_cooked} Cooked)`;
+  }
+
+  const ordBtn = document.getElementById("orders-btn");
+  if (ordBtn && currentOrdersData) {
+    ordBtn.textContent = `🛡️ Orders (${currentOrdersData.banners_held}/5 Banners)`;
   }
 
   // Quest Tracker
@@ -1521,7 +1542,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1605,7 +1626,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -2627,6 +2648,140 @@ function renderSurvivalModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchOrdersDataIfNeeded() {
+  if (cachedOrdersMetadata) return cachedOrdersMetadata;
+  try {
+    const res = await fetch("/api/game/orders");
+    if (res.ok) {
+      cachedOrdersMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Orders fetch failed:", e);
+  }
+  return cachedOrdersMetadata;
+}
+
+async function toggleOrdersModal() {
+  const modal = document.getElementById("orders-modal");
+  if (modal.style.display === "none") {
+    await fetchOrdersDataIfNeeded();
+    renderOrdersModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderOrdersModalContent() {
+  const content = document.getElementById("modal-orders-content");
+  if (!content) return;
+  const meta = cachedOrdersMetadata;
+  const oData = currentOrdersData;
+  const pledgedCount = (oData && oData.pledged_count) || 0;
+  const totalOrders = (oData && oData.total_orders) || 5;
+  const bannersHeld = (oData && oData.banners_held) || 0;
+  const rankTitle = (oData && oData.rank_title) || "Unsworn Wayfarer";
+  const activeMarker = (oData && oData.active_banner_marker) || null;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Provincial Faction Heraldry & Renown Orders</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Swear fealty at provincial council sanctums, claim war banners, and assert sovereignty across the realms.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(168, 85, 247, 0.25); color: #c084fc; font-weight: 700; font-size: 0.85rem;">
+          ${rankTitle}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${bannersHeld} / ${totalOrders} Banners Claimed &bull; ${pledgedCount} Oaths Sworn
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (activeMarker) {
+    html += `
+      <div style="background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <span style="color: #c084fc; font-weight: 700;">🚩 Active War Banner Raised:</span>
+        <span style="color: #fff; margin-left: 0.4rem;">${activeMarker}</span>
+      </div>
+    `;
+  }
+
+  const pct = Math.round((bannersHeld / totalOrders) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Order Ranks: 🗡️ 1 Knight-Errant &bull; 🚩 2 Banneret &bull; 🛡️ 3 Commander &bull; ⚔️ 4 Marshal &bull; 👑 5 Grandmaster</span>
+        <span style="font-weight: 600; color: #c084fc;">${pct}% Banners Held</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+        <div style="height: 100%; width: ${pct}%; background: linear-gradient(90deg, #8b5cf6, #ec4899); transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem;">`;
+
+  const ordersMap = (oData && oData.orders) || {};
+  const allOrders = (meta && meta.orders) || [];
+
+  for (const o of allOrders) {
+    const oStatus = ordersMap[o.id] || {};
+    const isPledged = oStatus.is_pledged || false;
+    const hasBanner = oStatus.has_banner || false;
+    const isRaised = oStatus.is_raised || false;
+
+    let badge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">UNSWORN</span>';
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+
+    if (isRaised) {
+      badge = '<span class="tag" style="background: rgba(168, 85, 247, 0.3); color: #e2baff; font-weight: 700; font-size: 0.7rem; border: 1px solid #c084fc;">🚩 BANNER RAISED</span>';
+      cardBorder = "rgba(168, 85, 247, 0.5)";
+      bgStyle = "rgba(168, 85, 247, 0.05)";
+    } else if (hasBanner) {
+      badge = '<span class="tag" style="background: rgba(34, 197, 94, 0.25); color: #4ade80; font-weight: 700; font-size: 0.7rem;">🎒 BANNER IN PACK</span>';
+      cardBorder = "rgba(34, 197, 94, 0.4)";
+    } else if (isPledged) {
+      badge = '<span class="tag" style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; font-weight: 700; font-size: 0.7rem;">FEALTY SWORN</span>';
+      cardBorder = "rgba(56, 189, 248, 0.35)";
+    }
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <span style="font-size: 1.1rem; margin-right: 0.3rem;">${o.crest_icon}</span>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${o.name}</span>
+            <span style="font-size: 0.8rem; color: #a78bfa; margin-left: 0.4rem; font-weight: 600;">(${o.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${o.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Sanctum:</span> <code style="color: #cbd5e1;">${o.sanctum_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Requirements:</span>
+            <span style="color: #58a6ff;">+${o.reputation_req} Rep</span> or
+            <span style="color: #3fb950;">${o.alternate_attribute.toUpperCase()} >= ${o.alternate_attr_val}</span> or
+            <span style="color: #c084fc;">${o.alternate_trait}</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">War Banner:</span>
+            <span class="tag" style="background: rgba(168, 85, 247, 0.2); color: #c084fc; font-weight: 600; font-size: 0.7rem;">${o.banner_name}</span>
+            <span style="color: #38bdf8; margin-left: 0.3rem;">Perk: ${o.granted_marker}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -2741,6 +2896,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("companion-modal").style.display = "none";
     document.getElementById("bestiary-modal").style.display = "none";
     document.getElementById("survival-modal").style.display = "none";
+    document.getElementById("orders-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -2782,6 +2938,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "k") {
     toggleSurvivalModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "o") {
+    toggleOrdersModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -2917,6 +3077,14 @@ _SURVIVAL_RESPONSE_BYTES = json.dumps(
         "spots": [s.to_dict() for s in FORAGING_SPOTS.values()],
         "total_recipes": len(COOKING_RECIPES),
         "recipes": [r.to_dict() for r in COOKING_RECIPES.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_ORDERS_RESPONSE_BYTES = json.dumps(
+    {
+        "total_orders": len(FACTION_ORDERS),
+        "orders": [o.to_dict() for o in FACTION_ORDERS.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -3232,6 +3400,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/orders
+    if path == "/api/game/orders":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_ORDERS_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -3280,6 +3468,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "companion": _ENGINE.get_companion_progress(state),
             "bestiary": _ENGINE.get_bestiary_progress(state),
             "survival": _ENGINE.get_survival_progress(state),
+            "orders": _ENGINE.get_orders_progress(state),
         }
         await _send_response(
             send,
@@ -3349,6 +3538,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "companion": _ENGINE.get_companion_progress(new_state),
             "bestiary": _ENGINE.get_bestiary_progress(new_state),
             "survival": _ENGINE.get_survival_progress(new_state),
+            "orders": _ENGINE.get_orders_progress(new_state),
         }
         await _send_response(
             send,
@@ -3417,6 +3607,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "companion": _ENGINE.get_companion_progress(state),
             "bestiary": _ENGINE.get_bestiary_progress(state),
             "survival": _ENGINE.get_survival_progress(state),
+            "orders": _ENGINE.get_orders_progress(state),
         }
         await _send_response(
             send,
@@ -3493,6 +3684,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "companion": _ENGINE.get_companion_progress(state),
             "bestiary": _ENGINE.get_bestiary_progress(state),
             "survival": _ENGINE.get_survival_progress(state),
+            "orders": _ENGINE.get_orders_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

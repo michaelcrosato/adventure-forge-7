@@ -26,6 +26,7 @@ from adventure_forge.core.bounties import get_bounty_affordances_for_scene
 from adventure_forge.core.companions import get_companion_affordances_for_scene
 from adventure_forge.core.bestiary import get_bestiary_affordances_for_scene
 from adventure_forge.core.survival import get_survival_affordances_for_scene
+from adventure_forge.core.heraldry import get_heraldry_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1026,5 +1027,13 @@ def synthesize_affordances(
             if surv_act.id not in seen_ids and surv_act.is_legal(character, world_flags):
                 legal_actions.append(surv_act)
                 seen_ids.add(surv_act.id)
+
+    # 15. Provincial Faction Heraldry, Renown Orders & Continental War Banners (Milestone 27)
+    if effective_scene_id:
+        heraldry_actions = get_heraldry_affordances_for_scene(effective_scene_id, character, world_flags)
+        for h_act in heraldry_actions:
+            if h_act.id not in seen_ids and h_act.is_legal(character, world_flags):
+                legal_actions.append(h_act)
+                seen_ids.add(h_act.id)
 
     return legal_actions
