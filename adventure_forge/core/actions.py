@@ -30,6 +30,7 @@ from adventure_forge.core.heraldry import get_heraldry_affordances_for_scene
 from adventure_forge.core.shrines import get_shrine_affordances_for_scene
 from adventure_forge.core.landmarks import get_landmark_affordances_for_scene
 from adventure_forge.core.vaults import get_vault_affordances_for_scene
+from adventure_forge.core.forge import get_forge_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1062,5 +1063,13 @@ def synthesize_affordances(
             if v_act.id not in seen_ids and v_act.is_legal(character, world_flags):
                 legal_actions.append(v_act)
                 seen_ids.add(v_act.id)
+
+    # 19. Continental Runeforges, Ancient Crucible Anvils & Master Artificer System (Milestone 31)
+    if effective_scene_id:
+        forge_actions = get_forge_affordances_for_scene(effective_scene_id, character, world_flags)
+        for f_act in forge_actions:
+            if f_act.id not in seen_ids and f_act.is_legal(character, world_flags):
+                legal_actions.append(f_act)
+                seen_ids.add(f_act.id)
 
     return legal_actions

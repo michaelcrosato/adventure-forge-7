@@ -37,6 +37,7 @@ from adventure_forge.core.heraldry import FACTION_ORDERS
 from adventure_forge.core.shrines import ANCIENT_SHRINES
 from adventure_forge.core.landmarks import SURVEY_LANDMARKS
 from adventure_forge.core.vaults import ANCIENT_VAULTS
+from adventure_forge.core.forge import ANCIENT_RUNEFORGES
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -663,6 +664,7 @@ footer {
         <button class="btn btn-secondary" id="shrines-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleShrinesModal()" title="View Ancient Shrines & Titan Blessings (Key: G)">🏛️ Shrines</button>
         <button class="btn btn-secondary" id="landmarks-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleLandmarksModal()" title="View Survey Landmarks & Panoramas (Key: L)">🔭 Landmarks</button>
         <button class="btn btn-secondary" id="vaults-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleVaultsModal()" title="View Dungeon Vaults & Arcane Keystones (Key: V)">🗝️ Vaults</button>
+        <button class="btn btn-secondary" id="forge-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleForgeModal()" title="View Continental Runeforges & Anvils (Key: F)">⚒️ Forge</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -866,6 +868,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleVaultsModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-vaults-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL RUNEFORGES & MASTER ARTIFICER MODAL -->
+    <div id="forge-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleForgeModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">⚒️ Continental Runeforges & Ancient Crucibles</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleForgeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-forge-content"></div>
       </div>
     </div>
 
@@ -1100,6 +1113,8 @@ let currentLandmarksData = null;
 let cachedLandmarksMetadata = null;
 let currentVaultsData = null;
 let cachedVaultsMetadata = null;
+let currentForgeData = null;
+let cachedForgeMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1156,7 +1171,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1187,7 +1202,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1213,7 +1228,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1294,7 +1309,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks, vaults) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks, vaults, forge) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1307,6 +1322,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (shrines) currentShrinesData = shrines;
   if (landmarks) currentLandmarksData = landmarks;
   if (vaults) currentVaultsData = vaults;
+  if (forge) currentForgeData = forge;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1386,6 +1402,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const vltBtn = document.getElementById("vaults-btn");
   if (vltBtn && currentVaultsData) {
     vltBtn.textContent = `🗝️ Vaults (${currentVaultsData.unlocked_count}/6)`;
+  }
+
+  const frgBtn = document.getElementById("forge-btn");
+  if (frgBtn && currentForgeData) {
+    frgBtn.textContent = `⚒️ Forge (${currentForgeData.inscribed_count}/6)`;
   }
 
   // Quest Tracker
@@ -1605,7 +1626,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1689,7 +1710,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -3239,6 +3260,136 @@ function renderVaultsModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchForgeDataIfNeeded() {
+  if (cachedForgeMetadata) return cachedForgeMetadata;
+  try {
+    const res = await fetch("/api/game/forge");
+    if (res.ok) {
+      cachedForgeMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Forge fetch failed:", e);
+  }
+  return cachedForgeMetadata;
+}
+
+async function toggleForgeModal() {
+  const modal = document.getElementById("forge-modal");
+  if (modal.style.display === "none") {
+    await fetchForgeDataIfNeeded();
+    renderForgeModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderForgeModalContent() {
+  const content = document.getElementById("modal-forge-content");
+  if (!content) return;
+  const meta = cachedForgeMetadata;
+  const fData = currentForgeData;
+  const inscribedCount = (fData && fData.inscribed_count) || 0;
+  const totalForges = (fData && fData.total_forges) || 6;
+  const artificerRank = (fData && fData.artificer_rank) || "Apprentice Striker";
+  const activeRunes = (fData && fData.active_runes_count) || 0;
+  const activeMasteries = (fData && fData.active_masteries_count) || 0;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Runeforges & Ancient Crucibles</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Inscribe ancient provincial anvils, forge masterwork runes, and attain Continental Forgemaster rank.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; font-weight: 700; font-size: 0.85rem;">
+          ⚒️ ${artificerRank}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${inscribedCount} / ${totalForges} Inscribed &bull; ${activeRunes} Runes Forged
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (activeMasteries > 0) {
+    html += `
+      <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <span style="color: #fbbf24; font-weight: 700;">🔥 Metallurgical Masteries:</span>
+        <span style="color: #fff; margin-left: 0.4rem;">${activeMasteries} Regional Smithing Masteries Active</span>
+      </div>
+    `;
+  }
+
+  const pct = Math.round((inscribedCount / totalForges) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Artificer Ranks: 1 Journeyman &bull; 2 Craftsman &bull; 3 Master &bull; 4 Metallurgist &bull; 5 Anvilmaster &bull; 6 Forgemaster</span>
+        <span style="font-weight: 600; color: #fbbf24;">${pct}% Anvils Inscribed</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+        <div style="height: 100%; width: ${pct}%; background: linear-gradient(90deg, #f59e0b, #eab308); transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem;">`;
+
+  const forgesList = (fData && fData.forges) || (meta && meta.forges) || [];
+
+  for (const f of forgesList) {
+    const isInscribed = f.is_inscribed || false;
+    const hasRune = f.has_rune || false;
+    const isTempered = f.is_tempered || false;
+    const hasMastery = f.has_mastery || false;
+
+    let badge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">DORMANT</span>';
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+
+    if (isTempered) {
+      badge = '<span class="tag" style="background: rgba(234, 179, 8, 0.25); color: #facc15; font-weight: 700; font-size: 0.7rem; border: 1px solid #eab308;">🔥 RUNE TEMPERED</span>';
+      cardBorder = "rgba(234, 179, 8, 0.4)";
+    } else if (hasMastery) {
+      badge = '<span class="tag" style="background: rgba(34, 197, 94, 0.25); color: #4ade80; font-weight: 700; font-size: 0.7rem;">⚒️ SMITH MASTERY</span>';
+      cardBorder = "rgba(34, 197, 94, 0.4)";
+      bgStyle = "rgba(34, 197, 94, 0.05)";
+    } else if (isInscribed) {
+      badge = '<span class="tag" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; font-weight: 700; font-size: 0.7rem;">INSCRIBED</span>';
+      cardBorder = "rgba(245, 158, 11, 0.35)";
+    }
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <span style="font-size: 1.1rem; margin-right: 0.3rem;">${f.icon}</span>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${f.name}</span>
+            <span style="font-size: 0.8rem; color: #fbbf24; margin-left: 0.4rem; font-weight: 600;">(${f.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${f.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Armory:</span> <code style="color: #cbd5e1;">${f.forge_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Rune:</span> <span style="color: #fbbf24; font-weight: 600;">${f.rune_name}</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Smith Tool:</span>
+            <span class="tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-weight: 600; font-size: 0.7rem;">${f.required_tool}</span>
+            <span style="color: #34d399; margin-left: 0.3rem;">Marker: ${f.rune_marker}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -3357,6 +3508,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("shrines-modal").style.display = "none";
     document.getElementById("landmarks-modal").style.display = "none";
     document.getElementById("vaults-modal").style.display = "none";
+    document.getElementById("forge-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -3414,6 +3566,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "v") {
     toggleVaultsModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "f") {
+    toggleForgeModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -3581,6 +3737,14 @@ _VAULTS_RESPONSE_BYTES = json.dumps(
     {
         "total_vaults": len(ANCIENT_VAULTS),
         "vaults": [v.to_dict() for v in ANCIENT_VAULTS.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_FORGE_RESPONSE_BYTES = json.dumps(
+    {
+        "total_forges": len(ANCIENT_RUNEFORGES),
+        "forges": [f.to_dict() for f in ANCIENT_RUNEFORGES.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -3976,6 +4140,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/forge
+    if path == "/api/game/forge":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_FORGE_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -4028,6 +4212,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "shrines": _ENGINE.get_shrines_progress(state),
             "landmarks": _ENGINE.get_landmarks_progress(state),
             "vaults": _ENGINE.get_vaults_progress(state),
+            "forge": _ENGINE.get_forge_progress(state),
         }
         await _send_response(
             send,
@@ -4101,6 +4286,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "shrines": _ENGINE.get_shrines_progress(new_state),
             "landmarks": _ENGINE.get_landmarks_progress(new_state),
             "vaults": _ENGINE.get_vaults_progress(new_state),
+            "forge": _ENGINE.get_forge_progress(new_state),
         }
         await _send_response(
             send,
@@ -4173,6 +4359,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "shrines": _ENGINE.get_shrines_progress(state),
             "landmarks": _ENGINE.get_landmarks_progress(state),
             "vaults": _ENGINE.get_vaults_progress(state),
+            "forge": _ENGINE.get_forge_progress(state),
         }
         await _send_response(
             send,
@@ -4253,6 +4440,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "shrines": _ENGINE.get_shrines_progress(state),
             "landmarks": _ENGINE.get_landmarks_progress(state),
             "vaults": _ENGINE.get_vaults_progress(state),
+            "forge": _ENGINE.get_forge_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

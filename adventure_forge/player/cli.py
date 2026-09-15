@@ -436,6 +436,34 @@ def render_vaults_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_forge_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental runeforges, inscribed anvils, and artificer rank."""
+    prog = engine.get_forge_progress(state)
+    inscribed = prog.get("inscribed_count", 0)
+    total = prog.get("total_forges", 6)
+    rank = prog.get("artificer_rank", "Apprentice Striker")
+    active_runes = prog.get("active_runes_count", 0)
+    active_masteries = prog.get("active_masteries_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL RUNEFORGES ({inscribed}/{total} Inscribed | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Runes    : {active_runes} | Smithing Masteries: {active_masteries}")
+    print(f" Artificer Status: {prog.get('rank_desc', '')}")
+    print("\n [ANCIENT CRUCIBLE ANVILS & RUNEFORGES]")
+    forges = prog.get("forges", [])
+    for f in forges:
+        status_str = "[INSCRIBED]" if f.get("is_inscribed") else "[DORMANT]"
+        rune_str = " (RUNE HELD)" if f.get("has_rune") else ""
+        mast_str = " [SMITH MASTERY]" if f.get("has_mastery") else ""
+        temper_str = " [TEMPERED]" if f.get("is_tempered") else ""
+        print(f"   • {f.get('icon')} [{f.get('province')}] {f.get('name')}: {status_str}{rune_str}{temper_str}{mast_str}")
+        print(f"     Armory   : {f.get('forge_scene')}")
+        print(f"     Domain   : {f.get('domain')}")
+        print(f"     Tool     : {f.get('required_tool')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -524,6 +552,7 @@ def render_ui(
     nav_hints.append("'shrines' for blessings")
     nav_hints.append("'landmarks' for panoramas")
     nav_hints.append("'vaults' for crypts")
+    nav_hints.append("'forge' for runes")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -702,6 +731,10 @@ def main():
             continue
         elif choice in ("vaults", "vault", "keystones", "keystone", "crypts", "crypt", "v"):
             render_vaults_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("forge", "forges", "runes", "rune", "anvil", "anvils", "f"):
+            render_forge_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):
