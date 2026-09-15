@@ -26,6 +26,7 @@ from adventure_forge.core.weather import get_weather_for_region, get_all_provinc
 from adventure_forge.core.bounties import evaluate_bounty_progress
 from adventure_forge.core.companions import evaluate_companions_progress
 from adventure_forge.core.bestiary import evaluate_bestiary_progress
+from adventure_forge.core.survival import evaluate_survival_progress
 
 
 @dataclass
@@ -143,6 +144,10 @@ class AdventureEngine:
     def get_bestiary_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current apex beast discoveries, hunts, trophies, and hunter rank."""
         return evaluate_bestiary_progress(state.world_flags, state.character.inventory)
+
+    def get_survival_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current foraging, meals cooked, field rations, and survival rank."""
+        return evaluate_survival_progress(state.world_flags, state.character.inventory)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

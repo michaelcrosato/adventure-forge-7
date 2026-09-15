@@ -32,6 +32,7 @@ from adventure_forge.core.weather import WEATHER_CONDITIONS, get_all_provincial_
 from adventure_forge.core.bounties import BOUNTY_CONTRACTS, BOUNTY_HUBS
 from adventure_forge.core.companions import COMPANIONS
 from adventure_forge.core.bestiary import APEX_BEASTS
+from adventure_forge.core.survival import FORAGING_SPOTS, COOKING_RECIPES
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -653,6 +654,7 @@ footer {
         <button class="btn btn-secondary" id="bounty-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleBountyModal()" title="View Mercenary Contract Board (Key: B)">🎯 Bounties</button>
         <button class="btn btn-secondary" id="companion-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCompanionModal()" title="View Continental Warband Fellowship (Key: P)">👥 Party</button>
         <button class="btn btn-secondary" id="bestiary-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleBestiaryModal()" title="View Continental Bestiary & Apex Trophies (Key: H)">🦁 Bestiary</button>
+        <button class="btn btn-secondary" id="survival-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSurvivalModal()" title="View Survival Camp & Foraging (Key: K)">🏕️ Camp</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -801,6 +803,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleBestiaryModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-bestiary-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL SURVIVAL CAMP & FORAGING MODAL -->
+    <div id="survival-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleSurvivalModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🏕️ Continental Survival Camp & Foraging</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleSurvivalModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-survival-content"></div>
       </div>
     </div>
 
@@ -1025,6 +1038,8 @@ let currentCompanionData = null;
 let cachedCompanionMetadata = null;
 let currentBestiaryData = null;
 let cachedBestiaryMetadata = null;
+let currentSurvivalData = null;
+let cachedSurvivalMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1081,7 +1096,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1112,7 +1127,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1138,7 +1153,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1219,7 +1234,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1227,6 +1242,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (bounty) currentBountyData = bounty;
   if (companion) currentCompanionData = companion;
   if (bestiary) currentBestiaryData = bestiary;
+  if (survival) currentSurvivalData = survival;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1281,6 +1297,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const bestiaryBtn = document.getElementById("bestiary-btn");
   if (bestiaryBtn && currentBestiaryData) {
     bestiaryBtn.textContent = `🦁 Hunt (${currentBestiaryData.hunted_count}/10)`;
+  }
+
+  const survBtn = document.getElementById("survival-btn");
+  if (survBtn && currentSurvivalData) {
+    survBtn.textContent = `🏕️ Camp (${currentSurvivalData.meals_cooked} Cooked)`;
   }
 
   // Quest Tracker
@@ -1500,7 +1521,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1584,7 +1605,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -2473,6 +2494,139 @@ function renderBestiaryModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchSurvivalDataIfNeeded() {
+  if (cachedSurvivalMetadata) return cachedSurvivalMetadata;
+  try {
+    const res = await fetch("/api/game/survival");
+    if (res.ok) {
+      cachedSurvivalMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Survival fetch failed:", e);
+  }
+  return cachedSurvivalMetadata;
+}
+
+async function toggleSurvivalModal() {
+  const modal = document.getElementById("survival-modal");
+  if (modal.style.display === "none") {
+    await fetchSurvivalDataIfNeeded();
+    renderSurvivalModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderSurvivalModalContent() {
+  const content = document.getElementById("modal-survival-content");
+  if (!content) return;
+  const meta = cachedSurvivalMetadata;
+  const sData = currentSurvivalData;
+  const foragedCount = (sData && sData.foraged_count) || 0;
+  const totalSpots = (sData && sData.total_spots) || 15;
+  const mealsCooked = (sData && sData.meals_cooked) || 0;
+  const rankTitle = (sData && sData.rank_title) || "Trail Wanderer";
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Survival Camp & Wilderness Rations</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Forage wild ingredients across 15 sites. Cook field rations at hearths to fortify health and stamina.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; font-weight: 700; font-size: 0.85rem;">
+          ${rankTitle}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${mealsCooked} Meals Cooked &bull; ${foragedCount} / ${totalSpots} Sites Foraged
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Recipes section
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Survival Cooking Recipes (Hearth & Campfire)</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem;">
+  `;
+
+  const recipesMap = (sData && sData.recipes) || {};
+  const allRecipes = (meta && meta.recipes) || [];
+
+  for (const r of allRecipes) {
+    const rStatus = recipesMap[r.id] || {};
+    const canCook = rStatus.can_cook || false;
+    const countHeld = rStatus.count_held || 0;
+
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+    let badge = `<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">NEEDS INGREDIENTS</span>`;
+
+    if (countHeld > 0) {
+      badge = `<span class="tag" style="background: rgba(34, 197, 94, 0.25); color: #4ade80; font-weight: 700; font-size: 0.7rem;">🎒 ${countHeld} IN PACK</span>`;
+      cardBorder = "rgba(34, 197, 94, 0.4)";
+      bgStyle = "rgba(34, 197, 94, 0.04)";
+    } else if (canCook) {
+      badge = `<span class="tag" style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; font-weight: 700; font-size: 0.7rem;">READY TO COOK</span>`;
+      cardBorder = "rgba(56, 189, 248, 0.35)";
+    }
+
+    const ingPills = r.required_ingredients.map(ing => `<code style="font-size: 0.75rem; color: #cbd5e1; background: rgba(255,255,255,0.06); padding: 0.1rem 0.3rem; border-radius: 3px;">${ing.replace(/^foraged_/, '').replace(/_/g, ' ')}</code>`).join(" ");
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem;">
+          <div>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${r.name}</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.4rem;">(${r.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.82rem; color: #d1d5db; margin-bottom: 0.45rem;">${r.description}</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.35rem;">
+          Ingredients: ${ingPills}
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #38bdf8; padding-top: 0.35rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <span>Recovery: +${r.stamina_restored} SP &bull; +${r.health_restored} HP</span>
+          ${r.granted_marker ? `<span style="color: #c084fc;">Perk: ${r.granted_marker}</span>` : ""}
+        </div>
+      </div>
+    `;
+  }
+  html += `</div></div>`;
+
+  // Foraging sites section
+  html += `
+    <div>
+      <h4 style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Wilderness Foraging Spots (15 Continental Gateways)</h4>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem;">
+  `;
+
+  const allSpots = (meta && meta.spots) || [];
+  for (const s of allSpots) {
+    const isHarvested = (gameState && gameState.world_flags && gameState.world_flags[\`survival_foraged_\${s.scene_id}\`]);
+    const statusBadge = isHarvested
+      ? `<span class="tag" style="background: rgba(34, 197, 94, 0.2); color: #4ade80; font-size: 0.7rem;">HARVESTED</span>`
+      : `<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">UNHARVESTED</span>`;
+
+    html += `
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border); border-radius: 4px; padding: 0.6rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
+          <span style="font-weight: 600; font-size: 0.8rem; color: #fff;">${s.ingredient_name}</span>
+          ${statusBadge}
+        </div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">${s.province}</div>
+        <code style="font-size: 0.7rem; color: #94a3b8;">${s.scene_id}</code>
+      </div>
+    `;
+  }
+
+  html += `</div></div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -2586,6 +2740,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("bounty-modal").style.display = "none";
     document.getElementById("companion-modal").style.display = "none";
     document.getElementById("bestiary-modal").style.display = "none";
+    document.getElementById("survival-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -2623,6 +2778,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "h") {
     toggleBestiaryModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "k") {
+    toggleSurvivalModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -2748,6 +2907,16 @@ _BESTIARY_RESPONSE_BYTES = json.dumps(
     {
         "total_beasts": len(APEX_BEASTS),
         "beasts": [b.to_dict() for b in APEX_BEASTS.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_SURVIVAL_RESPONSE_BYTES = json.dumps(
+    {
+        "total_spots": len(FORAGING_SPOTS),
+        "spots": [s.to_dict() for s in FORAGING_SPOTS.values()],
+        "total_recipes": len(COOKING_RECIPES),
+        "recipes": [r.to_dict() for r in COOKING_RECIPES.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -3043,6 +3212,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/survival
+    if path == "/api/game/survival":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_SURVIVAL_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -3090,6 +3279,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bounty": _ENGINE.get_bounty_progress(state),
             "companion": _ENGINE.get_companion_progress(state),
             "bestiary": _ENGINE.get_bestiary_progress(state),
+            "survival": _ENGINE.get_survival_progress(state),
         }
         await _send_response(
             send,
@@ -3158,6 +3348,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bounty": _ENGINE.get_bounty_progress(new_state),
             "companion": _ENGINE.get_companion_progress(new_state),
             "bestiary": _ENGINE.get_bestiary_progress(new_state),
+            "survival": _ENGINE.get_survival_progress(new_state),
         }
         await _send_response(
             send,
@@ -3225,6 +3416,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bounty": _ENGINE.get_bounty_progress(state),
             "companion": _ENGINE.get_companion_progress(state),
             "bestiary": _ENGINE.get_bestiary_progress(state),
+            "survival": _ENGINE.get_survival_progress(state),
         }
         await _send_response(
             send,
@@ -3300,6 +3492,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "bounty": _ENGINE.get_bounty_progress(state),
             "companion": _ENGINE.get_companion_progress(state),
             "bestiary": _ENGINE.get_bestiary_progress(state),
+            "survival": _ENGINE.get_survival_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

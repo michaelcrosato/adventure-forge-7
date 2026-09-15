@@ -25,6 +25,7 @@ from adventure_forge.core.weather import get_weather_affordance_for_scene
 from adventure_forge.core.bounties import get_bounty_affordances_for_scene
 from adventure_forge.core.companions import get_companion_affordances_for_scene
 from adventure_forge.core.bestiary import get_bestiary_affordances_for_scene
+from adventure_forge.core.survival import get_survival_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1017,5 +1018,13 @@ def synthesize_affordances(
             if bestiary_act.id not in seen_ids and bestiary_act.is_legal(character, world_flags):
                 legal_actions.append(bestiary_act)
                 seen_ids.add(bestiary_act.id)
+
+    # 14. Continental Survival Camping, Wilderness Foraging & Field Rations System (Milestone 26)
+    if effective_scene_id:
+        survival_actions = get_survival_affordances_for_scene(effective_scene_id, character, world_flags)
+        for surv_act in survival_actions:
+            if surv_act.id not in seen_ids and surv_act.is_legal(character, world_flags):
+                legal_actions.append(surv_act)
+                seen_ids.add(surv_act.id)
 
     return legal_actions

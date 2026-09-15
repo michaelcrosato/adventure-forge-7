@@ -82,6 +82,7 @@ def crawl_world_graph() -> Tuple[bool, str, Dict[str, Any]]:
                 or act_id.startswith("bounty_")
                 or act_id.startswith("companion_")
                 or act_id.startswith("bestiary_")
+                or act_id.startswith("survival_")
             ):
                 continue
 

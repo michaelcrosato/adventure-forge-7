@@ -298,6 +298,32 @@ def render_bestiary_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_survival_camp(state: GameState, engine: AdventureEngine) -> None:
+    """Display survival foraging, campfire recipes, and rations held."""
+    prog = engine.get_survival_progress(state)
+    foraged = prog.get("foraged_count", 0)
+    total_spots = prog.get("total_spots", 15)
+    meals = prog.get("meals_cooked", 0)
+    rank = prog.get("rank_title", "Trail Wanderer")
+
+    print("\n" + "=" * 65)
+    print(f" SURVIVAL CAMP & FORAGING ({meals} Meals Cooked | Rank: {rank})")
+    print("=" * 65)
+    print(f" Foraging Sites Harvested: {foraged} / {total_spots}")
+    print("\n [FIELD COOKING RECIPES]")
+    recipes = prog.get("recipes", {})
+    for rid, r in recipes.items():
+        cook_status = "[CAN COOK]" if r.get("can_cook") else "[NEED INGREDIENTS]"
+        held = r.get("count_held", 0)
+        held_str = f" ({held} In Pack)" if held > 0 else ""
+        print(f"   • [{r.get('province')}] {r.get('name')}: {cook_status}{held_str}")
+        print(f"     Requires : {', '.join(r.get('required_ingredients', []))}")
+        print(f"     Benefits : +{r.get('stamina_restored', 0)} SP, +{r.get('health_restored', 0)} HP")
+        if r.get("granted_marker"):
+            print(f"     Perk     : {r.get('granted_marker')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -381,6 +407,7 @@ def render_ui(
     nav_hints.append("'bounty' for contracts")
     nav_hints.append("'party' for companions")
     nav_hints.append("'hunt' for bestiary")
+    nav_hints.append("'camp' for survival")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -539,6 +566,10 @@ def main():
             continue
         elif choice in ("hunt", "bestiary", "beasts", "trophy", "trophies", "h"):
             render_bestiary_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("camp", "camping", "cook", "cooking", "rations", "survival", "k"):
+            render_survival_camp(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):
