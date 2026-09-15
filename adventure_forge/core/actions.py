@@ -28,6 +28,7 @@ from adventure_forge.core.bestiary import get_bestiary_affordances_for_scene
 from adventure_forge.core.survival import get_survival_affordances_for_scene
 from adventure_forge.core.heraldry import get_heraldry_affordances_for_scene
 from adventure_forge.core.shrines import get_shrine_affordances_for_scene
+from adventure_forge.core.landmarks import get_landmark_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1044,5 +1045,13 @@ def synthesize_affordances(
             if sh_act.id not in seen_ids and sh_act.is_legal(character, world_flags):
                 legal_actions.append(sh_act)
                 seen_ids.add(sh_act.id)
+
+    # 17. Continental Survey Landmarks, Lookout Panoramas & Master Cartographer (Milestone 29)
+    if effective_scene_id:
+        landmark_actions = get_landmark_affordances_for_scene(effective_scene_id, character, world_flags)
+        for lm_act in landmark_actions:
+            if lm_act.id not in seen_ids and lm_act.is_legal(character, world_flags):
+                legal_actions.append(lm_act)
+                seen_ids.add(lm_act.id)
 
     return legal_actions

@@ -380,6 +380,34 @@ def render_shrines_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_landmarks_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental survey landmarks, overlook panoramas, and cartographer rank."""
+    prog = engine.get_landmarks_progress(state)
+    surveyed = prog.get("surveyed_count", 0)
+    total = prog.get("total_landmarks", 6)
+    rank = prog.get("cartographer_rank", "Uncharted Drifter")
+    active_charts = prog.get("active_charts_count", 0)
+    active_masteries = prog.get("active_masteries_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL SURVEY LANDMARKS ({surveyed}/{total} Surveyed | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Charts: {active_charts} | Regional Masteries: {active_masteries}")
+    print(f" Cartographer Status: {prog.get('rank_desc', '')}")
+    print("\n [APEX PANORAMAS & LOOKOUT SUMMITS]")
+    landmarks = prog.get("landmarks", [])
+    for lm in landmarks:
+        status_str = "[SURVEYED]" if lm.get("is_surveyed") else "[UNCHARTED]"
+        chart_str = " (CHART HELD)" if lm.get("has_chart") else ""
+        mast_str = " [TERRAIN MASTERY]" if lm.get("has_mastery") else ""
+        stud_str = " [STUDIED]" if lm.get("is_studied") else ""
+        print(f"   • {lm.get('icon')} [{lm.get('province')}] {lm.get('name')}: {status_str}{chart_str}{stud_str}{mast_str}")
+        print(f"     Summit   : {lm.get('overlook_scene')}")
+        print(f"     Domain   : {lm.get('domain')}")
+        print(f"     Tool     : {lm.get('required_tool')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -466,6 +494,7 @@ def render_ui(
     nav_hints.append("'camp' for survival")
     nav_hints.append("'orders' for banners")
     nav_hints.append("'shrines' for blessings")
+    nav_hints.append("'landmarks' for panoramas")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -636,6 +665,10 @@ def main():
             continue
         elif choice in ("shrines", "shrine", "blessings", "blessing", "altars", "altar", "g"):
             render_shrines_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("landmarks", "landmark", "panoramas", "panorama", "survey", "l"):
+            render_landmarks_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

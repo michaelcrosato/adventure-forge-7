@@ -35,6 +35,7 @@ from adventure_forge.core.bestiary import APEX_BEASTS
 from adventure_forge.core.survival import FORAGING_SPOTS, COOKING_RECIPES
 from adventure_forge.core.heraldry import FACTION_ORDERS
 from adventure_forge.core.shrines import ANCIENT_SHRINES
+from adventure_forge.core.landmarks import SURVEY_LANDMARKS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -659,6 +660,7 @@ footer {
         <button class="btn btn-secondary" id="survival-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleSurvivalModal()" title="View Survival Camp & Foraging (Key: K)">🏕️ Camp</button>
         <button class="btn btn-secondary" id="orders-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleOrdersModal()" title="View Continental Orders & War Banners (Key: O)">🛡️ Orders</button>
         <button class="btn btn-secondary" id="shrines-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleShrinesModal()" title="View Ancient Shrines & Titan Blessings (Key: G)">🏛️ Shrines</button>
+        <button class="btn btn-secondary" id="landmarks-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleLandmarksModal()" title="View Survey Landmarks & Panoramas (Key: L)">🔭 Landmarks</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -840,6 +842,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleShrinesModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-shrines-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL SURVEY LANDMARKS & PANORAMAS MODAL -->
+    <div id="landmarks-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleLandmarksModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">🔭 Continental Survey Landmarks & Panoramas</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleLandmarksModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-landmarks-content"></div>
       </div>
     </div>
 
@@ -1070,6 +1083,8 @@ let currentOrdersData = null;
 let cachedOrdersMetadata = null;
 let currentShrinesData = null;
 let cachedShrinesMetadata = null;
+let currentLandmarksData = null;
+let cachedLandmarksMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1126,7 +1141,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1157,7 +1172,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1183,7 +1198,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1264,7 +1279,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1275,6 +1290,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (survival) currentSurvivalData = survival;
   if (orders) currentOrdersData = orders;
   if (shrines) currentShrinesData = shrines;
+  if (landmarks) currentLandmarksData = landmarks;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1344,6 +1360,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const shrBtn = document.getElementById("shrines-btn");
   if (shrBtn && currentShrinesData) {
     shrBtn.textContent = `🏛️ Shrines (${currentShrinesData.consecrated_count}/6)`;
+  }
+
+  const lmBtn = document.getElementById("landmarks-btn");
+  if (lmBtn && currentLandmarksData) {
+    lmBtn.textContent = `🔭 Landmarks (${currentLandmarksData.surveyed_count}/6)`;
   }
 
   // Quest Tracker
@@ -1563,7 +1584,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1647,7 +1668,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -2937,6 +2958,136 @@ function renderShrinesModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchLandmarksDataIfNeeded() {
+  if (cachedLandmarksMetadata) return cachedLandmarksMetadata;
+  try {
+    const res = await fetch("/api/game/landmarks");
+    if (res.ok) {
+      cachedLandmarksMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Landmarks fetch failed:", e);
+  }
+  return cachedLandmarksMetadata;
+}
+
+async function toggleLandmarksModal() {
+  const modal = document.getElementById("landmarks-modal");
+  if (modal.style.display === "none") {
+    await fetchLandmarksDataIfNeeded();
+    renderLandmarksModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderLandmarksModalContent() {
+  const content = document.getElementById("modal-landmarks-content");
+  if (!content) return;
+  const meta = cachedLandmarksMetadata;
+  const lData = currentLandmarksData;
+  const surveyedCount = (lData && lData.surveyed_count) || 0;
+  const totalLandmarks = (lData && lData.total_landmarks) || 6;
+  const cartographerRank = (lData && lData.cartographer_rank) || "Uncharted Drifter";
+  const activeCharts = (lData && lData.active_charts_count) || 0;
+  const activeMasteries = (lData && lData.active_masteries_count) || 0;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Survey Landmarks & Panoramas</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Scale apex lookout peaks, survey topographical panoramas, and achieve Grand Royal Cartographer mastery.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; font-weight: 700; font-size: 0.85rem;">
+          🔭 ${cartographerRank}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${surveyedCount} / ${totalLandmarks} Surveyed &bull; ${activeCharts} Charts Mapped
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (activeMasteries > 0) {
+    html += `
+      <div style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <span style="color: #38bdf8; font-weight: 700;">🗺️ Active Terrain Masteries:</span>
+        <span style="color: #fff; margin-left: 0.4rem;">${activeMasteries} Regional Topographical Masteries Active</span>
+      </div>
+    `;
+  }
+
+  const pct = Math.round((surveyedCount / totalLandmarks) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Cartographer Ranks: 1 Scout &bull; 2 Topographer &bull; 3 Cartographer &bull; 4 Grand Surveyor &bull; 5 Five Panoramas &bull; 6 Grand Royal</span>
+        <span style="font-weight: 600; color: #38bdf8;">${pct}% Continent Mapped</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+        <div style="height: 100%; width: ${pct}%; background: linear-gradient(90deg, #38bdf8, #34d399); transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem;">`;
+
+  const landmarksList = (lData && lData.landmarks) || (meta && meta.landmarks) || [];
+
+  for (const lm of landmarksList) {
+    const isSurveyed = lm.is_surveyed || false;
+    const hasChart = lm.has_chart || false;
+    const isStudied = lm.is_studied || false;
+    const hasMastery = lm.has_mastery || false;
+
+    let badge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">UNCHARTED</span>';
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+
+    if (isStudied) {
+      badge = '<span class="tag" style="background: rgba(168, 85, 247, 0.25); color: #c084fc; font-weight: 700; font-size: 0.7rem; border: 1px solid #a855f7;">📖 CHART STUDIED</span>';
+      cardBorder = "rgba(168, 85, 247, 0.4)";
+    } else if (hasMastery) {
+      badge = '<span class="tag" style="background: rgba(34, 197, 94, 0.25); color: #4ade80; font-weight: 700; font-size: 0.7rem;">🧭 TERRAIN MASTERY</span>';
+      cardBorder = "rgba(34, 197, 94, 0.4)";
+      bgStyle = "rgba(34, 197, 94, 0.05)";
+    } else if (isSurveyed) {
+      badge = '<span class="tag" style="background: rgba(56, 189, 248, 0.25); color: #38bdf8; font-weight: 700; font-size: 0.7rem;">SURVEYED</span>';
+      cardBorder = "rgba(56, 189, 248, 0.35)";
+    }
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <span style="font-size: 1.1rem; margin-right: 0.3rem;">${lm.icon}</span>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${lm.name}</span>
+            <span style="font-size: 0.8rem; color: #38bdf8; margin-left: 0.4rem; font-weight: 600;">(${lm.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${lm.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Summit:</span> <code style="color: #cbd5e1;">${lm.overlook_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Domain:</span> <span style="color: #38bdf8;">${lm.domain}</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Instrument:</span>
+            <span class="tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-weight: 600; font-size: 0.7rem;">${lm.required_tool}</span>
+            <span style="color: #34d399; margin-left: 0.3rem;">Marker: ${lm.survey_marker}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -3053,6 +3204,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("survival-modal").style.display = "none";
     document.getElementById("orders-modal").style.display = "none";
     document.getElementById("shrines-modal").style.display = "none";
+    document.getElementById("landmarks-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -3102,6 +3254,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "g") {
     toggleShrinesModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "l") {
+    toggleLandmarksModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -3253,6 +3409,14 @@ _SHRINES_RESPONSE_BYTES = json.dumps(
     {
         "total_shrines": len(ANCIENT_SHRINES),
         "shrines": [s.to_dict() for s in ANCIENT_SHRINES.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_LANDMARKS_RESPONSE_BYTES = json.dumps(
+    {
+        "total_landmarks": len(SURVEY_LANDMARKS),
+        "landmarks": [lm.to_dict() for lm in SURVEY_LANDMARKS.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -3608,6 +3772,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/landmarks
+    if path == "/api/game/landmarks":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_LANDMARKS_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -3658,6 +3842,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "survival": _ENGINE.get_survival_progress(state),
             "orders": _ENGINE.get_orders_progress(state),
             "shrines": _ENGINE.get_shrines_progress(state),
+            "landmarks": _ENGINE.get_landmarks_progress(state),
         }
         await _send_response(
             send,
@@ -3729,6 +3914,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "survival": _ENGINE.get_survival_progress(new_state),
             "orders": _ENGINE.get_orders_progress(new_state),
             "shrines": _ENGINE.get_shrines_progress(new_state),
+            "landmarks": _ENGINE.get_landmarks_progress(new_state),
         }
         await _send_response(
             send,
@@ -3799,6 +3985,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "survival": _ENGINE.get_survival_progress(state),
             "orders": _ENGINE.get_orders_progress(state),
             "shrines": _ENGINE.get_shrines_progress(state),
+            "landmarks": _ENGINE.get_landmarks_progress(state),
         }
         await _send_response(
             send,
@@ -3877,6 +4064,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "survival": _ENGINE.get_survival_progress(state),
             "orders": _ENGINE.get_orders_progress(state),
             "shrines": _ENGINE.get_shrines_progress(state),
+            "landmarks": _ENGINE.get_landmarks_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }
