@@ -493,6 +493,35 @@ def render_elixirs_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_orrery_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental celestial orreries, aligned astrolabes, and stargazer rank."""
+    prog = engine.get_orrery_progress(state)
+    aligned = prog.get("aligned_count", 0)
+    total = prog.get("total_orreries", 6)
+    rank = prog.get("stargazer_rank", "Novice Gazer")
+    active_lenses = prog.get("active_lenses_count", 0)
+    active_masteries = prog.get("active_masteries_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL CELESTIAL ORRERIES ({aligned}/{total} Aligned | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Lenses   : {active_lenses} | Astrometric Masteries: {active_masteries}")
+    print(f" Stargazer Status: {prog.get('rank_desc', '')}")
+    print("\n [ANCIENT ASTROLABE CHAMBERS & CELESTIAL SPHERES]")
+    orreries = prog.get("orreries", [])
+    for o in orreries:
+        status_str = "[ALIGNED]" if o.get("is_aligned") else "[DORMANT]"
+        lens_str = " (LENS HELD)" if o.get("has_lens") else ""
+        mast_str = " [ASTROMETRIC MASTERY]" if o.get("has_mastery") else ""
+        attune_str = " [ATTUNED]" if o.get("is_attuned") else ""
+        print(f"   • {o.get('icon')} [{o.get('province')}] {o.get('name')}: {status_str}{lens_str}{attune_str}{mast_str}")
+        print(f"     Chamber  : {o.get('chamber_scene')}")
+        print(f"     Lens     : {o.get('lens_name')}")
+        print(f"     Domain   : {o.get('domain')}")
+        print(f"     Tool     : {o.get('required_tool')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -583,6 +612,7 @@ def render_ui(
     nav_hints.append("'vaults' for crypts")
     nav_hints.append("'forge' for runes")
     nav_hints.append("'elixirs' for potions")
+    nav_hints.append("'orrery' for stars")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -769,6 +799,10 @@ def main():
             continue
         elif choice in ("elixirs", "elixir", "alchemy", "potions", "potion", "apothecary", "alembic", "alembics", "e"):
             render_elixirs_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("orrery", "orreries", "astrolabe", "astrolabes", "stars", "star", "stargazer", "a"):
+            render_orrery_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

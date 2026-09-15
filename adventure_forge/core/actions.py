@@ -32,6 +32,7 @@ from adventure_forge.core.landmarks import get_landmark_affordances_for_scene
 from adventure_forge.core.vaults import get_vault_affordances_for_scene
 from adventure_forge.core.forge import get_forge_affordances_for_scene
 from adventure_forge.core.elixirs import get_elixir_affordances_for_scene
+from adventure_forge.core.orrery import get_orrery_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1080,5 +1081,13 @@ def synthesize_affordances(
             if e_act.id not in seen_ids and e_act.is_legal(character, world_flags):
                 legal_actions.append(e_act)
                 seen_ids.add(e_act.id)
+
+    # 21. Continental Celestial Orreries, Astrolabe Spheres & Master Stargazer System (Milestone 33)
+    if effective_scene_id:
+        orrery_actions = get_orrery_affordances_for_scene(effective_scene_id, character, world_flags)
+        for o_act in orrery_actions:
+            if o_act.id not in seen_ids and o_act.is_legal(character, world_flags):
+                legal_actions.append(o_act)
+                seen_ids.add(o_act.id)
 
     return legal_actions
