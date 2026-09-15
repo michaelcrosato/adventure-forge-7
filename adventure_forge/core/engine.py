@@ -34,6 +34,7 @@ from adventure_forge.core.vaults import evaluate_vaults_progress
 from adventure_forge.core.forge import evaluate_forge_progress
 from adventure_forge.core.elixirs import evaluate_elixirs_progress
 from adventure_forge.core.orrery import evaluate_orrery_progress
+from adventure_forge.core.scriptorium import evaluate_scriptorium_progress
 
 
 @dataclass
@@ -183,6 +184,10 @@ class AdventureEngine:
     def get_orrery_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current aligned celestial orreries, stargazer rank, active lenses, and astrometric mastery."""
         return evaluate_orrery_progress(state.world_flags, state.character.inventory, state.character.markers, state.current_scene)
+
+    def get_scriptorium_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current inscribed manuscripts, calligrapher rank, active manuscripts, and scribal mastery."""
+        return evaluate_scriptorium_progress(state.world_flags, state.character.inventory, state.character.markers)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

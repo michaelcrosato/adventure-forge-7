@@ -33,6 +33,7 @@ from adventure_forge.core.vaults import get_vault_affordances_for_scene
 from adventure_forge.core.forge import get_forge_affordances_for_scene
 from adventure_forge.core.elixirs import get_elixir_affordances_for_scene
 from adventure_forge.core.orrery import get_orrery_affordances_for_scene
+from adventure_forge.core.scriptorium import get_scriptorium_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1089,5 +1090,13 @@ def synthesize_affordances(
             if o_act.id not in seen_ids and o_act.is_legal(character, world_flags):
                 legal_actions.append(o_act)
                 seen_ids.add(o_act.id)
+
+    # 22. Continental Scriptoriums, Illuminator Desks & Master Calligrapher System (Milestone 34)
+    if effective_scene_id:
+        scribe_actions = get_scriptorium_affordances_for_scene(effective_scene_id, character, world_flags)
+        for s_act in scribe_actions:
+            if s_act.id not in seen_ids and s_act.is_legal(character, world_flags):
+                legal_actions.append(s_act)
+                seen_ids.add(s_act.id)
 
     return legal_actions

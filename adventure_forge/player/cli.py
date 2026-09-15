@@ -522,6 +522,35 @@ def render_orrery_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_scriptorium_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental scriptoriums, illuminated manuscripts, and calligrapher rank."""
+    prog = engine.get_scriptorium_progress(state)
+    inscribed = prog.get("inscribed_count", 0)
+    total = prog.get("total_scriptoriums", 6)
+    rank = prog.get("calligrapher_rank", "Novice Copyist")
+    active_manuscripts = prog.get("active_manuscript_count", 0)
+    active_masteries = prog.get("active_masteries_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL SCRIPTORIUMS ({inscribed}/{total} Inscribed | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Manuscripts  : {active_manuscripts} | Scribal Masteries: {active_masteries}")
+    print(f" Calligrapher Status : {prog.get('calligrapher_desc', '')}")
+    print("\n [ANCIENT SCRIPTORIUM DESKS & ILLUMINATED MANUSCRIPTS]")
+    scriptoriums = prog.get("scriptoriums", [])
+    for s in scriptoriums:
+        status_str = "[INSCRIBED]" if s.get("is_inscribed") else "[DORMANT]"
+        man_str = " (MANUSCRIPT HELD)" if s.get("has_manuscript") else ""
+        mast_str = " [SCRIBAL MASTERY]" if s.get("has_mastery") else ""
+        recite_str = " [RECITED]" if s.get("is_recited") else ""
+        print(f"   • {s.get('icon')} [{s.get('province')}] {s.get('name')}: {status_str}{man_str}{recite_str}{mast_str}")
+        print(f"     Quarters : {s.get('quarters_scene')}")
+        print(f"     Scroll   : {s.get('manuscript_name')}")
+        print(f"     Domain   : {s.get('domain')}")
+        print(f"     Tool     : {s.get('required_tool')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -613,6 +642,7 @@ def render_ui(
     nav_hints.append("'forge' for runes")
     nav_hints.append("'elixirs' for potions")
     nav_hints.append("'orrery' for stars")
+    nav_hints.append("'scribe' for scrolls")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -803,6 +833,10 @@ def main():
             continue
         elif choice in ("orrery", "orreries", "astrolabe", "astrolabes", "stars", "star", "stargazer", "a"):
             render_orrery_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("scribe", "scriptorium", "manuscript", "manuscripts", "scroll", "scrolls", "calligrapher", "s"):
+            render_scriptorium_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

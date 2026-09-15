@@ -40,6 +40,7 @@ from adventure_forge.core.vaults import ANCIENT_VAULTS
 from adventure_forge.core.forge import ANCIENT_RUNEFORGES
 from adventure_forge.core.elixirs import ANCIENT_ALEMBICS
 from adventure_forge.core.orrery import ANCIENT_ORRERIES
+from adventure_forge.core.scriptorium import CANONICAL_SCRIPTORIUMS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -669,6 +670,7 @@ footer {
         <button class="btn btn-secondary" id="forge-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleForgeModal()" title="View Continental Runeforges & Anvils (Key: F)">⚒️ Forge</button>
         <button class="btn btn-secondary" id="elixirs-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleElixirsModal()" title="View Alchemical Laboratories & Elixirs (Key: E)">🧪 Elixirs</button>
         <button class="btn btn-secondary" id="orrery-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleOrreryModal()" title="View Celestial Orreries & Astrolabes (Key: A)">✨ Orrery</button>
+        <button class="btn btn-secondary" id="scriptorium-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleScriptoriumModal()" title="View Continental Scriptoriums & Manuscripts (Key: S)">✒️ Scribe</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -905,6 +907,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleOrreryModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-orrery-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL SCRIPTORIUMS & MASTER CALLIGRAPHER MODAL -->
+    <div id="scriptorium-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleScriptoriumModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">✒️ Continental Scriptoriums & Illuminated Manuscripts</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleScriptoriumModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-scriptorium-content"></div>
       </div>
     </div>
 
@@ -1145,6 +1158,8 @@ let currentElixirsData = null;
 let cachedElixirsMetadata = null;
 let currentOrreryData = null;
 let cachedOrreryMetadata = null;
+let currentScriptoriumData = null;
+let cachedScriptoriumMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1201,7 +1216,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery, data.scriptorium);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1232,7 +1247,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery, data.scriptorium);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1258,7 +1273,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery, data.scriptorium);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1339,7 +1354,7 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks, vaults, forge, elixirs, orrery) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion, bestiary, survival, orders, shrines, landmarks, vaults, forge, elixirs, orrery, scriptorium) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
@@ -1355,6 +1370,7 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   if (forge) currentForgeData = forge;
   if (elixirs) currentElixirsData = elixirs;
   if (orrery) currentOrreryData = orrery;
+  if (scriptorium) currentScriptoriumData = scriptorium;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1449,6 +1465,11 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, co
   const orrBtn = document.getElementById("orrery-btn");
   if (orrBtn && currentOrreryData) {
     orrBtn.textContent = `✨ Orrery (${currentOrreryData.aligned_count}/6)`;
+  }
+
+  const scribeBtn = document.getElementById("scriptorium-btn");
+  if (scribeBtn && currentScriptoriumData) {
+    scribeBtn.textContent = `✒️ Scribe (${currentScriptoriumData.inscribed_count}/6)`;
   }
 
   // Quest Tracker
@@ -1668,7 +1689,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery, data.scriptorium);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1752,7 +1773,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion, data.bestiary, data.survival, data.orders, data.shrines, data.landmarks, data.vaults, data.forge, data.elixirs, data.orrery, data.scriptorium);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -3688,6 +3709,134 @@ function renderOrreryModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchScriptoriumDataIfNeeded() {
+  if (cachedScriptoriumMetadata) return cachedScriptoriumMetadata;
+  try {
+    const res = await fetch("/api/game/scriptorium");
+    if (res.ok) {
+      cachedScriptoriumMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Scriptorium fetch failed:", e);
+  }
+  return cachedScriptoriumMetadata;
+}
+
+async function toggleScriptoriumModal() {
+  const modal = document.getElementById("scriptorium-modal");
+  if (modal.style.display === "none") {
+    await fetchScriptoriumDataIfNeeded();
+    renderScriptoriumModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderScriptoriumModalContent() {
+  const content = document.getElementById("modal-scriptorium-content");
+  if (!content) return;
+  const meta = cachedScriptoriumMetadata;
+  const sData = currentScriptoriumData;
+  const inscribedCount = (sData && sData.inscribed_count) || 0;
+  const totalScriptoriums = (sData && sData.total_scriptoriums) || 6;
+  const calligrapherRank = (sData && sData.calligrapher_rank) || "Novice Copyist";
+  const activeManuscripts = (sData && sData.active_manuscript_count) || 0;
+  const activeMasteries = (sData && sData.active_masteries_count) || 0;
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Scriptoriums & Illuminated Manuscripts</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Transcribe ancient provincial charters, recite illuminated manuscripts, and attain Continental Grandmaster Scribe rank.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(217, 119, 6, 0.25); color: #fbbf24; font-weight: 700; font-size: 0.85rem;">
+          ✒️ ${calligrapherRank}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          ${inscribedCount} / ${totalScriptoriums} Inscribed &bull; ${activeManuscripts} Manuscripts Held
+        </div>
+      </div>
+    </div>
+  `;
+
+  if (activeMasteries > 0) {
+    html += `
+      <div style="background: rgba(217, 119, 6, 0.12); border: 1px solid rgba(217, 119, 6, 0.35); border-radius: 6px; padding: 0.6rem 0.9rem; margin-bottom: 1rem; font-size: 0.85rem;">
+        <span style="color: #fbbf24; font-weight: 700;">📜 Scribal Masteries:</span>
+        <span style="color: #fff; margin-left: 0.4rem;">${activeMasteries} Regional Scribal Masteries Active</span>
+      </div>
+    `;
+  }
+
+  const pct = Math.round((inscribedCount / totalScriptoriums) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Calligrapher Ranks: 1 Apprentice &bull; 2 Illuminator &bull; 3 Master &bull; 4 Chancellor &bull; 5 Archivist &bull; 6 Grandmaster</span>
+        <span style="font-weight: 600; color: #fbbf24;">${pct}% Manuscripts Inscribed</span>
+      </div>
+      <div style="background: rgba(255,255,255,0.08); border-radius: 999px; height: 8px; overflow: hidden;">
+        <div style="background: #d97706; height: 100%; width: ${pct}%; transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  const scriptoriums = (sData && sData.scriptoriums) || (meta && meta.scriptoriums) || [];
+  html += `<div style="display: grid; grid-template-columns: 1fr; gap: 0.75rem;">`;
+
+  for (const s of scriptoriums) {
+    const isInscribed = s.is_inscribed;
+    const hasManuscript = s.has_manuscript;
+    const isRecited = s.is_recited;
+    const hasMastery = s.has_mastery;
+
+    let borderStyle = isInscribed
+      ? "border: 1px solid rgba(217, 119, 6, 0.6); background: rgba(217, 119, 6, 0.07);"
+      : "border: 1px solid var(--panel-border); background: rgba(255,255,255,0.02);";
+
+    let badge = isInscribed
+      ? '<span class="tag" style="background: rgba(217, 119, 6, 0.3); color: #fbbf24; font-weight: 700; font-size: 0.75rem;">INSCRIBED</span>'
+      : '<span class="tag" style="background: rgba(255,255,255,0.07); color: var(--text-muted); font-size: 0.75rem;">DORMANT</span>';
+
+    if (isRecited) {
+      badge += ' <span class="tag" style="background: rgba(244, 63, 94, 0.25); color: #fb7185; font-weight: 600; font-size: 0.75rem; margin-left: 0.3rem;">RECITED</span>';
+    }
+
+    if (hasMastery) {
+      badge += ' <span class="tag" style="background: rgba(217, 119, 6, 0.2); color: #fbbf24; font-weight: 600; font-size: 0.75rem; margin-left: 0.3rem;">SCRIBAL MASTERY</span>';
+    }
+
+    html += `
+      <div style="${borderStyle} border-radius: 8px; padding: 0.85rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
+          <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">
+            ${s.icon} ${s.name}
+            <span style="font-size: 0.8rem; color: #fbbf24; margin-left: 0.4rem; font-weight: 600;">(${s.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${s.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Quarters:</span> <code style="color: #cbd5e1;">${s.quarters_scene}</code>
+            <span style="color: var(--text-muted); margin-left: 0.5rem;">Scroll:</span> <span style="color: #fbbf24; font-weight: 600;">${s.manuscript_name}</span>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Apparatus:</span>
+            <span class="tag" style="background: rgba(217, 119, 6, 0.2); color: #fbbf24; font-weight: 600; font-size: 0.7rem;">${s.required_tool}</span>
+            <span style="color: #fbbf24; margin-left: 0.3rem;">Marker: ${s.manuscript_marker}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -3809,6 +3958,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("forge-modal").style.display = "none";
     document.getElementById("elixirs-modal").style.display = "none";
     document.getElementById("orrery-modal").style.display = "none";
+    document.getElementById("scriptorium-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -3878,6 +4028,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "a") {
     toggleOrreryModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "s") {
+    toggleScriptoriumModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -4069,6 +4223,14 @@ _ORRERY_RESPONSE_BYTES = json.dumps(
     {
         "total_orreries": len(ANCIENT_ORRERIES),
         "orreries": [o.to_dict() for o in ANCIENT_ORRERIES.values()],
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_SCRIPTORIUM_RESPONSE_BYTES = json.dumps(
+    {
+        "total_scriptoriums": len(CANONICAL_SCRIPTORIUMS),
+        "scriptoriums": [s.to_dict() for s in CANONICAL_SCRIPTORIUMS.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -4524,6 +4686,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/scriptorium
+    if path == "/api/game/scriptorium":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_SCRIPTORIUM_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -4579,6 +4761,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "forge": _ENGINE.get_forge_progress(state),
             "elixirs": _ENGINE.get_elixirs_progress(state),
             "orrery": _ENGINE.get_orrery_progress(state),
+            "scriptorium": _ENGINE.get_scriptorium_progress(state),
         }
         await _send_response(
             send,
@@ -4655,6 +4838,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "forge": _ENGINE.get_forge_progress(new_state),
             "elixirs": _ENGINE.get_elixirs_progress(new_state),
             "orrery": _ENGINE.get_orrery_progress(new_state),
+            "scriptorium": _ENGINE.get_scriptorium_progress(new_state),
         }
         await _send_response(
             send,
@@ -4730,6 +4914,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "forge": _ENGINE.get_forge_progress(state),
             "elixirs": _ENGINE.get_elixirs_progress(state),
             "orrery": _ENGINE.get_orrery_progress(state),
+            "scriptorium": _ENGINE.get_scriptorium_progress(state),
         }
         await _send_response(
             send,
@@ -4813,6 +4998,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "forge": _ENGINE.get_forge_progress(state),
             "elixirs": _ENGINE.get_elixirs_progress(state),
             "orrery": _ENGINE.get_orrery_progress(state),
+            "scriptorium": _ENGINE.get_scriptorium_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }
