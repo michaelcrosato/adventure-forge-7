@@ -25,6 +25,7 @@ from adventure_forge.core.trade import evaluate_trade_progress
 from adventure_forge.core.weather import get_weather_for_region, get_all_provincial_weather
 from adventure_forge.core.bounties import evaluate_bounty_progress
 from adventure_forge.core.companions import evaluate_companions_progress
+from adventure_forge.core.bestiary import evaluate_bestiary_progress
 
 
 @dataclass
@@ -138,6 +139,10 @@ class AdventureEngine:
     def get_companion_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current recruited warband companions and active follower progress."""
         return evaluate_companions_progress(state.world_flags)
+
+    def get_bestiary_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current apex beast discoveries, hunts, trophies, and hunter rank."""
+        return evaluate_bestiary_progress(state.world_flags, state.character.inventory)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""

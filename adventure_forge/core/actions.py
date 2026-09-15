@@ -24,6 +24,7 @@ from adventure_forge.core.trade import get_trade_affordances_for_scene
 from adventure_forge.core.weather import get_weather_affordance_for_scene
 from adventure_forge.core.bounties import get_bounty_affordances_for_scene
 from adventure_forge.core.companions import get_companion_affordances_for_scene
+from adventure_forge.core.bestiary import get_bestiary_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1008,5 +1009,13 @@ def synthesize_affordances(
             if comp_act.id not in seen_ids and comp_act.is_legal(character, world_flags):
                 legal_actions.append(comp_act)
                 seen_ids.add(comp_act.id)
+
+    # 13. Continental Bestiary & Apex Trophy Hunting System (Milestone 25)
+    if effective_scene_id:
+        bestiary_actions = get_bestiary_affordances_for_scene(effective_scene_id, character, world_flags)
+        for bestiary_act in bestiary_actions:
+            if bestiary_act.id not in seen_ids and bestiary_act.is_legal(character, world_flags):
+                legal_actions.append(bestiary_act)
+                seen_ids.add(bestiary_act.id)
 
     return legal_actions

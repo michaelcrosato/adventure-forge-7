@@ -265,6 +265,39 @@ def render_companion_roster(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_bestiary_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental apex bestiary, trophies held, and hunter rank."""
+    prog = engine.get_bestiary_progress(state)
+    hunted = prog.get("hunted_count", 0)
+    studied = prog.get("studied_count", 0)
+    mounted = prog.get("mounted_count", 0)
+    total = prog.get("total_beasts", 10)
+    rank = prog.get("rank_title", "Novice Trapper")
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL APEX BESTIARY ({hunted} / {total} Slain | Rank: {rank})")
+    print("=" * 65)
+    print(f" Studied Anatomies: {studied}/{total} | Trophies Mounted: {mounted}/{total}")
+    print("\n [APEX BEASTS]")
+    beasts = prog.get("beasts", {})
+    for bid, b in beasts.items():
+        if b.get("is_hunted"):
+            status = "🏆 SLAIN"
+        elif b.get("is_studied"):
+            status = "🔍 STUDIED"
+        else:
+            status = "❓ UNKNOWN"
+
+        trophy_info = f" [Trophy: {b.get('trophy_name')}]" if (b.get("has_trophy") or b.get("is_mounted")) else ""
+        print(f"   • [{b.get('province')}] {b.get('name')}: {status}{trophy_info}")
+        print(f"     Title   : {b.get('title')}")
+        print(f"     Lair    : {b.get('lair_scene')}")
+        if b.get("is_studied") or b.get("is_hunted"):
+            print(f"     Weakness: {b.get('weakness')}")
+            print(f"     Perk    : {b.get('trophy_perk')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -347,6 +380,7 @@ def render_ui(
     nav_hints.append("'weather' for climate")
     nav_hints.append("'bounty' for contracts")
     nav_hints.append("'party' for companions")
+    nav_hints.append("'hunt' for bestiary")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -501,6 +535,10 @@ def main():
             continue
         elif choice in ("party", "companions", "comp", "fellowship"):
             render_companion_roster(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("hunt", "bestiary", "beasts", "trophy", "trophies", "h"):
+            render_bestiary_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):
