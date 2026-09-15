@@ -23,6 +23,7 @@ from adventure_forge.core.transit import get_transit_routes_for_scene
 from adventure_forge.core.trade import get_trade_affordances_for_scene
 from adventure_forge.core.weather import get_weather_affordance_for_scene
 from adventure_forge.core.bounties import get_bounty_affordances_for_scene
+from adventure_forge.core.companions import get_companion_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -999,5 +1000,13 @@ def synthesize_affordances(
             if bounty_act.id not in seen_ids and bounty_act.is_legal(character, world_flags):
                 legal_actions.append(bounty_act)
                 seen_ids.add(bounty_act.id)
+
+    # 12. Continental Companion Recruiter & Follower Synergy System (Milestone 24)
+    if effective_scene_id:
+        comp_actions = get_companion_affordances_for_scene(effective_scene_id, character, world_flags)
+        for comp_act in comp_actions:
+            if comp_act.id not in seen_ids and comp_act.is_legal(character, world_flags):
+                legal_actions.append(comp_act)
+                seen_ids.add(comp_act.id)
 
     return legal_actions

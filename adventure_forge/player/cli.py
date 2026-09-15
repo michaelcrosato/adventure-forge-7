@@ -243,6 +243,28 @@ def render_bounty_board(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_companion_roster(state: GameState, engine: AdventureEngine) -> None:
+    """Display recruited continental warband companions and active follower."""
+    prog = engine.get_companion_progress(state)
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL WARBAND FELLOWSHIP ({prog['rank_title']})")
+    print("=" * 65)
+    print(f"\n Recruited: {prog['recruited_count']}/{prog['total_companions']} Companions | Active Follower: {prog['active_companion_name']} ({prog['active_companion_perk']})")
+
+    comps = prog.get("companions", {})
+    for cid, c in comps.items():
+        if c["is_active"]:
+            status_tag = "[ACTIVE FOLLOWER ★]"
+        elif c["is_recruited"]:
+            status_tag = "[RECRUITED ✓]"
+        else:
+            status_tag = "[AVAILABLE IN PROVINCE]"
+        print(f"\n {status_tag} {c['name']} — {c['title']} ({c['province']})")
+        print(f"   Home: {c['home_scene']} | Perk: {c['perk_name']} ({c['perk_description']})")
+        print(f"   \"{c['description']}\"")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -323,6 +345,8 @@ def render_ui(
     nav_hints.append("'codex' for lore")
     nav_hints.append("'trade' for market")
     nav_hints.append("'weather' for climate")
+    nav_hints.append("'bounty' for contracts")
+    nav_hints.append("'party' for companions")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -473,6 +497,10 @@ def main():
             continue
         elif choice in ("bounties", "bounty", "b"):
             render_bounty_board(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("party", "companions", "comp", "fellowship"):
+            render_companion_roster(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

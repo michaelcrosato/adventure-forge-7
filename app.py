@@ -30,6 +30,7 @@ from adventure_forge.core.transit import CHARTERED_ROUTES
 from adventure_forge.core.trade import COMMODITIES, TRADE_HUBS
 from adventure_forge.core.weather import WEATHER_CONDITIONS, get_all_provincial_weather
 from adventure_forge.core.bounties import BOUNTY_CONTRACTS, BOUNTY_HUBS
+from adventure_forge.core.companions import COMPANIONS
 from adventure_forge.core.engine import AdventureEngine
 from adventure_forge.core.hazards import HAZARD_COMBOS
 from adventure_forge.core.rng import DeterministicRNG
@@ -342,6 +343,7 @@ a:hover { text-decoration: underline; }
 .cat-trade { background: rgba(234,179,8,0.2); color: #facc15; border: 1px solid rgba(234,179,8,0.35); }
 .cat-weather { background: rgba(56,189,248,0.25); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.4); }
 .cat-bounty { background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+.cat-companion { background: rgba(192, 132, 252, 0.25); color: #d8b4fe; border: 1px solid rgba(192, 132, 252, 0.45); }
 .cat-systemic { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.35); }
 .cat-social { background: rgba(236,72,153,0.2); color: #ec4899; border: 1px solid rgba(236,72,153,0.35); }
 .cat-trait_exploit { background: rgba(210,153,34,0.2); color: var(--gold); }
@@ -647,6 +649,7 @@ footer {
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleTradeModal()" title="View Commodity Exchange (Key: T)">⚖️ Trade</button>
         <button class="btn btn-secondary" id="weather-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleWeatherModal()" title="View Continental Weather Forecast (Key: W)">⛅ Weather</button>
         <button class="btn btn-secondary" id="bounty-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleBountyModal()" title="View Mercenary Contract Board (Key: B)">🎯 Bounties</button>
+        <button class="btn btn-secondary" id="companion-btn" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleCompanionModal()" title="View Continental Warband Fellowship (Key: P)">👥 Party</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleMapModal()" title="View Continental Atlas (Key: M)">🗺️ Map</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="toggleReplayModal()" title="Export or Verify Replay">📜 Replay</button>
         <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.7rem;" onclick="resetToSelect()">Restart</button>
@@ -773,6 +776,17 @@ footer {
           <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleBountyModal()">✕</button>
         </div>
         <div class="modal-body" id="modal-bounty-content"></div>
+      </div>
+    </div>
+
+    <!-- CONTINENTAL COMPANION WARBAND MODAL -->
+    <div id="companion-modal" class="modal-backdrop" style="display: none;" onclick="if(event.target===this)toggleCompanionModal()">
+      <div class="modal-card" style="max-width: 760px;">
+        <div class="modal-header">
+          <h3 style="margin: 0; font-size: 1.15rem; color: #fff;">👥 Continental Warband Fellowship</h3>
+          <button class="btn btn-secondary" style="padding: 0.2rem 0.6rem;" onclick="toggleCompanionModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modal-companion-content"></div>
       </div>
     </div>
 
@@ -993,6 +1007,8 @@ let currentWeatherData = null;
 let cachedWeatherMetadata = null;
 let currentBountyData = null;
 let cachedBountyMetadata = null;
+let currentCompanionData = null;
+let cachedCompanionMetadata = null;
 let activeQuestTab = "campaign";
 let selectedMapProvince = null;
 
@@ -1049,7 +1065,7 @@ async function startAdventure() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -1080,7 +1096,7 @@ async function stepAction(actionId) {
     gameState = data.state;
     stateHistory.push(JSON.parse(JSON.stringify(gameState)));
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion);
   } catch (err) {
     alert(err.message);
     btns.forEach(b => b.disabled = false);
@@ -1106,7 +1122,7 @@ async function undoTurn() {
     if (latEl) latEl.textContent = `${dur}ms`;
     if (!res.ok) throw new Error("Undo observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion);
   } catch (err) {
     alert("Undo error: " + err.message);
   }
@@ -1187,12 +1203,13 @@ function renderActionButtons(actions) {
   });
 }
 
-function renderGame(obs, char, quest, codex, transit, trade, weather, bounty) {
+function renderGame(obs, char, quest, codex, transit, trade, weather, bounty, companion) {
   currentQuestData = quest;
   if (codex) currentCodexData = codex;
   if (trade) currentTradeData = trade;
   if (weather) currentWeatherData = weather;
   if (bounty) currentBountyData = bounty;
+  if (companion) currentCompanionData = companion;
   lastObservation = obs;
   lastCharacter = char;
   saveSessionToLocalStorage(obs, char, quest, codex);
@@ -1232,6 +1249,16 @@ function renderGame(obs, char, quest, codex, transit, trade, weather, bounty) {
   const bountyBtn = document.getElementById("bounty-btn");
   if (bountyBtn && currentBountyData) {
     bountyBtn.textContent = `🎯 Bounties (${currentBountyData.completed_count}/10)`;
+  }
+
+  const compBtn = document.getElementById("companion-btn");
+  if (compBtn && currentCompanionData) {
+    const actName = currentCompanionData.active_companion_name;
+    if (actName && actName !== "None") {
+      compBtn.textContent = `👥 ${actName} [Active]`;
+    } else {
+      compBtn.textContent = `👥 Party (${currentCompanionData.recruited_count}/5)`;
+    }
   }
 
   // Quest Tracker
@@ -1451,7 +1478,7 @@ async function runImportedReplay() {
     gameState = data.state;
     stateHistory = [JSON.parse(JSON.stringify(gameState))];
     updateUndoButton();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion);
     statusEl.innerHTML = `<span style="color: #3fb950;">✓ Replay verified: ${data.turn_count} turns executed. SHA: ${data.final_fingerprint.substring(0,16)}...</span>`;
     setTimeout(() => {
       document.getElementById("replay-modal").style.display = "none";
@@ -1535,7 +1562,7 @@ async function resumeSavedAdventure() {
     });
     if (!res.ok) throw new Error("Resume observation failed: " + res.statusText);
     const data = await res.json();
-    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty);
+    renderGame(data.observation, data.character, data.quest, data.codex, data.transit, data.trade, data.weather, data.bounty, data.companion);
     document.getElementById("select-view").style.display = "none";
     document.getElementById("play-view").style.display = "block";
   } catch (err) {
@@ -2182,6 +2209,125 @@ function renderBountyModalContent() {
   content.innerHTML = html;
 }
 
+async function fetchCompanionDataIfNeeded() {
+  if (cachedCompanionMetadata) return cachedCompanionMetadata;
+  try {
+    const res = await fetch("/api/game/companions");
+    if (res.ok) {
+      cachedCompanionMetadata = await res.json();
+    }
+  } catch (e) {
+    console.warn("Companion fetch failed:", e);
+  }
+  return cachedCompanionMetadata;
+}
+
+async function toggleCompanionModal() {
+  const modal = document.getElementById("companion-modal");
+  if (modal.style.display === "none") {
+    await fetchCompanionDataIfNeeded();
+    renderCompanionModalContent();
+    modal.style.display = "flex";
+  } else {
+    modal.style.display = "none";
+  }
+}
+
+function renderCompanionModalContent() {
+  const content = document.getElementById("modal-companion-content");
+  if (!content) return;
+  const meta = cachedCompanionMetadata;
+  const cData = currentCompanionData;
+  const recruitedCount = (cData && cData.recruited_count) || 0;
+  const totalComps = (cData && cData.total_companions) || 5;
+  const rankTitle = (cData && cData.rank_title) || "Lone Wanderer";
+  const activeName = (cData && cData.active_companion_name) || "None";
+  const activePerk = (cData && cData.active_companion_perk) || "None";
+
+  let html = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border);">
+      <div>
+        <div style="font-weight: 700; color: #fff; font-size: 1rem;">Continental Warband Fellowship</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Recruit allies in garrison courtyards. Switch active follower at Central Bazaar or camps.</div>
+      </div>
+      <div style="text-align: right;">
+        <span class="tag" style="background: rgba(192, 132, 252, 0.2); color: #d8b4fe; font-weight: 700; font-size: 0.85rem;">
+          ${rankTitle}
+        </span>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
+          Active: <span style="color: #58a6ff; font-weight: 600;">${activeName}</span> &bull; ${recruitedCount} / ${totalComps} Recruited
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Milestone Progress Bar
+  const pct = Math.round((recruitedCount / totalComps) * 100);
+  html += `
+    <div style="margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+        <span>Fellowship Ranks: 🛡️ 1 Partner &bull; ⚔️ 3 Warband &bull; 👑 5 Master Fellowship</span>
+        <span style="font-weight: 600; color: #c084fc;">${pct}% Warband Formed</span>
+      </div>
+      <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+        <div style="height: 100%; width: ${pct}%; background: linear-gradient(90deg, #c084fc, #38bdf8); transition: width 0.3s ease;"></div>
+      </div>
+    </div>
+  `;
+
+  // Companions list
+  html += `<div style="display: flex; flex-direction: column; gap: 0.75rem;">`;
+
+  const compsMap = (cData && cData.companions) || {};
+  const allList = (meta && meta.companions) || [];
+
+  for (const c of allList) {
+    const statusObj = compsMap[c.id] || {};
+    const isRecruited = statusObj.is_recruited || false;
+    const isActive = statusObj.is_active || false;
+
+    let badge = '<span class="tag" style="background: rgba(255,255,255,0.06); color: var(--text-muted); font-size: 0.7rem;">AVAILABLE IN PROVINCE</span>';
+    let cardBorder = "var(--panel-border)";
+    let bgStyle = "var(--bg-card)";
+
+    if (isActive) {
+      badge = '<span class="tag" style="background: rgba(56,189,248,0.25); color: #38bdf8; font-weight: 700; font-size: 0.7rem;">★ ACTIVE FOLLOWER</span>';
+      cardBorder = "rgba(56,189,248,0.5)";
+      bgStyle = "rgba(56,189,248,0.04)";
+    } else if (isRecruited) {
+      badge = '<span class="tag" style="background: rgba(63,185,80,0.25); color: #3fb950; font-weight: 700; font-size: 0.7rem;">✓ RECRUITED (IN RESERVE)</span>';
+      cardBorder = "rgba(63,185,80,0.4)";
+    }
+
+    html += `
+      <div style="background: ${bgStyle}; border: 1px solid ${cardBorder}; border-radius: 6px; padding: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem; gap: 0.5rem; flex-wrap: wrap;">
+          <div>
+            <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">${c.name}</span>
+            <span style="font-size: 0.8rem; color: #c084fc; margin-left: 0.4rem; font-weight: 600;">— ${c.title}</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted); margin-left: 0.4rem;">(${c.province})</span>
+          </div>
+          ${badge}
+        </div>
+        <div style="font-size: 0.85rem; color: #d1d5db; margin-bottom: 0.5rem; line-height: 1.4;">${c.description}</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; flex-wrap: wrap; gap: 0.4rem; padding-top: 0.4rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <div>
+            <span style="color: var(--text-muted);">Home Garrison:</span> <code style="color: #cbd5e1;">${c.home_scene}</code>
+          </div>
+          <div>
+            <span style="color: var(--text-muted);">Synergy Perk:</span>
+            <span class="tag" style="background: rgba(192, 132, 252, 0.2); color: #d8b4fe; font-weight: 600; font-size: 0.7rem;">${c.perk_name}</span>
+            <span style="color: var(--text-muted); margin-left: 0.3rem;">${c.perk_description}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
 function toggleMapModal() {
   const modal = document.getElementById("map-modal");
   if (modal.style.display === "none") {
@@ -2293,6 +2439,7 @@ window.addEventListener("keydown", (e) => {
     document.getElementById("trade-modal").style.display = "none";
     document.getElementById("weather-modal").style.display = "none";
     document.getElementById("bounty-modal").style.display = "none";
+    document.getElementById("companion-modal").style.display = "none";
     document.getElementById("map-modal").style.display = "none";
     return;
   }
@@ -2322,6 +2469,10 @@ window.addEventListener("keydown", (e) => {
   }
   if (e.key.toLowerCase() === "b") {
     toggleBountyModal();
+    return;
+  }
+  if (e.key.toLowerCase() === "p") {
+    toggleCompanionModal();
     return;
   }
   if (e.key.toLowerCase() === "m") {
@@ -2431,6 +2582,14 @@ _BOUNTY_RESPONSE_BYTES = json.dumps(
         "total_contracts": len(BOUNTY_CONTRACTS),
         "contracts": [c.to_dict() for c in BOUNTY_CONTRACTS.values()],
         "hubs": BOUNTY_HUBS,
+    },
+    sort_keys=True,
+    separators=(",", ":"),
+).encode("utf-8")
+_COMPANION_RESPONSE_BYTES = json.dumps(
+    {
+        "total_companions": len(COMPANIONS),
+        "companions": [c.to_dict() for c in COMPANIONS.values()],
     },
     sort_keys=True,
     separators=(",", ":"),
@@ -2686,6 +2845,26 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
         )
         return
 
+    # Route: /api/game/companions
+    if path == "/api/game/companions":
+        if method not in {"GET", "HEAD"}:
+            await _send_response(
+                send,
+                status=405,
+                body=_json_response({"error": "method_not_allowed"}),
+                content_type=b"application/json; charset=utf-8",
+            )
+            return
+
+        await _send_response(
+            send,
+            status=200,
+            body=_COMPANION_RESPONSE_BYTES,
+            content_type=b"application/json; charset=utf-8",
+            include_body=include_body,
+        )
+        return
+
     # Route: /api/game/new (Pure stateless start)
     if path == "/api/game/new":
         if method != "POST":
@@ -2731,6 +2910,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "trade": _ENGINE.get_trade_progress(state),
             "weather": _ENGINE.get_weather_state(state),
             "bounty": _ENGINE.get_bounty_progress(state),
+            "companion": _ENGINE.get_companion_progress(state),
         }
         await _send_response(
             send,
@@ -2797,6 +2977,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "trade": _ENGINE.get_trade_progress(new_state),
             "weather": _ENGINE.get_weather_state(new_state),
             "bounty": _ENGINE.get_bounty_progress(new_state),
+            "companion": _ENGINE.get_companion_progress(new_state),
         }
         await _send_response(
             send,
@@ -2862,6 +3043,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "trade": _ENGINE.get_trade_progress(state),
             "weather": _ENGINE.get_weather_state(state),
             "bounty": _ENGINE.get_bounty_progress(state),
+            "companion": _ENGINE.get_companion_progress(state),
         }
         await _send_response(
             send,
@@ -2935,6 +3117,7 @@ async def app(scope: dict[str, Any], receive: Receive, send: Send) -> None:
             "trade": _ENGINE.get_trade_progress(state),
             "weather": _ENGINE.get_weather_state(state),
             "bounty": _ENGINE.get_bounty_progress(state),
+            "companion": _ENGINE.get_companion_progress(state),
             "fingerprints": fingerprints,
             "final_fingerprint": state.fingerprint(),
         }

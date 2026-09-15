@@ -24,6 +24,7 @@ from adventure_forge.core.transit import evaluate_transit_progress
 from adventure_forge.core.trade import evaluate_trade_progress
 from adventure_forge.core.weather import get_weather_for_region, get_all_provincial_weather
 from adventure_forge.core.bounties import evaluate_bounty_progress
+from adventure_forge.core.companions import evaluate_companions_progress
 
 
 @dataclass
@@ -133,6 +134,10 @@ class AdventureEngine:
     def get_bounty_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current continental bounty contracts and hunter rank progress."""
         return evaluate_bounty_progress(state.world_flags)
+
+    def get_companion_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current recruited warband companions and active follower progress."""
+        return evaluate_companions_progress(state.world_flags)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""
