@@ -29,6 +29,7 @@ from adventure_forge.core.survival import get_survival_affordances_for_scene
 from adventure_forge.core.heraldry import get_heraldry_affordances_for_scene
 from adventure_forge.core.shrines import get_shrine_affordances_for_scene
 from adventure_forge.core.landmarks import get_landmark_affordances_for_scene
+from adventure_forge.core.vaults import get_vault_affordances_for_scene
 
 
 @dataclass(frozen=True)
@@ -1053,5 +1054,13 @@ def synthesize_affordances(
             if lm_act.id not in seen_ids and lm_act.is_legal(character, world_flags):
                 legal_actions.append(lm_act)
                 seen_ids.add(lm_act.id)
+
+    # 18. Continental Dungeon Vaults, Arcane Keystones & Ancient Crypt Raids (Milestone 30)
+    if effective_scene_id:
+        vault_actions = get_vault_affordances_for_scene(effective_scene_id, character, world_flags)
+        for v_act in vault_actions:
+            if v_act.id not in seen_ids and v_act.is_legal(character, world_flags):
+                legal_actions.append(v_act)
+                seen_ids.add(v_act.id)
 
     return legal_actions

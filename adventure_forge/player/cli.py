@@ -408,6 +408,34 @@ def render_landmarks_log(state: GameState, engine: AdventureEngine) -> None:
     print("=" * 65 + "\n")
 
 
+def render_vaults_log(state: GameState, engine: AdventureEngine) -> None:
+    """Display continental dungeon vaults, breached crypts, and delver rank."""
+    prog = engine.get_vaults_progress(state)
+    unlocked = prog.get("unlocked_count", 0)
+    total = prog.get("total_vaults", 6)
+    rank = prog.get("delver_rank", "Unproven Delver")
+    active_keystones = prog.get("active_keystones_count", 0)
+    active_masteries = prog.get("active_masteries_count", 0)
+
+    print("\n" + "=" * 65)
+    print(f" CONTINENTAL DUNGEON VAULTS ({unlocked}/{total} Breached | Rank: {rank})")
+    print("=" * 65)
+    print(f" Active Keystones: {active_keystones} | Crypt Masteries: {active_masteries}")
+    print(f" Delver Status   : {prog.get('rank_desc', '')}")
+    print("\n [LEGENDARY CRYPT VAULTS & RELIQUARIES]")
+    vaults = prog.get("vaults", [])
+    for v in vaults:
+        status_str = "[BREACHED]" if v.get("is_unlocked") else "[SEALED]"
+        key_str = " (KEYSTONE HELD)" if v.get("has_keystone") else ""
+        mast_str = " [DELVE MASTERY]" if v.get("has_mastery") else ""
+        attune_str = " [ATTUNED]" if v.get("is_attuned") else ""
+        print(f"   • {v.get('icon')} [{v.get('province')}] {v.get('name')}: {status_str}{key_str}{attune_str}{mast_str}")
+        print(f"     Crypt    : {v.get('vault_scene')}")
+        print(f"     Domain   : {v.get('domain')}")
+        print(f"     Tool     : {v.get('required_tool')}")
+    print("=" * 65 + "\n")
+
+
 def render_history(state: GameState) -> None:
     """Display turn-by-turn history of actions and recent events."""
     print("\n" + "=" * 65)
@@ -495,6 +523,7 @@ def render_ui(
     nav_hints.append("'orders' for banners")
     nav_hints.append("'shrines' for blessings")
     nav_hints.append("'landmarks' for panoramas")
+    nav_hints.append("'vaults' for crypts")
     nav_hints.append("'map' for atlas")
     if state and state.turn_count > 0:
         nav_hints.append("'u' to undo")
@@ -669,6 +698,10 @@ def main():
             continue
         elif choice in ("landmarks", "landmark", "panoramas", "panorama", "survey", "l"):
             render_landmarks_log(state, engine)
+            input("Press Enter to return to action screen...")
+            continue
+        elif choice in ("vaults", "vault", "keystones", "keystone", "crypts", "crypt", "v"):
+            render_vaults_log(state, engine)
             input("Press Enter to return to action screen...")
             continue
         elif choice in ("history", "hist"):

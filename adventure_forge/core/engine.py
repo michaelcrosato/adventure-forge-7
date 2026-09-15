@@ -30,6 +30,7 @@ from adventure_forge.core.survival import evaluate_survival_progress
 from adventure_forge.core.heraldry import evaluate_orders_progress
 from adventure_forge.core.shrines import evaluate_shrines_progress
 from adventure_forge.core.landmarks import evaluate_landmarks_progress
+from adventure_forge.core.vaults import evaluate_vaults_progress
 
 
 @dataclass
@@ -163,6 +164,10 @@ class AdventureEngine:
     def get_landmarks_progress(self, state: GameState) -> Dict[str, Any]:
         """Compute current surveyed landmarks, cartographer rank, active charts, and terrain mastery."""
         return evaluate_landmarks_progress(state.world_flags, state.character.inventory, state.character.markers, state.current_scene)
+
+    def get_vaults_progress(self, state: GameState) -> Dict[str, Any]:
+        """Compute current unlocked vaults, delver rank, active keystones, and crypt mastery."""
+        return evaluate_vaults_progress(state.world_flags, state.character.inventory, state.character.markers, state.current_scene)
 
     def observe(self, state: GameState, last_events: Optional[List[str]] = None) -> StepResult:
         """Produce the player observation for the current state."""
